@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    build: .
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - nginx-network
+
+networks:
+  nginx-network:
+    external: true

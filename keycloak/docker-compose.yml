@@ -5,6 +5,7 @@ services:
     image: quay.io/keycloak/keycloak:26.3.1
     container_name: keycloak
     environment:
+      KC_HOSTNAME: keycloak
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     command: start-dev
