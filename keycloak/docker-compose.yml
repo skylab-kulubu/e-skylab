@@ -12,8 +12,9 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./keycloak-themes/skylab:/opt/keycloak/themes/skylab
+      #- ./keycloak-themes/skylab:/opt/keycloak/themes/skylab
       - keycloak_data:/opt/keycloak/data
+      - ./keycloak-themes/providers:/opt/keycloak/providers
     networks:
       - nginx-network
     restart: unless-stopped

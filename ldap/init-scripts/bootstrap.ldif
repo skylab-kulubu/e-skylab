@@ -1,0 +1,25 @@
+dn: ou=people,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+description: Users organizational unit
+
+dn: ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+description: Groups organizational unit
+
+dn: cn=user,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: user
+description: Default user group
+member: cn=Directory Manager
+
+dn: cn=admin,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: admin
+description: Default admin group
+member: cn=Directory Manager

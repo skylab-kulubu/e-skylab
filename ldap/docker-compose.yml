@@ -1,0 +1,41 @@
+services:
+  ldap-server:
+    image: 389ds/dirsrv:latest
+    container_name: ldap-server
+    platform: linux/amd64
+    hostname: ldap.yildizskylab.com
+    restart: unless-stopped
+    ports:
+      - "3389:3389"
+      - "3636:3636"
+    environment:
+      DS_DM_PASSWORD: "admin"
+      DS_SUFFIX_NAME: "dc=yildizskylab,dc=com"
+    volumes:
+      - ./data/389ds_data:/data
+    healthcheck:
+      test: ["CMD", "/usr/lib/dirsrv/dscontainer", "-H"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - nginx-network
+
+  ldap-setup:
+    image: 389ds/dirsrv:latest
+    container_name: ldap-setup
+    platform: linux/amd64
+    depends_on:
+      ldap-server:
+        condition: service_healthy
+    volumes:
+      - ./init-scripts:/init-scripts:ro
+    entrypoint: ["/bin/bash", "/init-scripts/setup.sh"]
+    restart: "no"
+    networks:
+      - nginx-network
+
+networks:
+  nginx-network:
+    external: true
