@@ -2,7 +2,6 @@ services:
   ldap-server:
     image: 389ds/dirsrv:latest
     container_name: ldap-server
-    platform: linux/amd64
     hostname: ldap.yildizskylab.com
     restart: unless-stopped
     ports:
@@ -25,7 +24,6 @@ services:
   ldap-setup:
     image: 389ds/dirsrv:latest
     container_name: ldap-setup
-    platform: linux/amd64
     depends_on:
       ldap-server:
         condition: service_healthy
