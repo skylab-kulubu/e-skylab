@@ -13,6 +13,16 @@ public class GatewayConfig {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
+
+                .route("openapi-super-skylab", r -> r
+                        .path("/v3/api-docs/super-skylab")
+                        .filters(f -> f
+                                .rewritePath("/v3/api-docs/super-skylab", "/v3/api-docs")
+                                .modifyResponseBody(String.class, String.class,
+                                        (exchange, body) -> Mono.just(modifyOpenApiServers(body)))
+                        )
+                        .uri("lb://super-skylab"))
+
                 .route("users", r -> r.path("/api/users/**")
                         .uri("lb://super-skylab"))
 
@@ -34,7 +44,7 @@ public class GatewayConfig {
                 .route("groups", r -> r.path("/api/groups/**")
                         .uri("lb://super-skylab"))
 
-                .route("eventTypes", r -> r.path("/api/eventTypes/**")
+                .route("event-types", r -> r.path("/api/event-types/**")
                         .uri("lb://super-skylab"))
 
                 .route("images", r -> r.path("/api/images/**")

@@ -15,3 +15,24 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:8761/eureka/
+
+keycloak:
+  auth-server-url: http://keycloak:8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Super Skylab API
+        url: /v3/api-docs/super-skylab
+    oauth:
+      client-id: swagger
+      use-pkce-with-authorization-code-grant: true
+      scopes:
+        - openid
+        - profile
+        - email
+    config-url: /v3/api-docs/swagger-config
+  api-docs:
+    enabled: true
+  show-actuator: false
