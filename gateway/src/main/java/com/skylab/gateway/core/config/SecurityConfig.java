@@ -76,7 +76,7 @@ public class SecurityConfig {
 
 
 
-                                .pathMatchers(HttpMethod.POST, "/api/competitions/").hasAnyRole("ADMAIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.POST, "/api/competitions/").hasAnyRole("ADMIN", "YK", "DK")
                                 .pathMatchers(HttpMethod.GET, "/api/competitions/").permitAll()
                                 .pathMatchers(HttpMethod.DELETE, "/api/competitions/{id}").hasAnyRole("ADMIN", "YK", "DK")
                                 .pathMatchers(HttpMethod.POST, "/api/competitions/{competitionId}/events/{eventId}").hasAnyRole("ADMIN", "YK", "DK")
@@ -85,12 +85,43 @@ public class SecurityConfig {
                                 .pathMatchers(HttpMethod.GET, "/api/competitions/active/").permitAll() //TODO: remove this endpoint
 
 
+                                // Competitors Controller
+                                .pathMatchers(HttpMethod.GET, "/api/competitors/my").hasAnyRole("USER")
+                                .pathMatchers(HttpMethod.GET, "/api/competitors/user/{userId}").hasAnyRole("ADMIN", "AGC_ADMIN", "GECEKODU_ADMIN", "BIZBIZE_ADMIN")
+                                .pathMatchers(HttpMethod.GET, "/api/competitors/event/{eventId}").permitAll()
+                                .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard/{competitionId}").permitAll()
+                                .pathMatchers(HttpMethod.POST, "/api/competitors/").hasAnyRole("ADMIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.PUT, "/api/competitors/{id}").hasAnyRole("ADMIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.DELETE, "/api/competitors/{id}").hasAnyRole("ADMIN", "YK", "DK")
 
-                                //sessions
+
+                                // Sessions Controller
                         .pathMatchers(HttpMethod.GET, "/api/sessions/").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/sessions/").hasAnyRole("ADMIN", "YK", "DK")
                         .pathMatchers(HttpMethod.DELETE, "/api/sessions/{id}").hasAnyRole("ADMIN", "YK", "DK")
 
+
+                                // Seasons Controller
+                                .pathMatchers(HttpMethod.GET, "/api/seasons/").permitAll()
+                                .pathMatchers(HttpMethod.GET, "/api/seasons/{id}").permitAll()
+                                .pathMatchers(HttpMethod.POST, "/api/seasons/").hasAnyRole("ADMIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.DELETE, "/api/seasons/{id}").hasAnyRole("ADMIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.POST, "/api/seasons/addEventToSeason").hasAnyRole("ADMIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.POST, "/api/seasons/removeEventFromSeason").hasAnyRole("ADMIN", "YK", "DK")
+
+
+                                // Announcements Controller
+                                .pathMatchers(HttpMethod.GET, "/api/announcements/").permitAll()
+                                .pathMatchers(HttpMethod.GET, "/api/announcements/{id}").permitAll()
+                                .pathMatchers(HttpMethod.GET, "/api/announcements/event-type/{eventTypeId}").permitAll()
+                                .pathMatchers(HttpMethod.POST, "/api/announcements/").hasAnyRole("ADMIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.PATCH, "/api/announcements/{id}").hasAnyRole("ADMIN", "YK", "DK")
+                                .pathMatchers(HttpMethod.DELETE, "/api/announcements/{id}").hasAnyRole("ADMIN", "YK", "DK")
+
+
+                                // Images Controller
+                                .pathMatchers(HttpMethod.POST, "/api/images/").hasAnyRole("ADMIN", "YK", "DK", "USER")
+                                .pathMatchers(HttpMethod.DELETE, "/api/images/{imageId}").hasAnyRole("ADMIN", "YK", "DK")
 
 
                                 // QR Code Controller
