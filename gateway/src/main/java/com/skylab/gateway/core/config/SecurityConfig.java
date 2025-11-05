@@ -98,7 +98,7 @@ public class SecurityConfig {
                                 .pathMatchers(HttpMethod.GET, "/api/qrCodes/generateQRCodeWithLogo").permitAll()
 
 
-                        .anyExchange().denyAll()
+                        .anyExchange().hasAnyRole("ADMIN")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))
