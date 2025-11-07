@@ -23,3 +23,60 @@ objectClass: groupOfNames
 cn: admin
 description: Default admin group
 member: cn=Directory Manager
+
+# Additional groups required by application roles
+dn: cn=yk,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: yk
+description: YK role group
+member: cn=Directory Manager
+
+dn: cn=dk,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: dk
+description: DK role group
+member: cn=Directory Manager
+
+dn: cn=GECEKODU_ADMIN,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: GECEKODU_ADMIN
+description: GeceKodu admin group
+member: cn=Directory Manager
+
+dn: cn=GECEKODU_LEADER,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: GECEKODU_LEADER
+description: GeceKodu leader group
+member: cn=Directory Manager
+
+dn: cn=AGC_ADMIN,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: AGC_ADMIN
+description: AGC admin group
+member: cn=Directory Manager
+
+dn: cn=AGC_LEADER,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: AGC_LEADER
+description: AGC leader group
+member: cn=Directory Manager
+
+dn: cn=BIZBIZE_ADMIN,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: BIZBIZE_ADMIN
+description: Bizbize admin group
+member: cn=Directory Manager
+
+dn: cn=BIZBIZE_LEADER,ou=groups,dc=yildizskylab,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: BIZBIZE_LEADER
+description: Bizbize leader group
+member: cn=Directory Manager
