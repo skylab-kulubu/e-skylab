@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/api/users/me").authenticated()
                         .pathMatchers(HttpMethod.POST, "/api/users/me/profile-picture").authenticated()
 
+                        .pathMatchers(HttpMethod.POST, "/api/groups/**").hasAnyRole(ADMIN_ROLES)
                         .pathMatchers(HttpMethod.POST, "/api/users/assign-role/**").authenticated()
 
                         .pathMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole(ADMIN_ROLES)
