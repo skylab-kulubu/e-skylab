@@ -72,6 +72,7 @@ public class SecurityConfig {
                                 .pathMatchers(HttpMethod.GET, "/api/events/{id}").permitAll()
                                 .pathMatchers(HttpMethod.GET, "/api/events/event-type/{eventTypeName}").permitAll()
                                 .pathMatchers(HttpMethod.GET, "/api/events/active/{isActive}").permitAll()
+                                .pathMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("ADMIN", "YK", "DK","GECEKODU_LEADER", "AGC_LEADER","BIZBIZE_LEADER")
 
 
 
