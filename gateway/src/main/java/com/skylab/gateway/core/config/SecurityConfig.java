@@ -23,6 +23,8 @@ import java.util.List;
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
 
+    private static final String[] ADMIN_ROLES = {"ADMIN", "YK", "DK"};
+
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -37,100 +39,62 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/swagger-resources/**"
+                                "/swagger-resources/**",
+                                "/api/auth/register",
+                                "/api/auth/login"
+
                         ).permitAll()
 
 
+                        .pathMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/users/me").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/users/me/profile-picture").authenticated()
 
-                            .pathMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/users/assign-role/**").authenticated()
 
+                        .pathMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole(ADMIN_ROLES)
+                        .pathMatchers(HttpMethod.PUT, "/api/users/{id}").hasAnyRole(ADMIN_ROLES)
+                        .pathMatchers(HttpMethod.DELETE, "/api/users/{id}").hasAnyRole(ADMIN_ROLES)
 
-                                // User Controller
-                                .pathMatchers(HttpMethod.GET, "/api/users/me").hasAnyRole("USER")
-                                .pathMatchers(HttpMethod.PUT, "/api/users/me").hasAnyRole("USER")
-                                .pathMatchers(HttpMethod.POST, "/api/users/me/profile-picture").hasAnyRole("USER")
-                                .pathMatchers(HttpMethod.GET, "/api/users/").hasAnyRole("ADMIN", "AGC_ADMIN", "GECEKODU_ADMIN", "BIZBIZE_ADMIN")
-                                .pathMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("ADMIN", "AGC_ADMIN", "GECEKODU_ADMIN", "BIZBIZE_ADMIN")
-                                .pathMatchers(HttpMethod.PUT, "/api/users/{id}").hasAnyRole("ADMIN")
-                                .pathMatchers(HttpMethod.DELETE, "/api/users/{id}").hasAnyRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/event-types/**").permitAll()
+                        .pathMatchers("/api/event-types/**").hasAnyRole(ADMIN_ROLES)
 
-                                .pathMatchers(HttpMethod.PUT, "/api/users/add-role/{username}").permitAll()
-
-
-                                .pathMatchers(HttpMethod.POST, "/api/groups/").hasAnyRole("ADMIN","YK","DK")
+                        .pathMatchers(HttpMethod.GET, "/api/seasons/**").permitAll()
+                        .pathMatchers("/api/seasons/**").hasAnyRole(ADMIN_ROLES)
 
 
-                                //passed tests- EVENT TYPES CONTROLLER
-                                .pathMatchers(HttpMethod.POST, "/api/event-types/").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.DELETE, "/api/event-types/{id}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.PUT, "/api/event-types/{id}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.GET, "/api/event-types/").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/event-types/{id}").permitAll()
-
-                                .pathMatchers(HttpMethod.POST, "/api/events/").hasAnyRole("ADMIN", "YK", "DK","GECEKODU_LEADER", "AGC_LEADER","BIZBIZE_LEADER")
-                                .pathMatchers(HttpMethod.GET, "/api/events/").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/events/{id}").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/events/event-type/{eventTypeName}").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/events/active/{isActive}").permitAll()
-                                .pathMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("ADMIN", "YK", "DK","GECEKODU_LEADER", "AGC_LEADER","BIZBIZE_LEADER")
+                        .pathMatchers(HttpMethod.GET, "/api/events/**").permitAll()
 
 
+                        .pathMatchers(HttpMethod.POST, "/api/events/**").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/events/**").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/events/**").authenticated()
 
 
-                                .pathMatchers(HttpMethod.POST, "/api/competitions/").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.GET, "/api/competitions/").permitAll()
-                                .pathMatchers(HttpMethod.DELETE, "/api/competitions/{id}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.POST, "/api/competitions/{competitionId}/events/{eventId}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.GET, "/api/competitions/{id}").permitAll()
-                                .pathMatchers(HttpMethod.PUT, "/api/competitions/{id}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.GET, "/api/competitions/active/").permitAll() //TODO: remove this endpoint
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/event/**").permitAll()
 
 
-                                // Competitors Controller
-                                .pathMatchers(HttpMethod.GET, "/api/competitors/my").hasAnyRole("USER")
-                                .pathMatchers(HttpMethod.GET, "/api/competitors/user/{userId}").hasAnyRole("ADMIN", "AGC_ADMIN", "GECEKODU_ADMIN", "BIZBIZE_ADMIN")
-                                .pathMatchers(HttpMethod.GET, "/api/competitors/event/{eventId}").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard/{competitionId}").permitAll()
-                                .pathMatchers(HttpMethod.POST, "/api/competitors/").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.PUT, "/api/competitors/{id}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.DELETE, "/api/competitors/{id}").hasAnyRole("ADMIN", "YK", "DK")
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/my").authenticated()
 
 
-                                // Sessions Controller
-                        .pathMatchers(HttpMethod.GET, "/api/sessions/").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/sessions/").hasAnyRole("ADMIN", "YK", "DK")
-                        .pathMatchers(HttpMethod.DELETE, "/api/sessions/{id}").hasAnyRole("ADMIN", "YK", "DK")
+                        .pathMatchers("/api/competitors/**").authenticated()
 
 
-                                // Seasons Controller
-                                .pathMatchers(HttpMethod.GET, "/api/seasons/").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/seasons/{id}").permitAll()
-                                .pathMatchers(HttpMethod.POST, "/api/seasons/").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.DELETE, "/api/seasons/{id}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.POST, "/api/seasons/addEventToSeason").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.POST, "/api/seasons/removeEventFromSeason").hasAnyRole("ADMIN", "YK", "DK")
+                        .pathMatchers(HttpMethod.GET, "/api/sessions/**").permitAll()
+
+                        .pathMatchers("/api/sessions/**").authenticated()
 
 
-                                // Announcements Controller
-                                .pathMatchers(HttpMethod.GET, "/api/announcements/").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/announcements/{id}").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/announcements/event-type/{eventTypeId}").permitAll()
-                                .pathMatchers(HttpMethod.POST, "/api/announcements/").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.PATCH, "/api/announcements/{id}").hasAnyRole("ADMIN", "YK", "DK")
-                                .pathMatchers(HttpMethod.DELETE, "/api/announcements/{id}").hasAnyRole("ADMIN", "YK", "DK")
+                        .pathMatchers(HttpMethod.GET, "/api/announcements/**").permitAll()
+                        .pathMatchers("/api/announcements/**").hasAnyRole(ADMIN_ROLES)
+
+                        .pathMatchers(HttpMethod.GET, "/api/qrCodes/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/images/**").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/images/**").hasAnyRole(ADMIN_ROLES)
 
 
-                                // Images Controller
-                                .pathMatchers(HttpMethod.POST, "/api/images/").hasAnyRole("ADMIN", "YK", "DK", "USER")
-                                .pathMatchers(HttpMethod.DELETE, "/api/images/{imageId}").hasAnyRole("ADMIN", "YK", "DK")
-
-
-                                // QR Code Controller
-                                .pathMatchers(HttpMethod.GET, "/api/qrCodes/generateQRCode").permitAll()
-                                .pathMatchers(HttpMethod.GET, "/api/qrCodes/generateQRCodeWithLogo").permitAll()
-
-
-                        .anyExchange().hasAnyRole("ADMIN")
+                        .anyExchange().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))
@@ -148,7 +112,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*")); // Production'da spesifik olmalı
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
