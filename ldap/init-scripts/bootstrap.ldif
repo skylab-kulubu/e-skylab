@@ -10,16 +10,16 @@ objectClass: organizationalUnit
 ou: groups
 description: Groups organizational unit
 
-dn: cn=user,ou=groups,dc=yildizskylab,dc=com
+dn: cn=USER,ou=groups,dc=yildizskylab,dc=com
 objectClass: top
 objectClass: groupOfNames
-cn: user
+cn: USER
 description: Default user group
 member: cn=Directory Manager
 
-dn: cn=admin,ou=groups,dc=yildizskylab,dc=com
+dn: cn=ADMIN,ou=groups,dc=yildizskylab,dc=com
 objectClass: top
 objectClass: groupOfNames
-cn: admin
+cn: ADMIN
 description: Default admin group
 member: cn=Directory Manager
