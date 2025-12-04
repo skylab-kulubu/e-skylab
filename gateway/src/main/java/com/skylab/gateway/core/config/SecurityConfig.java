@@ -52,6 +52,7 @@ public class SecurityConfig {
 
                         .pathMatchers(HttpMethod.POST, "/api/groups/**").hasAnyRole(ADMIN_ROLES)
                         .pathMatchers(HttpMethod.PUT, "/api/users/assign-role/**").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/users/remove-role/**").authenticated()
 
                         .pathMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole(ADMIN_ROLES)
                         .pathMatchers(HttpMethod.PUT, "/api/users/{id}").hasAnyRole(ADMIN_ROLES)
