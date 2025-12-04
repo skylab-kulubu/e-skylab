@@ -80,6 +80,7 @@ public class SecurityConfig {
 
                         .pathMatchers(HttpMethod.GET, "/api/competitors/").hasAnyRole(ADMIN_ROLES)
 
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/{id}").hasAnyRole(ADMIN_ROLES)
 
                         .pathMatchers("/api/competitors/**").authenticated()
 
