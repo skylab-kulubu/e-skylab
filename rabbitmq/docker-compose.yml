@@ -7,18 +7,18 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: rabbitMQ
       RABBITMQ_DEFAULT_PASS: rabbitMQ
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+    #ports:
+    #  - "5672:5672"
+    #  - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
-      - nginx-network
+      - skynet
 
 volumes:
   rabbitmq_data:
 
 
 networks:
-  nginx-network:
+  skynet:
     external: true

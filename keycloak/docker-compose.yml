@@ -9,14 +9,14 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     command: start-dev
-    ports:
-      - "8080:8080"
+    #ports:
+    #  - "8080:8080"
     volumes:
       #- ./keycloak-themes/skylab:/opt/keycloak/themes/skylab
       - keycloak_data:/opt/keycloak/data
       - ./keycloak-themes/providers:/opt/keycloak/providers
     networks:
-      - nginx-network
+      - skynet
     restart: unless-stopped
 
 volumes:
@@ -24,5 +24,5 @@ volumes:
 
 
 networks:
-  nginx-network:
+  skynet:
     external: true
