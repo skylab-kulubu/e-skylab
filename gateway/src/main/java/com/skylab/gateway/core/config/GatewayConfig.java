@@ -59,6 +59,12 @@ public class GatewayConfig {
                 .route("sessions", r -> r.path("/api/sessions/**")
                         .uri("lb://super-skylab"))
 
+                .route("forms", r -> r.path("/api/forms/**")
+                        .uri("lb://formsapi"))
+
+                .route("admin-forms", r -> r.path("/api/admin/forms/**")
+                        .uri("lb://formsapi"))
+
                 .build();
 
 

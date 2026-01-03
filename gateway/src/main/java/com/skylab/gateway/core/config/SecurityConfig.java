@@ -99,6 +99,11 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/images/**").hasAnyRole(ADMIN_ROLES)
 
 
+
+                        .pathMatchers("/api/forms/**").permitAll()
+                        .pathMatchers("/api/admin/forms/**").hasAnyRole(ADMIN_ROLES)
+
+
                         .anyExchange().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
