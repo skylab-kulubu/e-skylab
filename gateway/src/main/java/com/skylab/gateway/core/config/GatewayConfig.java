@@ -26,11 +26,16 @@ public class GatewayConfig {
                 .route("openapi-formsapi", r -> r
                         .path("/v3/api-docs/formsapi")
                         .filters(f -> f
-                                .rewritePath("/v3/api-docs/formsapi", "/v3/api-docs")
+                                .rewritePath(
+                                        "/v3/api-docs/formsapi",
+                                        "/swagger/v1/swagger.json"
+                                )
                                 .modifyResponseBody(String.class, String.class,
-                                        (exchange, body) -> Mono.just(modifyOpenApiServers(body)))
+                                        (exchange, body) -> Mono.just(modifyOpenApiServers(body))
+                                )
                         )
-                        .uri("lb://formsapi"))
+                        .uri("lb://formsapi")
+                )
 
                 .route("users", r -> r.path("/api/users/**")
                         .uri("lb://super-skylab"))
