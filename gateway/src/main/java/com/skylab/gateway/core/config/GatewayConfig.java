@@ -23,6 +23,15 @@ public class GatewayConfig {
                         )
                         .uri("lb://super-skylab"))
 
+                .route("openapi-formsapi", r -> r
+                        .path("/v3/api-docs/formsapi")
+                        .filters(f -> f
+                                .rewritePath("/v3/api-docs/formsapi", "/v3/api-docs")
+                                .modifyResponseBody(String.class, String.class,
+                                        (exchange, body) -> Mono.just(modifyOpenApiServers(body)))
+                        )
+                        .uri("lb://formsapi"))
+
                 .route("users", r -> r.path("/api/users/**")
                         .uri("lb://super-skylab"))
 

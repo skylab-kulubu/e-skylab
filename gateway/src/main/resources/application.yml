@@ -25,6 +25,10 @@ springdoc:
     urls:
       - name: Super Skylab API
         url: /v3/api-docs/super-skylab
+
+      - name: Forms API
+        url: /v3/api-docs/formsapi
+
     oauth:
       client-id: swagger
       use-pkce-with-authorization-code-grant: true
@@ -32,7 +36,10 @@ springdoc:
         - openid
         - profile
         - email
+
     config-url: /v3/api-docs/swagger-config
+
   api-docs:
     enabled: true
+
   show-actuator: false
