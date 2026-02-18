@@ -61,7 +61,7 @@ public class GatewayConfig {
                 .route("event-types", r -> r.path("/api/event-types/**")
                         .uri("lb://super-skylab"))
 
-                .route("images", r -> r.path("/api/images/**")
+                .route("media", r -> r.path("/api/media/**")
                         .uri("lb://super-skylab"))
 
                 .route("qrCodes", r -> r.path("/api/qrCodes/**")

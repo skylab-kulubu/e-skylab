@@ -95,8 +95,9 @@ public class SecurityConfig {
                         .pathMatchers("/api/announcements/**").hasAnyRole(ADMIN_ROLES)
 
                         .pathMatchers(HttpMethod.GET, "/api/qrCodes/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/images/**").authenticated()
-                        .pathMatchers(HttpMethod.DELETE, "/api/images/**").hasAnyRole(ADMIN_ROLES)
+
+                        .pathMatchers(HttpMethod.POST, "/api/media").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/media/**").authenticated()
 
 
 
