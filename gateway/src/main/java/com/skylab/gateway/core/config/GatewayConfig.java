@@ -23,18 +23,18 @@ public class GatewayConfig {
                         )
                         .uri("lb://super-skylab"))
 
-                .route("openapi-formsapi", r -> r
-                        .path("/v3/api-docs/formsapi")
+                .route("openapi-DOTNETAPI", r -> r
+                        .path("/v3/api-docs/DOTNETAPI")
                         .filters(f -> f
                                 .rewritePath(
-                                        "/v3/api-docs/formsapi",
+                                        "/v3/api-docs/DOTNETAPI",
                                         "/swagger/v1/swagger.json"
                                 )
                                 .modifyResponseBody(String.class, String.class,
                                         (exchange, body) -> Mono.just(modifyOpenApiServers(body))
                                 )
                         )
-                        .uri("lb://formsapi")
+                        .uri("lb://DOTNETAPI")
                 )
 
                 .route("users", r -> r.path("/api/users/**")
@@ -74,10 +74,10 @@ public class GatewayConfig {
                         .uri("lb://super-skylab"))
 
                 .route("forms", r -> r.path("/api/forms/**")
-                        .uri("lb://formsapi"))
+                        .uri("lb://DOTNETAPI"))
 
                 .route("admin-forms", r -> r.path("/api/admin/forms/**")
-                        .uri("lb://formsapi"))
+                        .uri("lb://DOTNETAPI"))
 
                 .build();
 
