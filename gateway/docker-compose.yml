@@ -4,8 +4,8 @@ services:
   gateway-service:
     build: .
     container_name: gateway-service
-    #ports:
-    #  - "8081:8081"
+    ports:
+      - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
