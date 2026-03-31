@@ -125,7 +125,7 @@ public class SecurityConfig {
 
 
                         // SKYFORMS ACCESS
-                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms").hasAnyRole("skyforms:access")
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/metrics").hasAnyRole("skyforms:access")
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/component-groups").hasAnyRole("skyforms:access")
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/component-groups/{id}").hasAnyRole("skyforms:access")
