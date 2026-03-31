@@ -79,6 +79,9 @@ public class GatewayConfig {
                 .route("admin-forms", r -> r.path("/api/admin/forms/**")
                         .uri("lb://DOTNETAPI"))
 
+                .route("feedbacks", r -> r.path("/api/feedbacks/**")
+                        .uri("lb://DOTNETAPI"))
+
                 .build();
 
 

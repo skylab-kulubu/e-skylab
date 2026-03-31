@@ -160,6 +160,17 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/feedbacks/{id}").hasAnyRole("skyforms:feedback:manage")
                         .pathMatchers(HttpMethod.GET, "/api/feedbacks/all").hasAnyRole("skyforms:feedback:*")
 
+                        // PUBLIC FORMS
+                        .pathMatchers(HttpMethod.GET, "/api/forms/{id}").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/forms/{id}/meta").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/forms/responses").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/forms/responses/draft").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/forms/responses/draft/{id}").permitAll()
+                        .pathMatchers(HttpMethod.DELETE, "/api/forms/responses/draft/{id}").permitAll()
+
+                        // PUBLIC FEEDBACKS
+                        .pathMatchers(HttpMethod.POST, "/api/feedbacks/").permitAll()
+
 
                         .anyExchange().denyAll()
                 )
