@@ -23,8 +23,6 @@ import java.util.List;
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
 
-    private static final String[] ADMIN_ROLES = {"ADMIN", "YK", "DK"};
-
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -125,8 +123,42 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/qrCodes/**").permitAll()
 
 
-                        .pathMatchers("/api/forms/**").permitAll()
-                        .pathMatchers("/api/admin/forms/**").hasAnyRole(ADMIN_ROLES)
+
+                        // SKYFORMS ACCESS
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/metrics").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/component-groups").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/component-groups/{id}").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/component-groups").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.PUT, "/api/admin/forms/component-groups/{id}").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.DELETE, "/api/admin/forms/component-groups/{id}").hasAnyRole("skyforms:access")
+
+                        // SKYFORMS FORM MANAGE
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/info").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/linkable-forms").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.PUT, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/draft").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/{id}/draft").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.DELETE, "/api/admin/forms/{id}/draft").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.DELETE, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/metrics").hasAnyRole("skyforms:form:manage")
+
+                        // SKYFORMS RESPONSE MANAGE
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/responses").hasAnyRole("skyforms:response:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/responses/{id}").hasAnyRole("skyforms:response:manage")
+                        .pathMatchers(HttpMethod.PATCH, "/api/admin/forms/responses/{id}/status").hasAnyRole("skyforms:response:manage")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/responses/{id}/archive").hasAnyRole("skyforms:response:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/responses/export").hasAnyRole("skyforms:response:manage")
+
+                        // SKYFORMS ALL
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/all").hasAnyRole("skyforms:*")
+
+                        // SKYFORMS FEEDBACKS
+                        .pathMatchers(HttpMethod.GET, "/api/feedbacks/").hasAnyRole("skyforms:feedback:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/feedbacks/{id}").hasAnyRole("skyforms:feedback:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/feedbacks/all").hasAnyRole("skyforms:feedback:*")
 
 
                         .anyExchange().denyAll()
