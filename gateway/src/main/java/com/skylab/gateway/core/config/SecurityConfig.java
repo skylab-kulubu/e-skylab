@@ -137,7 +137,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/info").hasAnyRole("skyforms:form:manage")
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/linkable-forms").hasAnyRole("skyforms:form:manage")
-                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms").hasAnyRole("skyforms:form:manage")
                         .pathMatchers(HttpMethod.PUT, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/draft").hasAnyRole("skyforms:form:manage")
                         .pathMatchers(HttpMethod.POST, "/api/admin/forms/{id}/draft").hasAnyRole("skyforms:form:manage")
@@ -156,7 +156,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/all").hasAnyRole("skyforms:*")
 
                         // SKYFORMS FEEDBACKS
-                        .pathMatchers(HttpMethod.GET, "/api/feedbacks/").hasAnyRole("skyforms:feedback:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/feedbacks").hasAnyRole("skyforms:feedback:manage")
                         .pathMatchers(HttpMethod.GET, "/api/feedbacks/{id}").hasAnyRole("skyforms:feedback:manage")
                         .pathMatchers(HttpMethod.GET, "/api/feedbacks/all").hasAnyRole("skyforms:feedback:*")
 
@@ -169,7 +169,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/forms/responses/draft/{id}").permitAll()
 
                         // PUBLIC FEEDBACKS
-                        .pathMatchers(HttpMethod.POST, "/api/feedbacks/").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/feedbacks").permitAll()
 
 
                         .anyExchange().denyAll()
