@@ -21,6 +21,16 @@ services:
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: keycloak
 
+
+      RABBITMQ_HOST: super-skylab-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: rabbitMQ
+      RABBITMQ_PASSWORD: rabbitMQ
+      RABBITMQ_VHOST: /
+      RABBITMQ_EXCHANGE: keycloak.events
+
+
+
     volumes:
       - keycloak_data:/opt/keycloak/data
       - ./keycloak-themes/providers:/opt/keycloak/providers
