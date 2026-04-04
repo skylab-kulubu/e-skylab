@@ -65,12 +65,12 @@ public class SecurityConfig {
 
 
                         //COMPETITORS
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard/season/{seasonId}").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/event/{eventId}/winner").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/my").hasAnyRole("competitors.me", "competitors.moderator")
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard/type/{eventTypeName}").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard/season/{seasonId}/type/{eventTypeName}").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/competitors/winner").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/competitors").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/me").hasAnyRole("competitors.me", "competitors.moderator")
                         .pathMatchers(HttpMethod.GET, "/api/competitors/user/{userId}").hasAnyRole("competitors.list", "competitors.moderator")
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/event/{eventId}").hasAnyRole("competitors.list", "competitors.moderator")
                         .pathMatchers(HttpMethod.POST, "/api/competitors").hasAnyRole("competitors.create", "competitors.moderator")
                         .pathMatchers(HttpMethod.GET, "/api/competitors").hasAnyRole("competitors.list", "competitors.moderator")
                         .pathMatchers(HttpMethod.GET, "/api/competitors/{id}").hasAnyRole("competitors.get", "competitors.moderator")
@@ -80,7 +80,7 @@ public class SecurityConfig {
 
                         // EVENTS!!
                         .pathMatchers(HttpMethod.GET, "/api/events/active").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/events/event-type").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/events/type/{eventTypeName}").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events/{id}").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/events").hasAnyRole("events.create", "events.moderator")
@@ -103,11 +103,10 @@ public class SecurityConfig {
 
 
                         //SEASONS
-                        .pathMatchers(HttpMethod.GET, "/api/seasons/active").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/seasons/{seasonId}/events/{eventId}").hasAnyRole("seasons.manage_events", "seasons.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/seasons/{seasonId}/events/{eventId}").hasAnyRole("seasons.manage_events", "seasons.moderator")
                         .pathMatchers(HttpMethod.GET, "/api/seasons").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/seasons/{id}").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/seasons/{seasonId}/events/{eventId}").hasAnyRole("seasons.manage_events", "seasons.moderator")
+                        .pathMatchers(HttpMethod.DELETE, "/api/seasons/{seasonId}/events/{eventId}").hasAnyRole("seasons.manage_events", "seasons.moderator")
                         .pathMatchers(HttpMethod.POST, "/api/seasons").hasAnyRole("seasons.create", "seasons.moderator")
                         .pathMatchers(HttpMethod.PUT, "/api/seasons/{id}").hasAnyRole("seasons.update", "seasons.moderator")
                         .pathMatchers(HttpMethod.DELETE, "/api/seasons/{id}").hasAnyRole("seasons.delete", "seasons.moderator")
