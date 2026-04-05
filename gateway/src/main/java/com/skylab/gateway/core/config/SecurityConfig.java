@@ -86,6 +86,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/events").hasAnyRole("events.create", "events.moderator")
                         .pathMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("events.update", "events.moderator")
                         .pathMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("events.delete", "events.moderator")
+                        .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/seasons/{seasonId}").hasAnyRole("events.update", "events.moderator", "seasons.manage_events")
+                        .pathMatchers(HttpMethod.DELETE, "/api/events/{eventId}/season").hasAnyRole("events.update", "events.moderator", "seasons.manage_events")
 
 
                         //EVENT TYPES
@@ -105,8 +107,6 @@ public class SecurityConfig {
                         //SEASONS
                         .pathMatchers(HttpMethod.GET, "/api/seasons").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/seasons/{id}").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/seasons/{seasonId}/events/{eventId}").hasAnyRole("seasons.manage_events", "seasons.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/seasons/{seasonId}/events/{eventId}").hasAnyRole("seasons.manage_events", "seasons.moderator")
                         .pathMatchers(HttpMethod.POST, "/api/seasons").hasAnyRole("seasons.create", "seasons.moderator")
                         .pathMatchers(HttpMethod.PUT, "/api/seasons/{id}").hasAnyRole("seasons.update", "seasons.moderator")
                         .pathMatchers(HttpMethod.DELETE, "/api/seasons/{id}").hasAnyRole("seasons.delete", "seasons.moderator")
