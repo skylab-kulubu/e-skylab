@@ -5,8 +5,8 @@ services:
     image: quay.io/keycloak/keycloak:26.3.1
     container_name: keycloak
     command: start
-    #ports:
-    #  - "8080:8080"
+    ports:
+      - "8080:8080"
     environment:
       KC_HOSTNAME: localhost
       KC_PROXY: edge

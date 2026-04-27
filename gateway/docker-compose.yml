@@ -8,10 +8,24 @@ services:
       - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+
+      #  TEMEL AYARLAR 
+      - SERVER_PORT=8081
+      - APP_NAME=gateway-service
+      - GATEWAY_EXTERNAL_URL=https://api.yildizskylab.com
+
+      #  SECURITY & AUTH (KEYCLOAK) 
+      - KEYCLOAK_SERVER_URL=https://e.yildizskylab.com
+      - KEYCLOAK_EXTERNAL_URL=https://e.yildizskylab.com
+      - KEYCLOAK_REALM=e-skylab
+
+      #  SWAGGER 
+      - SWAGGER_CLIENT_ID=swagger
+
+      #  SERVICE DISCOVERY 
+      - EUREKA_URL=http://eureka-server:8761/eureka/
     networks:
       - skynet
-
-
 
 networks:
   skynet:

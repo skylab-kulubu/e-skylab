@@ -1,33 +1,42 @@
 package com.skylab.gateway.core.config;
 
+import com.skylab.gateway.core.properties.AppGatewayProperties;
+import com.skylab.gateway.core.properties.KeycloakProperties;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${keycloak.auth-server-url:http://localhost:8080}")
-    private String authServerUrl;
+    private final KeycloakProperties keycloakProperties;
+    private final AppGatewayProperties gatewayProperties;
+
+    public OpenApiConfig(KeycloakProperties keycloakProperties, AppGatewayProperties gatewayProperties) {
+        this.keycloakProperties = keycloakProperties;
+        this.gatewayProperties = gatewayProperties;
+    }
 
     @Bean
     public OpenAPI customOpenAPI() {
-        String keycloakUrl = authServerUrl + "/realms/e-skylab/protocol/openid-connect";
+        String authUrl = keycloakProperties.getExternalUrl() + "/realms/" + keycloakProperties.getRealm() + "/protocol/openid-connect/auth";
+        String tokenUrl = keycloakProperties.getExternalUrl() + "/realms/" + keycloakProperties.getRealm() + "/protocol/openid-connect/token";
 
         return new OpenAPI()
                 .info(new io.swagger.v3.oas.models.info.Info()
                         .title("Gateway API")
                         .version("1.0")
                         .description("API Gateway with OAuth2 Authentication"))
-                .servers(java.util.List.of(
+                .servers(List.of(
                         new io.swagger.v3.oas.models.servers.Server()
-                                .url("http://localhost:8081")
+                                .url(gatewayProperties.getExternalUrl())
                                 .description("Gateway Server")
                 ))
                 .components(new Components()
@@ -36,8 +45,8 @@ public class OpenApiConfig {
                                 .description("OAuth2 Authorization Code Flow with PKCE")
                                 .flows(new OAuthFlows()
                                         .authorizationCode(new OAuthFlow()
-                                                .authorizationUrl("http://keycloak:8080/realms/e-skylab/protocol/openid-connect/auth")
-                                                .tokenUrl("http://keycloak:8080/realms/e-skylab/protocol/openid-connect/token")
+                                                .authorizationUrl(authUrl)
+                                                .tokenUrl(tokenUrl)
                                                 .scopes(new io.swagger.v3.oas.models.security.Scopes()
                                                         .addString("openid", "OpenID Connect")
                                                         .addString("profile", "Profile information")
