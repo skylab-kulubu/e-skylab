@@ -1,5 +1,6 @@
 package com.skylab.gateway.core.config;
 
+import com.skylab.gateway.core.properties.AppGatewayProperties;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,12 @@ import reactor.core.publisher.Mono;
 
 @Configuration
 public class GatewayConfig {
+
+    private final AppGatewayProperties appGatewayProperties;
+
+    public GatewayConfig(AppGatewayProperties appGatewayProperties) {
+        this.appGatewayProperties = appGatewayProperties;
+    }
 
 
     @Bean
@@ -89,9 +96,10 @@ public class GatewayConfig {
 
     private String modifyOpenApiServers(String body) {
         if (body != null && body.contains("\"servers\"")) {
+            String gatewayUrl = appGatewayProperties.getExternalUrl();
             return body.replaceAll(
                     "\"servers\"\\s*:\\s*\\[[^\\]]*\\]",
-                    "\"servers\":[{\"url\":\"http://localhost:8081\",\"description\":\"Gateway Server\"}]"
+                    "\"servers\":[{\"url\":\"" + gatewayUrl + "\",\"description\":\"Gateway Server\"}]"
             );
         }
         return body;
