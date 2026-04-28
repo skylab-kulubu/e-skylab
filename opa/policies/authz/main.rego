@@ -1,30 +1,55 @@
 package skylab.authz
 
 import future.keywords.if
-import data.skylab.events
-import data.skylab.announcements
-import data.skylab.cms
-import data.skylab.users
+import future.keywords.in
+
 import data.skylab.seasons
+import data.skylab.users
+import data.skylab.events
+import data.skylab.event_types
 import data.skylab.competitors
 import data.skylab.media
-import data.skylab.event_types
-import data.skylab.common
+import data.skylab.sessions
+import data.skylab.ticket
 
 default allow = false
 
-
 allow if {
-    common.is_authenticated
-    _module_allow
+    input.resource.type == "SEASON"
+    seasons.allow
 }
 
+allow if {
+    input.resource.type == "USER"
+    users.allow
+}
 
-_module_allow if events.allow
-_module_allow if announcements.allow
-_module_allow if cms.allow
-_module_allow if users.allow
-_module_allow if seasons.allow
-_module_allow if competitors.allow
-_module_allow if media.allow
-_module_allow if event_types.allow
+allow if {
+    input.resource.type == "EVENT"
+    events.allow
+}
+
+allow if {
+    input.resource.type == "EVENT_TYPE"
+    event_types.allow
+}
+
+allow if {
+    input.resource.type == "COMPETITOR"
+    competitors.allow
+}
+
+allow if {
+    input.resource.type == "MEDIA"
+    media.allow
+}
+
+allow if {
+    input.resource.type == "SESSION"
+    sessions.allow
+}
+
+allow if {
+    input.resource.type == "TICKET"
+    ticket.allow
+}
