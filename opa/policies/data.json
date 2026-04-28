@@ -1,0 +1,9 @@
+{
+  "privileged_roles": ["ADMIN", "YK", "DK"],
+
+  "event_type_roles": {
+    "GECEKODU": ["GECEKODU", "GECEKODU_LEADER"],
+    "AGC":      ["AGC", "AGC_LEADER"]
+  }
+
+}

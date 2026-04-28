@@ -41,23 +41,23 @@ public class SecurityConfig {
 
 
                         //USERS
-                        .pathMatchers(HttpMethod.GET, "/api/users/me").hasAnyRole("users.me", "users.moderator")
-                        .pathMatchers(HttpMethod.PATCH, "/api/users/me").hasAnyRole("users.me", "users.moderator")
-                        .pathMatchers(HttpMethod.POST, "/api/users/me/profile-picture").hasAnyRole("users.me", "users.moderator")
-                        .pathMatchers(HttpMethod.GET, "/api/users").hasAnyRole("users.list", "users.moderator")
-                        .pathMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("users.get", "users.moderator")
-                        .pathMatchers(HttpMethod.PUT, "/api/users/{id}").hasAnyRole("users.update", "users.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/users/{id}").hasAnyRole("users.delete", "users.moderator")
-                        .pathMatchers(HttpMethod.POST, "/api/users/{id}/promote").hasAnyRole("users.promote", "users.moderator")
+                        .pathMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                        .pathMatchers(HttpMethod.PATCH, "/api/users/me").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/users/me/profile-picture").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/users").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/users/{id}").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/users/{id}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/users/{id}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/users/{id}/promote").authenticated()
 
 
                         //ANNOUNCEMENTS
                         .pathMatchers(HttpMethod.GET, "/api/announcements").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/announcements/{id}").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/announcements/event-type/{eventTypeId}").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/announcements").hasAnyRole("announcements.create", "announcements.moderator")
-                        .pathMatchers(HttpMethod.PATCH, "/api/announcements/{id}").hasAnyRole("announcements.update", "announcements.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/announcements/{id}").hasAnyRole("announcements.delete", "announcements.moderator")
+                        .pathMatchers(HttpMethod.POST, "/api/announcements").authenticated()
+                        .pathMatchers(HttpMethod.PATCH, "/api/announcements/{id}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/announcements/{id}").authenticated()
 
 
                         //COMPETITORS
@@ -65,13 +65,13 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/competitors/leaderboard/season/{seasonId}/type/{eventTypeName}").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/competitors/winner").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/competitors").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/me").hasAnyRole("competitors.me", "competitors.moderator")
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/user/{userId}").hasAnyRole("competitors.list", "competitors.moderator")
-                        .pathMatchers(HttpMethod.POST, "/api/competitors").hasAnyRole("competitors.create", "competitors.moderator")
-                        .pathMatchers(HttpMethod.GET, "/api/competitors").hasAnyRole("competitors.list", "competitors.moderator")
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/{id}").hasAnyRole("competitors.get", "competitors.moderator")
-                        .pathMatchers(HttpMethod.PUT, "/api/competitors/{id}").hasAnyRole("competitors.update", "competitors.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/competitors/{id}").hasAnyRole("competitors.delete", "competitors.moderator")
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/me").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/user/{userId}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/competitors").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/{id}").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/competitors/{id}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/competitors/{id}").authenticated()
 
 
                         // EVENTS!!
@@ -79,39 +79,39 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/events/type/{eventTypeName}").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events/{id}").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/events").hasAnyRole("events.create", "events.moderator")
-                        .pathMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("events.update", "events.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("events.delete", "events.moderator")
-                        .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/seasons/{seasonId}").hasAnyRole("events.update", "events.moderator", "seasons.manage_events")
-                        .pathMatchers(HttpMethod.DELETE, "/api/events/{eventId}/season").hasAnyRole("events.update", "events.moderator", "seasons.manage_events")
+                        .pathMatchers(HttpMethod.POST, "/api/events").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/events/{id}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/events/{id}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/seasons/{seasonId}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/events/{eventId}/season").authenticated()
 
 
                         //EVENT TYPES
                         .pathMatchers(HttpMethod.GET, "/api/event-types/{eventTypeName}/coordinators").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/event-types").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/event-types/{id}").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/event-types").hasAnyRole("event_types.create", "event_types.moderator")
-                        .pathMatchers(HttpMethod.PUT, "/api/event-types/{id}").hasAnyRole("event_types.update", "event_types.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/event-types/{id}").hasAnyRole("event_types.delete", "event_types.moderator")
+                        .pathMatchers(HttpMethod.POST, "/api/event-types").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/event-types/{id}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/event-types/{id}").authenticated()
 
 
                         //MEDIA
                         .pathMatchers(HttpMethod.GET, "/api/media/{id}").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/media").hasAnyRole("media.upload", "media.moderator")
+                        .pathMatchers(HttpMethod.POST, "/api/media").authenticated()
 
 
                         //SEASONS
                         .pathMatchers(HttpMethod.GET, "/api/seasons").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/seasons/{id}").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/seasons").hasAnyRole("seasons.create", "seasons.moderator")
-                        .pathMatchers(HttpMethod.PUT, "/api/seasons/{id}").hasAnyRole("seasons.update", "seasons.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/seasons/{id}").hasAnyRole("seasons.delete", "seasons.moderator")
+                        .pathMatchers(HttpMethod.POST, "/api/seasons").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/seasons/{id}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/seasons/{id}").authenticated()
 
 
                         //SESSIONS
                         .pathMatchers(HttpMethod.GET, "/api/sessions").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/sessions").hasAnyRole("sessions.create", "sessions.moderator")
-                        .pathMatchers(HttpMethod.DELETE, "/api/sessions/{id}").hasAnyRole("sessions.delete", "sessions.moderator")
+                        .pathMatchers(HttpMethod.POST, "/api/sessions").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/sessions/{id}").authenticated()
 
 
                         //QR CODES

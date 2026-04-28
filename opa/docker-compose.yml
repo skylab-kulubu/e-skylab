@@ -1,0 +1,27 @@
+services:
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: opa
+    #ports:
+    #  - "8181:8181"
+    volumes:
+      - ./policies:/policies
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "--log-level=info"
+      - "/policies"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - skynet
+
+
+networks:
+  skynet:
+    external: true
