@@ -25,14 +25,17 @@ public class CorrelationIdFilter implements GlobalFilter, Ordered {
                 exchange.getRequest().getMethod(),
                 exchange.getRequest().getURI().getPath());
 
+        exchange.getResponse().beforeCommit(() -> {
+            exchange.getResponse().getHeaders().add(CORRELATION_ID_HEADER, correlationId);
+            return Mono.empty();
+        });
+
         ServerWebExchange mutatedExchange = exchange.mutate()
                 .request(r -> r.header(CORRELATION_ID_HEADER, correlationId))
                 .build();
 
         return chain.filter(mutatedExchange).then(Mono.fromRunnable(() -> {
-            exchange.getResponse().getHeaders().add(CORRELATION_ID_HEADER, correlationId);
-
-            log.info("[{}] Response sent with status: {}",
+            log.info("[{}] Response completed with status: {}",
                     correlationId,
                     exchange.getResponse().getStatusCode());
         }));
