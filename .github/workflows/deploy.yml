@@ -1,0 +1,55 @@
+name: E-Skylab CI (Custom Services)
+
+on:
+  push:
+    tags: [ "v*.*.*" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Build Eureka
+        uses: docker/build-push-action@v4
+        with:
+          context: ./eureka
+          push: true
+          tags: |
+            ghcr.io/skylab-kulubu/e-skylab-eureka:latest
+            ghcr.io/skylab-kulubu/e-skylab-eureka:${{ github.ref_name }}
+
+
+      - name: Build Gateway
+        uses: docker/build-push-action@v4
+        with:
+          context: ./gateway
+          push: true
+          tags: |
+            ghcr.io/skylab-kulubu/e-skylab-gateway:latest
+            ghcr.io/skylab-kulubu/e-skylab-gateway:${{ github.ref_name }}
+
+
+      - name: Build Keycloak
+        uses: docker/build-push-action@v4
+        with:
+          context: ./keycloak
+          push: true
+          tags: |
+            ghcr.io/skylab-kulubu/e-skylab-keycloak:latest
+            ghcr.io/skylab-kulubu/e-skylab-keycloak:${{ github.ref_name }}
