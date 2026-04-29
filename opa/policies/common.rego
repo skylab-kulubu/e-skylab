@@ -5,9 +5,8 @@ import future.keywords.in
 
 is_privileged if {
     some role in input.user.roles
-    role in data.privileged_roles
+    role in data.skylab.privileged_roles
 }
-
 
 has_role(role) if {
     role in input.user.roles
