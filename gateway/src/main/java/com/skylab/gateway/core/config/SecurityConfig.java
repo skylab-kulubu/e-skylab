@@ -144,7 +144,8 @@ public class SecurityConfig {
 
 
                         //QR CODES
-                        .pathMatchers(HttpMethod.GET, "/api/qrCodes/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/qr-codes/generate").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/qr-codes/generate-with-logo").permitAll()
 
 
 
