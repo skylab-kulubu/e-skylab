@@ -11,6 +11,8 @@ import data.skylab.competitors
 import data.skylab.media
 import data.skylab.sessions
 import data.skylab.ticket
+import data.skylab.event_day
+import data.skylab.certificate
 
 default allow = false
 
@@ -52,4 +54,14 @@ allow if {
 allow if {
     input.resource.type == "TICKET"
     ticket.allow
+}
+
+allow if {
+    input.resource.type == "EVENT_DAY"
+    event_day.allow
+}
+
+allow if {
+    input.resource.type == "CERTIFICATE"
+    certificate.allow
 }

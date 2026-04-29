@@ -71,13 +71,22 @@ public class GatewayConfig {
                 .route("media", r -> r.path("/api/media/**")
                         .uri("lb://super-skylab"))
 
-                .route("qrCodes", r -> r.path("/api/qrCodes/**")
+                .route("qr-codes", r -> r.path("/api/qr-codes/**")
                         .uri("lb://super-skylab"))
 
                 .route("seasons", r -> r.path("/api/seasons/**")
                         .uri("lb://super-skylab"))
 
                 .route("sessions", r -> r.path("/api/sessions/**")
+                        .uri("lb://super-skylab"))
+
+                .route("certificates", r -> r.path("/api/certificates/**")
+                        .uri("lb://super-skylab"))
+
+                .route("event-days", r -> r.path("/api/event-days/**")
+                        .uri("lb://super-skylab"))
+
+                .route("tickets", r -> r.path("/api/tickets/**")
                         .uri("lb://super-skylab"))
 
                 .route("forms", r -> r.path("/api/forms/**")

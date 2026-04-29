@@ -30,3 +30,9 @@ allow if {
     input.action == "READ_ME"
     common.is_authenticated
 }
+
+allow if {
+    input.resource.type == "TICKET"
+    input.action == "CREATE"
+    common.is_authenticated
+}

@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/competitors/{id}").authenticated()
                         .pathMatchers(HttpMethod.PUT, "/api/competitors/{id}").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/competitors/{id}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/event-type/{id}").authenticated()
 
 
                         // EVENTS!!
@@ -86,6 +87,15 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/events/{id}").authenticated()
                         .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/seasons/{seasonId}").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/events/{eventId}/season").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/events/{id}/images").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/events/{id}/images").authenticated()
+
+                        // EVENT DAYS
+                        .pathMatchers(HttpMethod.POST, "/api/event-days").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/event-days/{id}").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/event-days/{id}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/event-days/{id}").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/event-days/event/{id}").permitAll()
 
 
                         //EVENT TYPES
@@ -95,6 +105,22 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/event-types").authenticated()
                         .pathMatchers(HttpMethod.PUT, "/api/event-types/{id}").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/event-types/{id}").authenticated()
+
+                        // CERTIFICATES
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/{id}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/event/{eventId}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/user/{userId}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/me").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/certificates").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/certificates/{id}").authenticated()
+                        .pathMatchers(HttpMethod.DELETE, "/api/certificates/{id}").authenticated()
+
+                        // TICKETS
+                        .pathMatchers(HttpMethod.GET, "/api/tickets/{ticketId}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/tickets/{ticketId}/event-days/{eventDayId}/check-in").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/tickets/me").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/tickets/user/{userId}/event/{eventId}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/tickets").authenticated()
 
 
                         //MEDIA
@@ -108,6 +134,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/seasons").authenticated()
                         .pathMatchers(HttpMethod.PUT, "/api/seasons/{id}").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/seasons/{id}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/seasons/name/{name}").permitAll()
 
 
                         //SESSIONS

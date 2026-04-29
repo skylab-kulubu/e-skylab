@@ -13,6 +13,6 @@ allow if {
 
 allow if {
     input.resource.type == "SEASON"
-    input.action in {"CREATE", "UPDATE", "DELETE", "MANAGE_EVENTS"}
+    input.action in {"CREATE", "UPDATE", "DELETE"}
     common.is_privileged
 }

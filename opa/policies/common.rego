@@ -14,5 +14,5 @@ has_role(role) if {
 
 is_authenticated if {
     input.user.id != ""
-    input.user.roles != null
+    count(input.user.roles) > 0
 }

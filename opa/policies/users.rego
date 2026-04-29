@@ -16,7 +16,7 @@ allow if {
 
 allow if {
     input.resource.type == "USER"
-    input.action == "READ"
+    input.action in {"READ", "LIST"}
     common.is_privileged
 }
 
