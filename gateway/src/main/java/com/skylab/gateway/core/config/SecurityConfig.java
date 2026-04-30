@@ -92,6 +92,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/sessions").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/applications/guest").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/applications/me").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/tickets").authenticated()
 
                         // EVENT DAYS
                         .pathMatchers(HttpMethod.POST, "/api/event-days").authenticated()
