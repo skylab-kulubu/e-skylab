@@ -18,5 +18,5 @@ allow if {
 }
 
 is_valid if {
-    input.name in object.keys(data.event_type_roles)
+    input.name in object.keys(data.skylab.event_type_roles)
 }

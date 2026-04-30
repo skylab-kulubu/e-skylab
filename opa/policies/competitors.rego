@@ -31,7 +31,7 @@ allow if {
     input.action == "CREATE"
 
      event_type := input.resource.eventType
-     authorized := data.event_type_roles[event_type]
+     authorized := data.skylab.event_type_roles[event_type]
 
      some role in input.user.roles
      role in authorized
@@ -43,7 +43,7 @@ allow if {
     input.action in {"UPDATE", "DELETE"}
 
     event_type := input.resource.eventType
-    authorized := data.event_type_roles[event_type]
+    authorized := data.skylab.event_type_roles[event_type]
 
     some role in input.user.roles
     role in authorized
