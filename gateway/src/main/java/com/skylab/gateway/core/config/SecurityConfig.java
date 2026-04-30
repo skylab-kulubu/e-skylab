@@ -89,6 +89,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/events/{eventId}/season").authenticated()
                         .pathMatchers(HttpMethod.POST, "/api/events/{id}/images").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/events/{id}/images").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/sessions").permitAll()
 
                         // EVENT DAYS
                         .pathMatchers(HttpMethod.POST, "/api/event-days").authenticated()
