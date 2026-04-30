@@ -90,6 +90,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/events/{id}/images").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/events/{id}/images").authenticated()
                         .pathMatchers(HttpMethod.GET, "/api/events/{eventId}/sessions").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/applications/guest").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/applications/me").authenticated()
 
                         // EVENT DAYS
                         .pathMatchers(HttpMethod.POST, "/api/event-days").authenticated()
