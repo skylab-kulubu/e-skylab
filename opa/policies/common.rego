@@ -8,6 +8,11 @@ is_privileged if {
     role in data.skylab.privileged_roles
 }
 
+is_leader if {
+    some role in input.user.roles
+    role in data.skylab.leader_roles
+}
+
 has_role(role) if {
     role in input.user.roles
 }

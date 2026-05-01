@@ -1,10 +1,20 @@
 {
   "skylab": {
-    "privileged_roles": ["ADMIN", "YK", "DK"],
+    "privileged_roles": [
+      "ADMIN",
+      "YK",
+      "DK"
+    ],
+    "leader_roles": [
+      "GECEKODU_LEADER",
+      "AGC_LEADER",
+      "BIZBIZE_LEADER",
+      "SKYSEC_LEADER"
+    ],
     "event_type_roles": {
       "GECEKODU": ["GECEKODU", "GECEKODU_LEADER"],
       "AGC":      ["AGC", "AGC_LEADER"],
-      "BIZBIZE":   ["BIZBIZE", "BIZBIZE_LEADER"]
+      "BIZBIZE":  ["BIZBIZE", "BIZBIZE_LEADER"]
     }
   }
 }

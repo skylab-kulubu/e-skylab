@@ -27,10 +27,9 @@ allow if {
     common.is_privileged
 }
 
-
-#skyforms users can access to all users
+# leaders
 allow if {
     input.resource.type == "USER"
     input.action == "READ"
-    "skyforms:access" in input.user.roles
+    common.is_leader
 }
