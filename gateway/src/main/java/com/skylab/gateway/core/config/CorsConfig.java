@@ -17,7 +17,7 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "http://localhost:8081", "http://localhost:8080" ,"https://api.yildizskylab.com", "https://app.yildizskylab.com", "https://forms.yildizskylab.com", "https://agc.yildizskylab.com", "https://admin.yildizskylab.com", "https://e.yildizskylab.com"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "http://localhost:8081", "http://localhost:8080", "https://skylapp.yildizskylab.com", "https://api.yildizskylab.com", "https://app.yildizskylab.com", "https://forms.yildizskylab.com", "https://agc.yildizskylab.com", "https://admin.yildizskylab.com", "https://e.yildizskylab.com"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
