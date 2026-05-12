@@ -9,7 +9,8 @@
       "GECEKODU_LEADER",
       "AGC_LEADER",
       "BIZBIZE_LEADER",
-      "SKYSEC_LEADER"
+      "SKYSEC_LEADER",
+      "MOBILAB_LEADER"
     ],
     "event_type_roles": {
       "GECEKODU": ["GECEKODU", "GECEKODU_LEADER"],
