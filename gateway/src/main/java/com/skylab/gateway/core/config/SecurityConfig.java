@@ -167,6 +167,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/admin/forms/component-groups/{id}").hasAnyRole("skyforms:access")
                         .pathMatchers(HttpMethod.POST, "/api/admin/forms/component-groups/{id}/share").hasAnyRole("skyforms:access")
                         .pathMatchers(HttpMethod.POST, "/api/admin/forms/component-groups/{id}/clone").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/responses/{id}/revoke-token").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/responses/{id}/share").hasAnyRole("skyforms:access")
 
                         // SKYFORMS FORM MANAGE
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
@@ -198,6 +200,8 @@ public class SecurityConfig {
                         // PUBLIC FORMS
                         .pathMatchers(HttpMethod.GET, "/api/forms/{id}").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/forms/{id}/meta").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/forms/responses/{id}/meta").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/forms/component-groups/{id}/meta").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/forms/responses").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/forms/responses/draft").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/forms/responses/draft/{id}").permitAll()
