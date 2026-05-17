@@ -37,9 +37,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
                                 "/api/auth/register",
-                                "/api/auth/login"
-
+                                "/api/auth/login",
+                                "/fallback/**",
+                                "/actuator/health",
+                                "/actuator/info"
                         ).permitAll()
+
+                        .pathMatchers("/actuator/**").authenticated()
 
 
                         //USERS
@@ -161,6 +165,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/admin/forms/component-groups").hasAnyRole("skyforms:access")
                         .pathMatchers(HttpMethod.PUT, "/api/admin/forms/component-groups/{id}").hasAnyRole("skyforms:access")
                         .pathMatchers(HttpMethod.DELETE, "/api/admin/forms/component-groups/{id}").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/component-groups/{id}/share").hasAnyRole("skyforms:access")
+                        .pathMatchers(HttpMethod.POST, "/api/admin/forms/component-groups/{id}/clone").hasAnyRole("skyforms:access")
 
                         // SKYFORMS FORM MANAGE
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
