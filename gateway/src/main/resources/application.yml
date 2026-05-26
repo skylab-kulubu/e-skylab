@@ -27,6 +27,7 @@ spring:
         - name: RequestSize
           args:
             maxSize: 10MB
+        - RemoveRequestHeader=Cookie
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
