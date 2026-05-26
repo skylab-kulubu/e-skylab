@@ -29,6 +29,11 @@ spring:
             maxSize: 10MB
         - RemoveRequestHeader=Cookie
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 20
+            redis-rate-limiter.burstCapacity: 40
+            key-resolver: "#{@userKeyResolver}"
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
