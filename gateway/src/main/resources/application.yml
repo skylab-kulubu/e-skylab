@@ -115,6 +115,7 @@ management:
 #  DOCUMENTATION
 springdoc:
   swagger-ui:
+    custom-css-url: /custom-swagger.css
     path: /swagger-ui.html
     urls:
       - name: Super Skylab API
@@ -126,10 +127,8 @@ springdoc:
     oauth:
       client-id: ${SWAGGER_CLIENT_ID}
       use-pkce-with-authorization-code-grant: true
-      scopes:
-        - openid
-        - profile
-        - email
+      additional-query-string-params:
+        scope: "openid profile email"
     config-url: /v3/api-docs/swagger-config
   api-docs:
     enabled: true

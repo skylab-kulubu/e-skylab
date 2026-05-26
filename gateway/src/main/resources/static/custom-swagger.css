@@ -1,0 +1,4 @@
+.swagger-ui label[for=client_secret],
+.swagger-ui #client_secret {
+    display: none !important;
+}
