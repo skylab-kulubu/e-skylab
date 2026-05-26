@@ -210,6 +210,9 @@ public class SecurityConfig {
                         // PUBLIC FEEDBACKS
                         .pathMatchers(HttpMethod.POST, "/api/feedbacks").permitAll()
 
+                        // SKYMAIL
+                        .pathMatchers("/api/skymail/**").authenticated()
+
 
                         .anyExchange().denyAll()
                 )

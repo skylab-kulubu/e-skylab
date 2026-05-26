@@ -12,13 +12,32 @@ spring:
           issuer-uri: ${KEYCLOAK_SERVER_URL}/realms/${KEYCLOAK_REALM}
           jwk-set-uri: ${KEYCLOAK_SERVER_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
 
-#  SERVICE DISCOVERY 
+  #  REDIS (Rate Limiting)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+
+  #  GATEWAY DEFAULT FILTERS & HTTP CLIENT
+  cloud:
+    gateway:
+      default-filters:
+        - name: RequestSize
+          args:
+            maxSize: 10MB
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 10s
+
+#  SERVICE DISCOVERY
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URL}
 
-#  CUSTOM PROPERTIES 
+#  CUSTOM PROPERTIES
 gateway:
   external-url: ${GATEWAY_EXTERNAL_URL}
 
@@ -27,7 +46,66 @@ keycloak:
   external-url: ${KEYCLOAK_EXTERNAL_URL}
   realm: ${KEYCLOAK_REALM}
 
-#  DOCUMENTATION 
+#  CIRCUIT BREAKER (Resilience4j)
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        slowCallDurationThreshold: 5s
+        slowCallRateThreshold: 50
+    instances:
+      super-skylab-cb:
+        baseConfig: default
+      dotnet-cb:
+        baseConfig: default
+        waitDurationInOpenState: 15s
+      skymail-cb:
+        baseConfig: default
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 10s
+    instances:
+      super-skylab-cb:
+        timeoutDuration: 10s
+      dotnet-cb:
+        timeoutDuration: 15s
+      skymail-cb:
+        timeoutDuration: 10s
+
+#  RATE LIMITING
+gateway-rate-limit:
+  authenticated:
+    replenish-rate: ${RATE_LIMIT_AUTH_REPLENISH:20}
+    burst-capacity: ${RATE_LIMIT_AUTH_BURST:40}
+  anonymous:
+    replenish-rate: ${RATE_LIMIT_ANON_REPLENISH:5}
+    burst-capacity: ${RATE_LIMIT_ANON_BURST:10}
+
+#  ACTUATOR
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway,circuitbreakers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+      show-components: always
+  health:
+    circuitbreakers:
+      enabled: true
+    redis:
+      enabled: true
+
+#  DOCUMENTATION
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -35,7 +113,9 @@ springdoc:
       - name: Super Skylab API
         url: /v3/api-docs/super-skylab
       - name: Forms API
-        url: /v3/api-docs/formsapi
+        url: /v3/api-docs/DOTNETAPI
+      - name: Skymail API
+        url: /v3/api-docs/skymail
     oauth:
       client-id: ${SWAGGER_CLIENT_ID}
       use-pkce-with-authorization-code-grant: true

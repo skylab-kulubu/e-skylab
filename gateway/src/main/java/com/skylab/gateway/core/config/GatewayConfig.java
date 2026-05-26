@@ -10,97 +10,190 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class GatewayConfig {
 
+    private static final String SUPER_SKYLAB_CB = "super-skylab-cb";
+    private static final String DOTNET_CB        = "dotnet-cb";
+
+    private static final String SUPER_SKYLAB_URI = "lb://super-skylab";
+    private static final String DOTNET_URI        = "lb://DOTNETAPI";
+
+    private static final String SKYMAIL_CB = "skymail-cb";
+    private static final String SKYMAIL_URI = "lb://skymail";
+
     private final AppGatewayProperties appGatewayProperties;
 
     public GatewayConfig(AppGatewayProperties appGatewayProperties) {
         this.appGatewayProperties = appGatewayProperties;
     }
 
-
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
 
+                // ── OpenAPI docs ────────────────────────────────────────────
                 .route("openapi-super-skylab", r -> r
                         .path("/v3/api-docs/super-skylab")
                         .filters(f -> f
                                 .rewritePath("/v3/api-docs/super-skylab", "/v3/api-docs")
                                 .modifyResponseBody(String.class, String.class,
                                         (exchange, body) -> Mono.just(modifyOpenApiServers(body)))
+                                .circuitBreaker(c -> c
+                                        .setName(SUPER_SKYLAB_CB)
+                                        .setFallbackUri("forward:/fallback/super-skylab"))
                         )
-                        .uri("lb://super-skylab"))
+                        .uri(SUPER_SKYLAB_URI))
 
-                .route("openapi-DOTNETAPI", r -> r
+                .route("openapi-dotnet", r -> r
                         .path("/v3/api-docs/DOTNETAPI")
                         .filters(f -> f
-                                .rewritePath(
-                                        "/v3/api-docs/DOTNETAPI",
-                                        "/swagger/v1/swagger.json"
-                                )
+                                .rewritePath("/v3/api-docs/DOTNETAPI", "/swagger/v1/swagger.json")
                                 .modifyResponseBody(String.class, String.class,
-                                        (exchange, body) -> Mono.just(modifyOpenApiServers(body))
-                                )
+                                        (exchange, body) -> Mono.just(modifyOpenApiServers(body)))
+                                .circuitBreaker(c -> c
+                                        .setName(DOTNET_CB)
+                                        .setFallbackUri("forward:/fallback/dotnet"))
                         )
-                        .uri("lb://DOTNETAPI")
-                )
+                        .uri(DOTNET_URI))
 
+
+                .route("openapi-skymail", r -> r
+                        .path("/v3/api-docs/skymail")
+                        .filters(f -> f
+                                .rewritePath("/v3/api-docs/skymail", "/docs/openapi.json")
+                                .modifyResponseBody(String.class, String.class,
+                                        (exchange, body) -> Mono.just(modifyOpenApiServers(body)))
+                                .circuitBreaker(c -> c
+                                        .setName(SKYMAIL_CB)
+                                        .setFallbackUri("forward:/fallback/skymail")))
+                        .uri(SKYMAIL_URI))
+
+                // ── super-skylab routes ──────────────────────────────────────
                 .route("users", r -> r.path("/api/users/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("announcements", r -> r.path("/api/announcements/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("auth", r -> r.path("/api/auth/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("competitions", r -> r.path("/api/competitions/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("competitors", r -> r.path("/api/competitors/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("events", r -> r.path("/api/events/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("groups", r -> r.path("/api/groups/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("event-types", r -> r.path("/api/event-types/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("media", r -> r.path("/api/media/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("qr-codes", r -> r.path("/api/qr-codes/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("seasons", r -> r.path("/api/seasons/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("sessions", r -> r.path("/api/sessions/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("certificates", r -> r.path("/api/certificates/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("event-days", r -> r.path("/api/event-days/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
                 .route("tickets", r -> r.path("/api/tickets/**")
-                        .uri("lb://super-skylab"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
 
+                .route("content", r -> r.path("/api/content/**")
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(SUPER_SKYLAB_CB)
+                                .setFallbackUri("forward:/fallback/super-skylab")))
+                        .uri(SUPER_SKYLAB_URI))
+
+                // ── DOTNETAPI routes ─────────────────────────────────────────
                 .route("forms", r -> r.path("/api/forms/**")
-                        .uri("lb://DOTNETAPI"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(DOTNET_CB)
+                                .setFallbackUri("forward:/fallback/dotnet")))
+                        .uri(DOTNET_URI))
 
                 .route("admin-forms", r -> r.path("/api/admin/forms/**")
-                        .uri("lb://DOTNETAPI"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(DOTNET_CB)
+                                .setFallbackUri("forward:/fallback/dotnet")))
+                        .uri(DOTNET_URI))
 
                 .route("feedbacks", r -> r.path("/api/feedbacks/**")
-                        .uri("lb://DOTNETAPI"))
+                        .filters(f -> f.circuitBreaker(c -> c
+                                .setName(DOTNET_CB)
+                                .setFallbackUri("forward:/fallback/dotnet")))
+                        .uri(DOTNET_URI))
+
+
+                // SKYMAIL routes
+                .route("skymail", r -> r.path("/api/skymail/**")
+                        .filters(f -> f
+                                .rewritePath("/api/skymail/(?<segment>.*)", "/${segment}")
+                                .circuitBreaker(c -> c
+                                        .setName(SKYMAIL_CB)
+                                        .setFallbackUri("forward:/fallback/skymail")))
+                        .uri(SKYMAIL_URI))
+
 
                 .build();
-
-
     }
 
     private String modifyOpenApiServers(String body) {
@@ -113,6 +206,4 @@ public class GatewayConfig {
         }
         return body;
     }
-
-
 }

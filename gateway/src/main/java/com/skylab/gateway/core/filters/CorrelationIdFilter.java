@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -20,13 +21,10 @@ public class CorrelationIdFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String correlationId = UUID.randomUUID().toString();
 
-        log.info("[{}] Received request: {} {}",
-                correlationId,
-                exchange.getRequest().getMethod(),
-                exchange.getRequest().getURI().getPath());
+        long startTime = System.currentTimeMillis();
 
         exchange.getResponse().beforeCommit(() -> {
-            exchange.getResponse().getHeaders().add(CORRELATION_ID_HEADER, correlationId);
+            exchange.getResponse().getHeaders().set(CORRELATION_ID_HEADER, correlationId);
             return Mono.empty();
         });
 
@@ -34,11 +32,27 @@ public class CorrelationIdFilter implements GlobalFilter, Ordered {
                 .request(r -> r.header(CORRELATION_ID_HEADER, correlationId))
                 .build();
 
-        return chain.filter(mutatedExchange).then(Mono.fromRunnable(() -> {
-            log.info("[{}] Response completed with status: {}",
-                    correlationId,
-                    exchange.getResponse().getStatusCode());
-        }));
+        return ReactiveSecurityContextHolder.getContext()
+                .map(ctx -> ctx.getAuthentication() != null ? ctx.getAuthentication().getName() : "anonymous")
+                .defaultIfEmpty("anonymous")
+                .flatMap(userId -> {
+                    log.info("[{}] --> {} {} userId={}",
+                            correlationId,
+                            exchange.getRequest().getMethod(),
+                            exchange.getRequest().getURI().getPath(),
+                            userId);
+
+                    return chain.filter(mutatedExchange).then(Mono.fromRunnable(() -> {
+                        long duration = System.currentTimeMillis() - startTime;
+                        log.info("[{}] <-- {} {} userId={} status={} duration={}ms",
+                                correlationId,
+                                exchange.getRequest().getMethod(),
+                                exchange.getRequest().getURI().getPath(),
+                                userId,
+                                exchange.getResponse().getStatusCode(),
+                                duration);
+                    }));
+                });
     }
 
     @Override
