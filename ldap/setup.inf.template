@@ -1,0 +1,18 @@
+[general]
+full_machine_name = localhost
+selinux = off
+
+[slapd]
+instance_name = ${DS_INSTANCE_NAME}
+root_dn = cn=Directory Manager
+root_password = ${DS_DM_PASSWORD}
+# Arch paketleri varsayılan olarak non-root portları kullanabilir, kontrol et
+# Veya Dockerfile'da root olarak çalıştırabiliriz
+port = 389
+secure_port = 636
+
+[backend-userRoot]
+# dscreate bu backend'i otomatik oluşturur, suffix'i burada belirtmek yeterli
+suffix = ${DS_SUFFIX_NAME}
+# Sample entries oluşturmasın
+# create_suffix_entry = yes # Backend oluşturulduğunda suffix entry'sini otomatik oluştursun

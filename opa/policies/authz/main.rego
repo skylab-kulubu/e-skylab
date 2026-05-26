@@ -13,6 +13,9 @@ import data.skylab.sessions
 import data.skylab.ticket
 import data.skylab.event_day
 import data.skylab.certificate
+import data.skylab.announcements
+import data.skylab.applications
+import data.skylab.content
 
 default allow = false
 
@@ -64,4 +67,19 @@ allow if {
 allow if {
     input.resource.type == "CERTIFICATE"
     certificate.allow
+}
+
+allow if {
+    input.resource.type == "ANNOUNCEMENT"
+    announcements.allow
+}
+
+allow if {
+    input.resource.type == "APPLICATION"
+    applications.allow
+}
+
+allow if {
+    input.resource.type == "CONTENT_ITEM"
+    content.allow
 }
