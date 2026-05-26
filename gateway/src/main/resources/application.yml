@@ -28,6 +28,7 @@ spring:
           args:
             maxSize: 10MB
         - RemoveRequestHeader=Cookie
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
