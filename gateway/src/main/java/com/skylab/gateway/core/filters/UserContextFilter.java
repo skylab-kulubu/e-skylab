@@ -34,7 +34,7 @@ public class UserContextFilter implements GlobalFilter, Ordered {
                     ServerWebExchange mutated = exchange.mutate()
                             .request(r -> r
                                     .header(HEADER_USER_ID, userId != null ? userId : "")
-                                    .header(HEADER_USER_ROLES, roles)
+                                    //.header(HEADER_USER_ROLES, roles)
                                     .header(HEADER_USER_EMAIL, email != null ? email : "")
                             )
                             .build();
