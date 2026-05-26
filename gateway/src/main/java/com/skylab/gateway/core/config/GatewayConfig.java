@@ -72,7 +72,7 @@ public class GatewayConfig {
                                 .rewritePath("/v3/api-docs/skymail", "/docs/openapi.json")
                                 .modifyResponseBody(String.class, String.class,
                                         (exchange, body) -> Mono.just(
-                                                injectOAuth2Security(modifyOpenApiServers(body))))
+                                                injectOAuth2Security(modifyOpenApiServers(body, "/api/skymail/v1"))))
                                 .circuitBreaker(c -> c
                                         .setName(SKYMAIL_CB)
                                         .setFallbackUri("forward:/fallback/skymail")))
@@ -277,11 +277,17 @@ public class GatewayConfig {
 
 
     private String modifyOpenApiServers(String body) {
-        if (body != null && body.contains("\"servers\"")) {
-            String gatewayUrl = appGatewayProperties.getExternalUrl();
+        return modifyOpenApiServers(body, "");
+    }
+
+    private String modifyOpenApiServers(String body, String basePath) {
+        if (body == null) return null;
+        String gatewayUrl = appGatewayProperties.getExternalUrl() + basePath;
+        String serverEntry = "\"servers\":[{\"url\":\"" + gatewayUrl + "\",\"description\":\"Gateway Server\"}]";
+        if (body.contains("\"servers\"")) {
             return body.replaceAll(
                     "\"servers\"\\s*:\\s*\\[[^\\]]*\\]",
-                    "\"servers\":[{\"url\":\"" + gatewayUrl + "\",\"description\":\"Gateway Server\"}]"
+                    serverEntry
             );
         }
         return body;
