@@ -50,6 +50,7 @@ public class RequestIdFilter implements GlobalFilter, Ordered {
                 .defaultIfEmpty("anonymous")
                 .flatMap(userId -> {
                     log.info("http-request",
+                            kv("traceId", requestId),
                             kv("direction", "in"),
                             kv("method", exchange.getRequest().getMethod().name()),
                             kv("path", exchange.getRequest().getURI().getPath()),
@@ -61,6 +62,7 @@ public class RequestIdFilter implements GlobalFilter, Ordered {
                         int status = exchange.getResponse().getStatusCode() != null
                                 ? exchange.getResponse().getStatusCode().value() : 0;
                         log.info("http-response",
+                                kv("traceId", requestId),
                                 kv("direction", "out"),
                                 kv("method", exchange.getRequest().getMethod().name()),
                                 kv("path", exchange.getRequest().getURI().getPath()),
