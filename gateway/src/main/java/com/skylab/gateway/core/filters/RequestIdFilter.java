@@ -3,6 +3,7 @@ package com.skylab.gateway.core.filters;
 import com.skylab.gateway.core.web.ClientIpResolver;
 import io.micrometer.tracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
@@ -24,9 +26,9 @@ public class RequestIdFilter implements GlobalFilter, Ordered {
     private final ClientIpResolver clientIpResolver;
     private final Tracer tracer;
 
-    public RequestIdFilter(ClientIpResolver clientIpResolver, Tracer tracer) {
+    public RequestIdFilter(ClientIpResolver clientIpResolver, Optional<Tracer> tracer) {
         this.clientIpResolver = clientIpResolver;
-        this.tracer = tracer;
+        this.tracer = tracer.orElse(null);
     }
 
     @Override
@@ -73,9 +75,11 @@ public class RequestIdFilter implements GlobalFilter, Ordered {
     }
 
     private String currentTraceId() {
-        var span = tracer.currentSpan();
-        if (span != null) {
-            return span.context().traceId();
+        if (tracer != null) {
+            var span = tracer.currentSpan();
+            if (span != null) {
+                return span.context().traceId();
+            }
         }
         return UUID.randomUUID().toString();
     }
