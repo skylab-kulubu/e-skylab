@@ -1,0 +1,52 @@
+# OpenTelemetry Collector
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+
+exporters:
+  # TRACES → Tempo (Grafana)
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  # METRICS Prometheus
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
+  # --- ELASTIC
+  # elasticsearch:
+  #   endpoints: ["http://ELASTIC_HOST:9200"]
+  #   # user: elastic
+  #   # password: ${ELASTIC_PASSWORD}
+
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/tempo]   # [otlp/tempo, elasticsearch]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+  telemetry:
+    logs:
+      level: info

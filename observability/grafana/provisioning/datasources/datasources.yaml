@@ -1,0 +1,40 @@
+# Grafana veri kaynaklari — otomatik provision edilir, elle eklemeye gerek yok.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      # Log icindeki traceId'den Tempo trace'ine atlama (logdan trace'e)
+      derivedFields:
+        - name: TraceID
+          matcherType: label
+          matcherRegex: '"traceId":"(\w+)"'
+          url: '$${__value.raw}'
+          datasourceUid: tempo
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    uid: tempo
+    jsonData:
+      # Trace'ten o isteğin loglarina atlama (trace'ten loga) — traceId ile Loki sorgusu
+      tracesToLogsV2:
+        datasourceUid: loki
+        filterByTraceID: true
+        spanStartTimeShift: '-5m'
+        spanEndTimeShift: '5m'
+      # Trace'ten metrige (service graph / span metrics)
+      tracesToMetrics:
+        datasourceUid: prometheus
+      serviceMap:
+        datasourceUid: prometheus
