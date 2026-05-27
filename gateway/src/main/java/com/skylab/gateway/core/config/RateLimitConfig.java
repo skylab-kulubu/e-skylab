@@ -7,7 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @Configuration
 public class RateLimitConfig {
@@ -37,8 +40,21 @@ public class RateLimitConfig {
                     }
                     return Mono.just(auth.getName());
                 })
-                .switchIfEmpty(Mono.justOrEmpty(exchange.getRequest().getRemoteAddress())
-                        .map(addr -> "anon:" + addr.getAddress().getHostAddress()))
-                .defaultIfEmpty("anon:unknown");
+                .switchIfEmpty(Mono.fromCallable(() -> resolveClientIp(exchange)));
+    }
+
+
+    private String resolveClientIp(ServerWebExchange exchange) {
+        String xRealIp = exchange.getRequest().getHeaders().getFirst("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isBlank()) {
+            return "anon:" + xRealIp;
+        }
+        String xForwardedFor = exchange.getRequest().getHeaders().getFirst("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isBlank()) {
+            return "anon:" + xForwardedFor.split(",")[0].trim();
+        }
+        return Optional.ofNullable(exchange.getRequest().getRemoteAddress())
+                .map(addr -> "anon:" + addr.getAddress().getHostAddress())
+                .orElse("anon:unknown");
     }
 }
