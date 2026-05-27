@@ -129,6 +129,14 @@ springdoc:
     enabled: true
   show-actuator: false
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: W3C
+
 logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+  level:
+    com.skylab: INFO
+    org.springframework: WARN

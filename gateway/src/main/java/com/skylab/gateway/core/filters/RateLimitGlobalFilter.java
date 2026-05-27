@@ -11,10 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Slf4j
 @Component
 public class RateLimitGlobalFilter implements GlobalFilter, Ordered {
-
 
     private static final String ROUTE_ID = "global";
 
@@ -30,11 +31,13 @@ public class RateLimitGlobalFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         return keyResolver.resolve(exchange)
                 .flatMap(key -> {
-                    log.debug("Rate limit check: key={} path={}", key, exchange.getRequest().getPath());
+                    log.debug("rate-limit-check", kv("key", key), kv("path", exchange.getRequest().getPath().value()));
                     return rateLimiter.isAllowed(ROUTE_ID, key)
                             .doOnNext(response -> {
                                 if (!response.isAllowed()) {
-                                    log.warn("Rate limit exceeded: key={} path={}", key, exchange.getRequest().getPath());
+                                    log.warn("rate-limit-exceeded",
+                                            kv("key", key),
+                                            kv("path", exchange.getRequest().getPath().value()));
                                 }
                             });
                 })
@@ -46,7 +49,9 @@ public class RateLimitGlobalFilter implements GlobalFilter, Ordered {
                     return exchange.getResponse().setComplete();
                 })
                 .onErrorResume(e -> {
-                    log.error("Rate limiter error, failing open: path={} error={}", exchange.getRequest().getPath(), e.getMessage());
+                    log.error("rate-limiter-error",
+                            kv("path", exchange.getRequest().getPath().value()),
+                            kv("error", e.getMessage()));
                     return chain.filter(exchange);
                 });
     }

@@ -41,7 +41,7 @@ public class FallbackController {
     }
 
     private ResponseEntity<Map<String, Object>> buildFallbackResponse(ServerWebExchange exchange, String detail) {
-        String correlationId = exchange.getRequest().getHeaders().getFirst("X-Correlation-Id");
+        String requestId = exchange.getRequest().getHeaders().getFirst("X-Request-ID");
         String path = exchange.getRequest().getURI().getPath();
 
         Map<String, Object> body = new LinkedHashMap<>();
@@ -51,8 +51,8 @@ public class FallbackController {
         body.put("detail", detail);
         body.put("instance", path);
         body.put("timestamp", Instant.now().toString());
-        if (correlationId != null) {
-            body.put("correlationId", correlationId);
+        if (requestId != null) {
+            body.put("requestId", requestId);
         }
 
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
