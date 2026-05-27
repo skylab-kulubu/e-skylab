@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
@@ -26,9 +25,9 @@ public class RequestIdFilter implements GlobalFilter, Ordered {
     private final ClientIpResolver clientIpResolver;
     private final Tracer tracer;
 
-    public RequestIdFilter(ClientIpResolver clientIpResolver, Optional<Tracer> tracer) {
+    public RequestIdFilter(ClientIpResolver clientIpResolver, Tracer tracer) {
         this.clientIpResolver = clientIpResolver;
-        this.tracer = tracer.orElse(null);
+        this.tracer = tracer;
     }
 
     @Override
@@ -75,11 +74,9 @@ public class RequestIdFilter implements GlobalFilter, Ordered {
     }
 
     private String currentTraceId() {
-        if (tracer != null) {
-            var span = tracer.currentSpan();
-            if (span != null) {
-                return span.context().traceId();
-            }
+        var span = tracer.currentSpan();
+        if (span != null) {
+            return span.context().traceId();
         }
         return UUID.randomUUID().toString();
     }
