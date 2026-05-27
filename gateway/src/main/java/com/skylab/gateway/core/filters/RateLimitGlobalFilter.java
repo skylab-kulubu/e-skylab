@@ -1,0 +1,58 @@
+package com.skylab.gateway.core.filters;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+@Slf4j
+@Component
+public class RateLimitGlobalFilter implements GlobalFilter, Ordered {
+
+
+    private static final String ROUTE_ID = "global";
+
+    private final RedisRateLimiter rateLimiter;
+    private final KeyResolver keyResolver;
+
+    public RateLimitGlobalFilter(RedisRateLimiter rateLimiter, KeyResolver keyResolver) {
+        this.rateLimiter = rateLimiter;
+        this.keyResolver = keyResolver;
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        return keyResolver.resolve(exchange)
+                .flatMap(key -> {
+                    log.debug("Rate limit check: key={} path={}", key, exchange.getRequest().getPath());
+                    return rateLimiter.isAllowed(ROUTE_ID, key)
+                            .doOnNext(response -> {
+                                if (!response.isAllowed()) {
+                                    log.warn("Rate limit exceeded: key={} path={}", key, exchange.getRequest().getPath());
+                                }
+                            });
+                })
+                .flatMap(response -> {
+                    if (response.isAllowed()) {
+                        return chain.filter(exchange);
+                    }
+                    exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+                    return exchange.getResponse().setComplete();
+                })
+                .onErrorResume(e -> {
+                    log.error("Rate limiter error, failing open: path={} error={}", exchange.getRequest().getPath(), e.getMessage());
+                    return chain.filter(exchange);
+                });
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE + 10;
+    }
+}
