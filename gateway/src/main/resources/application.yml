@@ -111,6 +111,16 @@ management:
       probability: 1.0
     propagation:
       type: W3C
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://otel-collector:4318}/v1/traces
+  otlp:
+    metrics:
+      export:
+        enabled: ${OTEL_METRICS_ENABLED:true}
+        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://otel-collector:4318}/v1/metrics
 
 #  DOCUMENTATION
 springdoc:
