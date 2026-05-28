@@ -19,14 +19,9 @@ allow if {
     common.is_privileged
 }
 
-# only leaders can edit their events day
+# Sahip takim uyeleri/liderleri kendi event day'lerini yonetebilir (TUM takimlar)
 allow if {
     input.resource.type == "EVENT_DAY"
     input.action in {"CREATE", "UPDATE", "DELETE"}
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
+    common.owner_member(object.get(input.resource, "ownerGroup", input.resource.eventType))
 }

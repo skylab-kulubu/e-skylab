@@ -19,26 +19,9 @@ allow if {
     common.is_privileged
 }
 
-# Liderler kendi event type'larına ait session'ları yönetebilir
+# Sahip takim uyeleri/liderleri kendi session'larini yonetebilir (TUM takimlar)
 allow if {
     input.resource.type == "SESSION"
-    input.action in {"CREATE", "UPDATE", "DELETE"}
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
-}
-
-# Liderler kendi event type'larının session'larını yönetebilir (MANAGE_SESSIONS)
-allow if {
-    input.resource.type == "SESSION"
-    input.action == "MANAGE_SESSIONS"
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
+    input.action in {"CREATE", "UPDATE", "DELETE", "MANAGE_SESSIONS"}
+    common.owner_member(object.get(input.resource, "ownerGroup", input.resource.eventType))
 }

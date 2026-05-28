@@ -13,16 +13,11 @@ allow if {
     common.is_privileged
 }
 
-# Liderler kendi event type'larına ait biletleri okuyabilir ve doğrulayabilir
+# Sahip takim uyeleri/liderleri kendi biletlerini okuyabilir/dogrulayabilir (TUM takimlar)
 allow if {
     input.resource.type == "TICKET"
     input.action in {"READ", "VALIDATE"}
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
+    common.owner_member(object.get(input.resource, "ownerGroup", input.resource.eventType))
 }
 
 # Giriş yapmış kullanıcılar kendi biletlerini görebilir
