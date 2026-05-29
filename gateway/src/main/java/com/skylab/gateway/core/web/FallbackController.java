@@ -40,6 +40,14 @@ public class FallbackController {
         ));
     }
 
+    @RequestMapping("/fallback/skycms")
+    public Mono<ResponseEntity<Map<String, Object>>> skycmsFallback(ServerWebExchange exchange) {
+        return Mono.just(buildFallbackResponse(
+                exchange,
+                "CMS service is temporarily unavailable. Please try again shortly."
+        ));
+    }
+
     private ResponseEntity<Map<String, Object>> buildFallbackResponse(ServerWebExchange exchange, String detail) {
         String requestId = exchange.getRequest().getHeaders().getFirst("X-Request-ID");
         String path = exchange.getRequest().getURI().getPath();

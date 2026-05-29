@@ -214,6 +214,28 @@ public class SecurityConfig {
                         .pathMatchers("/api/skymail/**").authenticated()
 
 
+                        // SKYCMS
+                        .pathMatchers(HttpMethod.GET, "/cms/data").permitAll()
+
+                        .pathMatchers(HttpMethod.GET, "/cms/content").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/cms/content").authenticated()
+
+                        .pathMatchers(HttpMethod.PUT, "/cms/draft").authenticated()
+
+                        .pathMatchers(HttpMethod.POST, "/cms/sync").authenticated()
+
+                        .pathMatchers(HttpMethod.GET, "/cms/collections/me").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/cms/collections/{key}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/cms/collections/{key}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/cms/collections/{key}/drafts").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/cms/collections/{key}/{slug}").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/cms/collections/{key}/{slug}").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/cms/collections/{key}/{slug}/draft").authenticated()
+                         .pathMatchers(HttpMethod.GET, "/cms/collections/{key}/schema").permitAll()
+
+                        .pathMatchers("/cms/**").authenticated()
+
+
                         .anyExchange().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
