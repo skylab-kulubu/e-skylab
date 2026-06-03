@@ -199,10 +199,12 @@ public class GatewayConfig {
 
 
                 // ── SKYCMS routes ────────────────────────────────────────────
-                .route("cms", r -> r.path("/cms/**")
-                        .filters(f -> f.circuitBreaker(c -> c
-                                .setName(SKYCMS_CB)
-                                .setFallbackUri("forward:/fallback/skycms")))
+                .route("cms", r -> r.path("/api/cms/**")
+                        .filters(f -> f
+                                .rewritePath("/api/cms/(?<segment>.*)", "/cms/${segment}")
+                                .circuitBreaker(c -> c
+                                        .setName(SKYCMS_CB)
+                                        .setFallbackUri("forward:/fallback/skycms")))
                         .uri(SKYCMS_URI))
 
 
