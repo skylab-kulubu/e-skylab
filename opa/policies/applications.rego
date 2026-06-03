@@ -42,14 +42,9 @@ allow if {
     common.is_privileged
 }
 
-# Liderler kendi event type'larına ait başvuruları yönetebilir
+# Sahip takim uyeleri/liderleri kendi basvurularini yonetebilir (TUM takimlar)
 allow if {
     input.resource.type == "APPLICATION"
     input.action in {"READ", "LIST", "APPROVE", "REJECT"}
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
+    common.owner_member(object.get(input.resource, "ownerGroup", input.resource.eventType))
 }

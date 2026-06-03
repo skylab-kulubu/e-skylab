@@ -16,6 +16,18 @@
       "GECEKODU": ["GECEKODU", "GECEKODU_LEADER"],
       "AGC":      ["AGC", "AGC_LEADER"],
       "BIZBIZE":  ["BIZBIZE", "BIZBIZE_LEADER"]
+    },
+    "event_permissions": {
+      "_default": {
+        "CREATE": ["LEADER"],
+        "UPDATE": ["LEADER"],
+        "DELETE": ["LEADER"]
+      },
+      "GECEKODU": {
+        "CREATE": ["LEADER", "MEMBER"],
+        "UPDATE": ["LEADER", "MEMBER"],
+        "DELETE": ["LEADER"]
+      }
     }
   }
 }

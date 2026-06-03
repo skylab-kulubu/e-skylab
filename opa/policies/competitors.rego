@@ -23,29 +23,29 @@ allow if {
     common.is_privileged
 }
 
+# Kullanici kendi adina kayit olabilir (self-registration)
 allow if {
     input.resource.type == "COMPETITOR"
     input.action == "CREATE"
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
+    common.is_authenticated
+    input.resource.ownerId == input.user.id
 }
 
+# Sahip takim uyesi/lideri baskasi adina kayit yapabilir (TUM takimlar)
+allow if {
+    input.resource.type == "COMPETITOR"
+    input.action == "CREATE"
+    common.owner_member(object.get(input.resource, "ownerGroup", input.resource.eventType))
+}
+
+# Sahip takim uyesi/lideri competitor guncelleyebilir
 allow if {
     input.resource.type == "COMPETITOR"
     input.action == "UPDATE"
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
+    common.owner_member(object.get(input.resource, "ownerGroup", input.resource.eventType))
 }
 
-# Kullanıcı kendi competitor kaydını silebilir
+# Kullanıcı kendi competitor kaydını silebilir (self)
 allow if {
     input.resource.type == "COMPETITOR"
     input.action == "DELETE"
@@ -53,14 +53,9 @@ allow if {
     input.resource.ownerId == input.user.id
 }
 
-# Liderler kendi event type'larındaki competitor'ları silebilir
+# Sahip takim uyesi/lideri competitor silebilir
 allow if {
     input.resource.type == "COMPETITOR"
     input.action == "DELETE"
-
-    event_type := input.resource.eventType
-    authorized := data.skylab.event_type_roles[event_type]
-
-    some role in input.user.roles
-    role in authorized
+    common.owner_member(object.get(input.resource, "ownerGroup", input.resource.eventType))
 }

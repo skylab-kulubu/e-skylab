@@ -23,6 +23,9 @@ public class GatewayConfig {
     private static final String SKYMAIL_CB = "skymail-cb";
     private static final String SKYMAIL_URI = "lb://skymail";
 
+    private static final String SKYCMS_CB = "skycms-cb";
+    private static final String SKYCMS_URI = "lb://skycms";
+
     private final AppGatewayProperties appGatewayProperties;
     private final KeycloakProperties keycloakProperties;
     private final ObjectMapper objectMapper;
@@ -193,6 +196,16 @@ public class GatewayConfig {
                                 .setName(DOTNET_CB)
                                 .setFallbackUri("forward:/fallback/dotnet")))
                         .uri(DOTNET_URI))
+
+
+                // ── SKYCMS routes ────────────────────────────────────────────
+                .route("cms", r -> r.path("/api/cms/**")
+                        .filters(f -> f
+                                .rewritePath("/api/cms/(?<segment>.*)", "/cms/${segment}")
+                                .circuitBreaker(c -> c
+                                        .setName(SKYCMS_CB)
+                                        .setFallbackUri("forward:/fallback/skycms")))
+                        .uri(SKYCMS_URI))
 
 
                 // SKYMAIL routes
