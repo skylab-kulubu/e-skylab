@@ -112,14 +112,16 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/event-types/{id}").authenticated()
 
                         // CERTIFICATES
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/{id}").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/event/{eventId}").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/user/{userId}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/verify/{serial}").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/certificates/me").authenticated()
-                        .pathMatchers(HttpMethod.POST, "/api/certificates").authenticated()
-                        .pathMatchers(HttpMethod.PUT, "/api/certificates/{id}").authenticated()
-                        .pathMatchers(HttpMethod.PATCH, "/api/certificates/{id}").authenticated()
-                        .pathMatchers(HttpMethod.DELETE, "/api/certificates/{id}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/templates").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/templates/{id}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/certificates/templates").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/certificates/templates/{id}").authenticated()
+                        .pathMatchers(HttpMethod.PATCH, "/api/certificates/templates/{id}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/certificates/{serial}/download").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/certificates/{serial}/revoke").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/certificates/issue").authenticated()
 
                         // TICKETS
                         .pathMatchers(HttpMethod.GET, "/api/tickets/{ticketId}").authenticated()
@@ -213,25 +215,20 @@ public class SecurityConfig {
 
 
                         // SKYCMS
-                        .pathMatchers(HttpMethod.GET, "/cms/data").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/cms/data").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/cms/content").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/cms/content").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/cms/draft").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/cms/sync").authenticated()
 
-                        .pathMatchers(HttpMethod.GET, "/cms/content").authenticated()
-                        .pathMatchers(HttpMethod.PUT, "/cms/content").authenticated()
-
-                        .pathMatchers(HttpMethod.PUT, "/cms/draft").authenticated()
-
-                        .pathMatchers(HttpMethod.POST, "/cms/sync").authenticated()
-
-                        .pathMatchers(HttpMethod.GET, "/cms/collections/me").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/cms/collections/{key}").authenticated()
-                        .pathMatchers(HttpMethod.POST, "/cms/collections/{key}").authenticated()
-                        .pathMatchers(HttpMethod.POST, "/cms/collections/{key}/drafts").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/cms/collections/{key}/{slug}").authenticated()
-                        .pathMatchers(HttpMethod.PUT, "/cms/collections/{key}/{slug}").authenticated()
-                        .pathMatchers(HttpMethod.PUT, "/cms/collections/{key}/{slug}/draft").authenticated()
-                         .pathMatchers(HttpMethod.GET, "/cms/collections/{key}/schema").permitAll()
-
-                        .pathMatchers("/cms/**").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/cms/collections/me").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/cms/collections/{key}/schema").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/cms/collections/{key}").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/cms/collections/{key}").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/api/cms/collections/{key}/drafts").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/cms/collections/{key}/{slug}").permitAll()
+                        .pathMatchers(HttpMethod.PUT, "/api/cms/collections/{key}/{slug}").authenticated()
+                        .pathMatchers(HttpMethod.PUT, "/api/cms/collections/{key}/{slug}/draft").authenticated()
 
 
                         .anyExchange().denyAll()
