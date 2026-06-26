@@ -75,6 +75,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/competitors/team/{ownerTeam}").authenticated()
 
                         .pathMatchers(HttpMethod.GET, "/api/teams/{team}/members").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/teams/{team}/leaders").permitAll()
 
                         // EVENTS!!
                         .pathMatchers(HttpMethod.GET, "/api/events/active").permitAll()
