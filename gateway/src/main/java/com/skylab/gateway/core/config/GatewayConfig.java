@@ -154,12 +154,6 @@ public class GatewayConfig {
                                 .setFallbackUri("forward:/fallback/super-skylab")))
                         .uri(SUPER_SKYLAB_URI))
 
-                .route("certificates", r -> r.path("/api/certificates/**")
-                        .filters(f -> f.circuitBreaker(c -> c
-                                .setName(SUPER_SKYLAB_CB)
-                                .setFallbackUri("forward:/fallback/super-skylab")))
-                        .uri(SUPER_SKYLAB_URI))
-
                 .route("event-days", r -> r.path("/api/event-days/**")
                         .filters(f -> f.circuitBreaker(c -> c
                                 .setName(SUPER_SKYLAB_CB)

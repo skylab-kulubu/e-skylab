@@ -6,13 +6,11 @@ import future.keywords.in
 import data.skylab.seasons
 import data.skylab.users
 import data.skylab.events
-import data.skylab.event_types
 import data.skylab.competitors
 import data.skylab.media
 import data.skylab.sessions
 import data.skylab.ticket
 import data.skylab.event_day
-import data.skylab.certificate
 import data.skylab.applications
 
 default allow = false
@@ -30,11 +28,6 @@ allow if {
 allow if {
     input.resource.type == "EVENT"
     events.allow
-}
-
-allow if {
-    input.resource.type == "EVENT_TYPE"
-    event_types.allow
 }
 
 allow if {
@@ -60,11 +53,6 @@ allow if {
 allow if {
     input.resource.type == "EVENT_DAY"
     event_day.allow
-}
-
-allow if {
-    input.resource.type == "CERTIFICATE"
-    certificate.allow
 }
 
 allow if {

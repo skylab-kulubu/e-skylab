@@ -111,18 +111,6 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PATCH, "/api/event-types/{id}").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/event-types/{id}").authenticated()
 
-                        // CERTIFICATES
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/verify/{serial}").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/me").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/templates").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/templates/{id}").authenticated()
-                        .pathMatchers(HttpMethod.POST, "/api/certificates/templates").authenticated()
-                        .pathMatchers(HttpMethod.PUT, "/api/certificates/templates/{id}").authenticated()
-                        .pathMatchers(HttpMethod.PATCH, "/api/certificates/templates/{id}").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/api/certificates/{serial}/download").authenticated()
-                        .pathMatchers(HttpMethod.POST, "/api/certificates/{serial}/revoke").authenticated()
-                        .pathMatchers(HttpMethod.POST, "/api/events/{eventId}/certificates/issue").authenticated()
-
                         // TICKETS
                         .pathMatchers(HttpMethod.GET, "/api/tickets/{ticketId}").authenticated()
                         .pathMatchers(HttpMethod.POST, "/api/tickets/{ticketId}/event-days/{eventDayId}/check-in").authenticated()
