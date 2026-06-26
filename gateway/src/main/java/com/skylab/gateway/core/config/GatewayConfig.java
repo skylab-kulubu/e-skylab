@@ -124,7 +124,7 @@ public class GatewayConfig {
                                 .setFallbackUri("forward:/fallback/super-skylab")))
                         .uri(SUPER_SKYLAB_URI))
 
-                .route("event-types", r -> r.path("/api/event-types/**")
+                .route("teams", r -> r.path("/api/teams/**")
                         .filters(f -> f.circuitBreaker(c -> c
                                 .setName(SUPER_SKYLAB_CB)
                                 .setFallbackUri("forward:/fallback/super-skylab")))

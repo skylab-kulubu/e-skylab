@@ -1,22 +1,14 @@
 {
   "skylab": {
-    "privileged_roles": [
+    "privileged_groups": [
       "ADMIN",
       "YK",
       "DK"
     ],
-    "leader_roles": [
-      "GECEKODU_LEADER",
-      "AGC_LEADER",
-      "BIZBIZE_LEADER",
-      "SKYSEC_LEADER",
-      "MOBILAB_LEADER"
+    "leader_subgroups": [
+      "LIDERLER",
+      "KOORDINATORLER"
     ],
-    "event_type_roles": {
-      "GECEKODU": ["GECEKODU", "GECEKODU_LEADER"],
-      "AGC":      ["AGC", "AGC_LEADER"],
-      "BIZBIZE":  ["BIZBIZE", "BIZBIZE_LEADER"]
-    },
     "event_permissions": {
       "_default": {
         "CREATE": ["LEADER"],

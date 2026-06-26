@@ -34,20 +34,17 @@ allow if {
 # ownerGroup gonderilmisse onu, yoksa eventType'i kullan (eventType != sahip takim senaryosuna hazir).
 owner := object.get(input.resource, "ownerGroup", input.resource.eventType)
 
-# --- Kullanicinin sahip takimdaki seviyeleri ---
-# LEADER: {owner}_LEADER rolu (lider alt grubundan miras; alt grup adi onemli degil)
+# --- Kullanicinin sahip takimdaki seviyeleri (KAYNAK: Keycloak grup agaci) ---
+# LEADER: grup yolu sahip takimin lider alt grubuna isaret ediyor (.../OWNER/LIDERLER)
 user_levels contains "LEADER" if {
-    concat("", [owner, "_LEADER"]) in input.user.roles
+    some g in input.user.groups
+    some sub in data.skylab.leader_subgroups
+    contains(g, concat("", ["/", owner, "/", sub]))
 }
 
-# MEMBER (rol sinyali): {owner} rolu (takim grubundan miras)
-user_levels contains "MEMBER" if {
-    owner in input.user.roles
-}
-
-# MEMBER (grup sinyali): grup yolu sahip takima isaret ediyor mu
+# MEMBER: grup yolu sahip takima isaret ediyor
 #   .../OWNER      -> takimin direkt uyesi
-#   .../OWNER/...  -> takimin alt grubunda (Leaders/Coordinator dahil)
+#   .../OWNER/...  -> takimin alt grubunda (Liderler dahil)
 user_levels contains "MEMBER" if {
     some g in input.user.groups
     endswith(g, concat("", ["/", owner]))

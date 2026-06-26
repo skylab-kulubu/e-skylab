@@ -72,12 +72,12 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/api/competitors/{id}").authenticated()
                         .pathMatchers(HttpMethod.PATCH, "/api/competitors/{id}").authenticated()
                         .pathMatchers(HttpMethod.DELETE, "/api/competitors/{id}").authenticated()
-                        .pathMatchers(HttpMethod.GET, "/api/competitors/event-type/{id}").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/competitors/team/{ownerTeam}").authenticated()
 
+                        .pathMatchers(HttpMethod.GET, "/api/teams/{team}/members").permitAll()
 
                         // EVENTS!!
                         .pathMatchers(HttpMethod.GET, "/api/events/active").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/events/type/{eventTypeName}").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/events/{id}").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/events").authenticated()
