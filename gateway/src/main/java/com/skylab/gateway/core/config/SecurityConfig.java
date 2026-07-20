@@ -170,6 +170,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/admin/forms/{id}/draft").hasAnyRole("skyforms:form:manage")
                         .pathMatchers(HttpMethod.DELETE, "/api/admin/forms/{id}").hasAnyRole("skyforms:form:manage")
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/metrics").hasAnyRole("skyforms:form:manage")
+                        .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/analytics").hasAnyRole("skyforms:form:manage")
 
                         // SKYFORMS RESPONSE MANAGE
                         .pathMatchers(HttpMethod.GET, "/api/admin/forms/{id}/responses").hasAnyRole("skyforms:response:manage")
