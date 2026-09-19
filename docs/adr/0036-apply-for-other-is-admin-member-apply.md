@@ -1,0 +1,3 @@
+# Apply-for-other is admin Member apply, not Guest apply
+
+Privileged people and Owner-team Leaders may write a REGISTERED Ticket for another User from the Event hub (apply-for-other). That is Member apply on someone else's behalf: identity comes from that User; they are not dumped onto a public Form slot (ADR 0029). Operators may also Guest apply from the hub for a person without an account. Desk check-in then resolves the Ticket and marks the Oturum. Rejected: Guest apply to enroll a Member; Walk-in Event QR in this slice; a Staff scanner camera in superadmin; treating apply-for-other as the attendee's own `/applications/me`.
