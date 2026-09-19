@@ -1,0 +1,3 @@
+# Admin writes club profile; User phone is admin-only PII
+
+Privileged people (or whoever already may manage that User in admin) may PATCH another User's club profile: name, LinkedIn, university, faculty, department, phone. skyNumber and password/passkey stay off that write — password is Account Console `e.` Empty PATCH keys follow `PUT/PATCH /v1/users/me` (omitted stay; empty string on replace clears). Phone lives on the User shadow but is admin-panel-only: omit it from `GET /v1/users/me` and every non-admin payload (sky-app, SkyPass, public roster, CMS, guest Ticket as “User phone”, forms). Rejected: treating JWT `phoneNumber` as the looked-up card; putting phone on sky-app profile.

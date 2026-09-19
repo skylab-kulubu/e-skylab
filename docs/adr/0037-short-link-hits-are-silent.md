@@ -1,0 +1,3 @@
+# Short-link hits are silent; userId only if JWT already on the hop
+
+`GET /v1/go/{alias}` stays a 301 (ADR 0020). Immediately before redirect, core writes a hit: time, IP / `X-Forwarded-For`, UA, Referer, alias, and `userId` only if that request already carried a valid core JWT (Bearer and/or a session cookie this host already accepts). A public click (WhatsApp, Instagram, Safari) does not send `admin.` or `e.` cookies; empty `userId` is expected. Do not redirect through Keycloak, open a hidden iframe, run silent SSO, delay the 301, or put login on skyl.app to “fill in” who clicked. QR PNG GET is not a hit. Admin analysis (Privileged or `url:moderator`) reads the table; default retention 90 days. Rejected: interstitial; hop SSO; treating empty `userId` as a bug.
