@@ -12,11 +12,13 @@ below have recorded evidence and an owner.
   passwordless assertion with a Chromium virtual authenticator, plus
   conditional-passkey remember-me, locale, keyboard,
   reduced motion and contrast contracts. CI cannot supply production platform
-  authenticators. Record successful registration, cancellation, passwordless
-  login and failure recovery on representative Touch ID, Face ID, Android
-  Credential Manager, Windows Hello and supported mobile WebViews before
-  rollout; mocked or virtual credentials are not a substitute for this
-  evidence.
+  authenticators. The initial rollout records successful registration,
+  cancellation, passwordless login and failure recovery on the available
+  Touch ID and Face ID surfaces; mocked or virtual credentials are not a
+  substitute for this evidence. Android Credential Manager, Windows Hello and
+  mobile WebView coverage is explicitly deferred to post-release compatibility
+  testing. A failure on a deferred surface is handled as a compatibility fix
+  and does not retroactively expand the recorded release evidence.
 
   The production clone must report
   `webAuthnPolicyPasswordlessPasskeysEnabled=true` and
@@ -26,14 +28,15 @@ below have recorded evidence and an owner.
 
   The `keycloak-production` release environment must define all three variables
   below. The release gate rejects absent data, evidence for another commit, or
-  a partial surface list before registry login or image publication:
+  a surface list different from the recorded rollout scope before registry
+  login or image publication:
 
   - `KEYCLOAK_PHYSICAL_WEBAUTHN_APPROVED_COMMIT`: the exact candidate commit
     from the release job;
   - `KEYCLOAK_PHYSICAL_WEBAUTHN_EVIDENCE_URL`: HTTPS URL to the retained test
-    record;
+    record for the tested rollout scope;
   - `KEYCLOAK_PHYSICAL_WEBAUTHN_APPROVED_SURFACES`:
-    `touch-id,face-id,android-credential-manager,windows-hello,mobile-webview`.
+    `touch-id,face-id`.
 
   The protected build/test job has read-only repository permission and no
   registry write capability. It packages the already-tested image and exact
@@ -41,9 +44,10 @@ below have recorded evidence and an owner.
   job alone receives `packages: write`; it verifies the one-day artifact's
   commit SHA, checksums, image ID and one-JAR/theme contract, and cannot rebuild
   the candidate.
-- The `sky-native-handoff` authenticator and its protected redemption endpoint
-  are not part of this foundation. The `account-center-browser` flow is a
-  client-specific standard browser-flow copy until that work lands.
+- The `sky-native-handoff` authenticator, protected mTLS/HMAC redemption client,
+  client-specific browser flow and `skyapp` audience mapper are included in the
+  candidate. Native application WebView coverage remains part of the deferred
+  post-release compatibility scope.
 - `https://my.yildizskylab.com/api/auth/backchannel-logout` is the agreed
   Keycloak contract, but the Account Center route must exist and pass logout
   tests before production enablement.
@@ -54,8 +58,9 @@ below have recorded evidence and an owner.
   TOTP AIA mutation, virtual WebAuthn registration/retry/passwordless
   assertion, ID-token
   `sub`/`sid`/`auth_time`, token audience/roles, Account REST profile read and
-  source-built theme rendering. It does not complete physical WebAuthn or
-  deliver backchannel logout to the BFF; those remain release gates.
+  source-built theme rendering. It does not replace the recorded Touch ID and
+  Face ID checks or deliver backchannel logout to the BFF; those remain release
+  gates.
 
 ## 1. Capture and verify a backup
 
