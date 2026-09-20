@@ -35,7 +35,7 @@ theme_metadata=$(unzip -p "$THEME_JAR" META-INF/keycloak-themes.json)
 jq -e '.themes == [{"name":"e-skylab-theme","types":["login"]}]' <<<"$theme_metadata" >/dev/null \
   || fail 'theme metadata exposes an unexpected name or theme type'
 
-bundle_text=$(unzip -p "$THEME_JAR" 'theme/e-skylab-theme/login/resources/dist/assets/*.js' | strings)
+bundle_text=$(unzip -p "$THEME_JAR" 'theme/e-skylab-theme/login/resources/dist/assets/*.js')
 for required_token in \
   residentKey \
   requireResidentKey \
