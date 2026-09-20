@@ -14,9 +14,9 @@ below have recorded evidence and an owner.
   reduced motion and contrast contracts. CI cannot supply production platform
   authenticators. The initial rollout records successful registration,
   cancellation, passwordless login and failure recovery on the available
-  Touch ID and Face ID surfaces; mocked or virtual credentials are not a
-  substitute for this evidence. Android Credential Manager, Windows Hello and
-  mobile WebView coverage is explicitly deferred to post-release compatibility
+  Touch ID surface; mocked or virtual credentials are not a substitute for
+  this evidence. Face ID, Android Credential Manager, Windows Hello and mobile
+  WebView coverage are explicitly deferred to post-release compatibility
   testing. A failure on a deferred surface is handled as a compatibility fix
   and does not retroactively expand the recorded release evidence.
 
@@ -36,7 +36,7 @@ below have recorded evidence and an owner.
   - `KEYCLOAK_PHYSICAL_WEBAUTHN_EVIDENCE_URL`: HTTPS URL to the retained test
     record for the tested rollout scope;
   - `KEYCLOAK_PHYSICAL_WEBAUTHN_APPROVED_SURFACES`:
-    `touch-id,face-id`.
+    `touch-id`.
 
   The protected build/test job has read-only repository permission and no
   registry write capability. It packages the already-tested image and exact
@@ -58,9 +58,9 @@ below have recorded evidence and an owner.
   TOTP AIA mutation, virtual WebAuthn registration/retry/passwordless
   assertion, ID-token
   `sub`/`sid`/`auth_time`, token audience/roles, Account REST profile read and
-  source-built theme rendering. It does not replace the recorded Touch ID and
-  Face ID checks or deliver backchannel logout to the BFF; those remain release
-  gates.
+  source-built theme rendering. It does not replace the recorded Touch ID
+  check or deliver backchannel logout to the BFF; those remain release gates.
+  Face ID and the other deferred surfaces stay post-release compatibility work.
 
 ## 1. Capture and verify a backup
 

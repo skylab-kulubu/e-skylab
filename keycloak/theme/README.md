@@ -71,8 +71,9 @@ virtual authenticator.
 
 CI browser automation cannot prove platform authenticator behavior on real
 Touch ID, Face ID, Android Credential Manager, Windows Hello or the supported
-mobile WebViews. Registration, cancellation, passwordless sign-in and failure
-recovery on representative physical hardware remain a recorded production
-rollout gate. Registry publication is blocked unless the release environment
-binds an HTTPS evidence record and the complete device list to the exact
-candidate commit; a virtual browser success is not a substitute.
+mobile WebViews. The initial production rollout records registration,
+cancellation, passwordless sign-in and failure recovery on physical Touch ID.
+Face ID and the other device surfaces are deferred to post-release
+compatibility testing. Registry publication is blocked unless the release
+environment binds an HTTPS evidence record and the exact tested surface list
+to the candidate commit; a virtual browser success is not a substitute.
