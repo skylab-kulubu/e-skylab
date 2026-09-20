@@ -140,6 +140,19 @@ def assert_release_boundary(workflow)
   if publish_steps.any? { |step| step["uses"] == "docker/build-push-action@v7" }
     abort "#{workflow} keycloak-publish must load the tested artifact, not rebuild it"
   end
+
+  publication = publish_steps.fetch(publish_index).fetch("run", "")
+  for alias_name in ["latest", "main", "production"]
+    unless publication.include?(%($PUBLISH_IMAGE:#{alias_name}))
+      abort "#{workflow} tested Keycloak release must publish the #{alias_name} alias"
+    end
+  end
+  unless publication.include?('published_images=(') &&
+      publication.include?('docker image inspect') &&
+      publication.include?('docker buildx imagetools inspect --raw') &&
+      publication.include?('test "$version_digest" = "$alias_digest"')
+    abort "#{workflow} all release aliases must be bound to the tested image ID and manifest digest"
+  end
 end
 
 assert_order(File.join(root, ".github/workflows/keycloak-ci.yml"), "integration")

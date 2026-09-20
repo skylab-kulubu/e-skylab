@@ -136,9 +136,11 @@ job.
 
 ## 5. Immutable artifact and proxy boundary
 
-The release workflow builds one candidate, tests that local image, pushes the
-same image as the version and `latest`, and records the registry manifest digest
-in the workflow summary. The repository is hardcoded in Compose as
+The release workflow builds one candidate, tests that local image, and pushes
+the same image as the version plus the `latest`, `main` and `production`
+aliases. Those mutable aliases move only after the tagged release passes the
+physical WebAuthn gate. The workflow records the registry manifest digest in
+its summary. The repository is hardcoded in Compose as
 `ghcr.io/skylab-kulubu/e-skylab-keycloak`; operators can supply only the 64
 hexadecimal characters after `sha256:` as `KEYCLOAK_IMAGE_DIGEST`. Production
 compose constructs one exact `repository@sha256:digest` for runtime, preflight
