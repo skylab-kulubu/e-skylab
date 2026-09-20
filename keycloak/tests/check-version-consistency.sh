@@ -63,10 +63,12 @@ if grep -Fq 'providers/e-skylab-theme-1.1.1.jar' "$KEYCLOAK_DIR/Dockerfile"; the
   fail 'optimized image still installs the source-less legacy theme'
 fi
 
-for compose_file in "$KEYCLOAK_DIR/docker-compose.yml" "$SCRIPT_DIR/docker-compose.integration.yml"; do
-  grep -Fq "image: $POSTGRES_IMAGE" "$compose_file" \
-    || fail "$compose_file does not use the approved digest-pinned PostgreSQL image"
-done
+grep -Fq "image: $POSTGRES_IMAGE" "$SCRIPT_DIR/docker-compose.integration.yml" \
+  || fail 'integration Compose does not use the approved digest-pinned PostgreSQL fixture image'
+if grep -Eq '^[[:space:]]+keycloak-db:|^[[:space:]]+image:[[:space:]]+postgres:' \
+  "$KEYCLOAK_DIR/docker-compose.yml"; then
+  fail 'production Compose must connect to the existing shared PostgreSQL service'
+fi
 
 grep -Fq "image: $RABBITMQ_IMAGE" "$SCRIPT_DIR/docker-compose.integration.yml" \
   || fail 'integration RabbitMQ image is not digest-pinned'

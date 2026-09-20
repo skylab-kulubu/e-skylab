@@ -19,14 +19,12 @@ This directory owns the Keycloak runtime used by `e.yildizskylab.com`.
   validated `KEYCLOAK_IMAGE_DIGEST` input. Runtime, preflight and reconciler
   resolve to the same `repository@sha256:digest`.
   Local builds use the standalone `docker-compose.build.yml` explicitly.
-- Production data volumes are required external resources with operator-supplied
-  names. A networkless, read-only preflight checks the PostgreSQL 17 control
-  file, fixed system catalogs/databases, transaction state and a complete WAL
-  segment before the database or Keycloak is allowed to start. Marker-only or
-  empty volumes cannot pass. Only that preflight runs as UID 0 with
-  `DAC_READ_SEARCH`, so it can inspect 0700 volumes owned by either the prior
-  Debian image UID or the pinned Alpine image UID; runtime privileges are not
-  widened.
+- Production connects to the existing shared PostgreSQL 18 service. Compose
+  never declares a PostgreSQL service, mounts its data volume or creates a
+  Keycloak data volume. A read-only, non-root preflight validates the immutable
+  image and shared-database inputs, then proves the configured database endpoint
+  is reachable without receiving the database password. Keycloak performs the
+  authenticated database and schema checks during normal startup.
 - Forwarded headers are accepted only from the required
   `KEYCLOAK_PROXY_TRUSTED_ADDRESSES` allowlist.
 
@@ -92,10 +90,11 @@ docker compose -f keycloak/docker-compose.build.yml build
 ```
 
 Static/render checks deliberately run before the candidate exists. After the
-build, a separate runtime preflight initializes a real PostgreSQL Alpine 0700
-volume, accepts it, and rejects the former marker-only false-positive fixture.
-The main fixture then starts PostgreSQL, RabbitMQ and the optimized image; runs
-reconciliation twice with deliberate configuration drift between runs; checks
+build, a separate runtime preflight reaches a PostgreSQL fixture across an
+internal Docker network and rejects an unreachable endpoint or malformed
+production input. The main fixture then starts PostgreSQL, RabbitMQ and the
+optimized image; runs reconciliation twice with deliberate configuration drift
+between runs; checks
 the exact OIDC client contract and a live minimal `openid` PAR request;
 completes a browser Authorization Code + S256 exchange; asserts the ID
 token's `sub`, `sid` and integer/non-future `auth_time`; and proves an actual
