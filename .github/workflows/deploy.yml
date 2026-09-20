@@ -233,20 +233,34 @@ jobs:
         run: |
           version_image="$PUBLISH_IMAGE:$VERSION"
           latest_image="$PUBLISH_IMAGE:latest"
+          main_image="$PUBLISH_IMAGE:main"
+          production_image="$PUBLISH_IMAGE:production"
           candidate_id=$(docker image inspect --format '{{.Id}}' "$KEYCLOAK_TEST_IMAGE")
-          docker tag "$KEYCLOAK_TEST_IMAGE" "$version_image"
-          docker tag "$KEYCLOAK_TEST_IMAGE" "$latest_image"
-          test "$(docker image inspect --format '{{.Id}}' "$version_image")" = "$candidate_id"
-          test "$(docker image inspect --format '{{.Id}}' "$latest_image")" = "$candidate_id"
-          docker push "$version_image"
-          docker push "$latest_image"
+
+          published_images=(
+            "$version_image"
+            "$latest_image"
+            "$main_image"
+            "$production_image"
+          )
+          for image in "${published_images[@]}"; do
+            docker tag "$KEYCLOAK_TEST_IMAGE" "$image"
+            test "$(docker image inspect --format '{{.Id}}' "$image")" = "$candidate_id"
+            docker push "$image"
+          done
+
           version_digest="sha256:$(docker buildx imagetools inspect --raw "$version_image" | sha256sum | cut -d' ' -f1)"
-          latest_digest="sha256:$(docker buildx imagetools inspect --raw "$latest_image" | sha256sum | cut -d' ' -f1)"
-          test "$version_digest" = "$latest_digest"
+          for image in "${published_images[@]:1}"; do
+            alias_digest="sha256:$(docker buildx imagetools inspect --raw "$image" | sha256sum | cut -d' ' -f1)"
+            test "$version_digest" = "$alias_digest"
+          done
+
           {
             echo "### Tested Keycloak artifact"
             echo
             echo "\`$version_image@$version_digest\`"
+            echo
+            echo "Mutable aliases: \`latest\`, \`main\`, \`production\`"
             echo
             echo "Candidate commit: \`$GITHUB_SHA\`"
           } >> "$GITHUB_STEP_SUMMARY"

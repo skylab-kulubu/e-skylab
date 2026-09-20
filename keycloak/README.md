@@ -111,7 +111,10 @@ gate, then uploads a one-day artifact containing the tested image, its exact
 source-built theme JAR, commit SHA, image ID and checksums. Only the dependent
 publish job receives package-write permission. It verifies those identities,
 the one-JAR/theme contract and the transferred checksums before retagging and
-pushing the same image bytes as `X.Y.Z` and `latest`; it never rebuilds them.
+pushing the same image bytes as `X.Y.Z`, `latest`, `main` and `production`; it
+never rebuilds them. The mutable aliases are updated only by this gated release
+path, never by an ordinary push to `main`. Production deployment still uses the
+immutable manifest digest recorded by the workflow, not a mutable alias.
 
 Production deployment must follow
 [`docs/keycloak-26.7.4-upgrade-runbook.md`](../docs/keycloak-26.7.4-upgrade-runbook.md).
