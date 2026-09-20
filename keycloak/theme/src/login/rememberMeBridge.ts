@@ -9,7 +9,6 @@ export function installPasskeyRememberMeBridge(root: ParentNode = document): () 
     return () => undefined;
   }
 
-  const rememberMeCheckbox = root.querySelector<HTMLInputElement>("input#rememberMe");
   const hiddenInput = document.createElement("input");
   hiddenInput.type = "hidden";
   hiddenInput.id = PASSKEY_REMEMBER_ME_INPUT_ID;
@@ -17,14 +16,24 @@ export function installPasskeyRememberMeBridge(root: ParentNode = document): () 
   hiddenInput.value = "on";
   passkeyForm.append(hiddenInput);
 
+  let rememberMeCheckbox: HTMLInputElement | null = null;
+
   const sync = () => {
+    const nextCheckbox = root.querySelector<HTMLInputElement>("input#rememberMe");
+    if (nextCheckbox !== rememberMeCheckbox) {
+      rememberMeCheckbox?.removeEventListener("change", sync);
+      rememberMeCheckbox = nextCheckbox;
+      rememberMeCheckbox?.addEventListener("change", sync);
+    }
     hiddenInput.disabled = rememberMeCheckbox?.checked !== true;
   };
 
   sync();
-  rememberMeCheckbox?.addEventListener("change", sync);
+  const observer = new MutationObserver(sync);
+  observer.observe(root instanceof Document ? root.body : root, { childList: true, subtree: true });
 
   return () => {
+    observer.disconnect();
     rememberMeCheckbox?.removeEventListener("change", sync);
     hiddenInput.remove();
   };
@@ -52,10 +61,7 @@ export function watchPasskeyRememberMeBridge(root: Document = document): () => v
 
 export function usePasskeyRememberMeBridge(kcContext: KcContext): void {
   useEffect(() => {
-    if (
-      (kcContext.pageId !== "login.ftl" && kcContext.pageId !== "login-username.ftl") ||
-      !kcContext.enableWebAuthnConditionalUI
-    ) {
+    if (kcContext.pageId !== "login.ftl" && kcContext.pageId !== "login-username.ftl") {
       return;
     }
 

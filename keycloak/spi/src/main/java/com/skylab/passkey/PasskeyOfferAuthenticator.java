@@ -55,11 +55,19 @@ final class PasskeyOfferAuthenticator implements Authenticator {
         }
 
         MultivaluedMap<String, String> form = context.getHttpRequest().getDecodedFormParameters();
-        if ("yes".equalsIgnoreCase(form.getFirst(CHOICE_PARAM))) {
+        String choice = form.getFirst(CHOICE_PARAM);
+        if ("yes".equalsIgnoreCase(choice)) {
             user.removeAttribute(ATTR_DISMISSED_AT);
-            user.addRequiredAction(REQUIRED_ACTION_WEBAUTHN_REGISTER_PASSWORDLESS);
-        } else {
+            context.getAuthenticationSession()
+                    .addRequiredAction(REQUIRED_ACTION_WEBAUTHN_REGISTER_PASSWORDLESS);
+        } else if ("no".equalsIgnoreCase(choice)) {
             user.setSingleAttribute(ATTR_DISMISSED_AT, String.valueOf(System.currentTimeMillis()));
+        } else {
+            Response challenge = context.form()
+                    .setError("Lütfen passkey tercihini yeniden seç.")
+                    .createForm(FORM_TEMPLATE);
+            context.challenge(challenge);
+            return;
         }
         context.success();
     }
@@ -107,4 +115,3 @@ final class PasskeyOfferAuthenticator implements Authenticator {
         // no-op
     }
 }
-

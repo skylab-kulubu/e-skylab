@@ -5,6 +5,17 @@ const { useI18n, ofTypeI18n } = i18nBuilder
   .withThemeName<ThemeName>()
   .withCustomTranslations({
     tr: {
+      skylabTitle: "SKY LAB'e Hoş Geldin!",
+      skylabDesc:
+        "Tüm SKY LAB sitelerine erişim için YTÜ öğrenci mailinle hesabına giriş yapabilirsin. Eğer YTÜ öğrencisi değilsen de hesabını oluşturduğun e-posta ve şifrenle girebilirsin.",
+      microsoft: "YTÜ Öğrencisiyim",
+      notYtuStudent: "YTÜ Öğrencisi Değilim",
+      goBack: "Geri dön",
+      kvkkPrefix: "Giriş yaparak ",
+      kvkkLinkText: "KVKK Metni",
+      kvkkSuffix: "'ni okuduğunuzu ve kabul ettiğinizi onaylıyorsunuz.",
+      passkeyChoice: "Erişim anahtarı ile giriş yap",
+      skipToContent: "İçeriğe geç",
       doLogIn: "Giriş yap",
       doRegister: "Kayıt ol",
       doCancel: "Vazgeç",
@@ -38,6 +49,17 @@ const { useI18n, ofTypeI18n } = i18nBuilder
       "passkey-autofill-select": "Passkeyini seç"
     },
     en: {
+      skylabTitle: "Welcome to SKY LAB!",
+      skylabDesc:
+        "You can log in with your YTÜ student email to access all SKY LAB sites. If you are not a YTÜ student, you can log in with your registered email and password.",
+      microsoft: "I'm a YTÜ Student",
+      notYtuStudent: "I'm not a YTÜ Student",
+      goBack: "Go back",
+      kvkkPrefix: "By logging in, you confirm that you have read and accepted the ",
+      kvkkLinkText: "KVKK Policy",
+      kvkkSuffix: ".",
+      passkeyChoice: "Sign in with a passkey",
+      skipToContent: "Skip to content",
       doLogIn: "Sign in",
       doRegister: "Register",
       doCancel: "Cancel",
