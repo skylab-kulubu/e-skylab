@@ -30,6 +30,23 @@ jobs:
           bash keycloak/tests/check-version-consistency.sh
           bash keycloak/tests/check-fresh-runner.sh
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.22.1
+          cache: npm
+          cache-dependency-path: keycloak/theme/package-lock.json
+
+      - name: Test and build the source-controlled login theme
+        working-directory: keycloak/theme
+        run: |
+          npm ci --ignore-scripts
+          npm audit --audit-level=high
+          npm test
+          npx playwright install --with-deps chromium
+          npm run test:browser
+          npm run build-keycloak-theme
+          bash ../tests/check-theme-contract.sh
+
       - uses: docker/setup-buildx-action@v4
 
       - name: Build optimized Keycloak image

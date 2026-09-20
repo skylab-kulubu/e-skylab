@@ -2,7 +2,13 @@
   "realm": "e-skylab-test",
   "enabled": true,
   "displayName": "SKY LAB test realm",
-  "loginTheme": "e-skylab-theme-v1-1-1",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "tr",
+    "en"
+  ],
+  "defaultLocale": "tr",
+  "loginTheme": "e-skylab-theme",
   "eventsEnabled": true,
   "adminEventsEnabled": true,
   "adminEventsDetailsEnabled": false,

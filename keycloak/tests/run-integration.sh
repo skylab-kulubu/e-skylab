@@ -168,7 +168,10 @@ unexpected_mapper_count=$(kcadm get \
 [[ $unexpected_mapper_count == 1 ]] \
   || fail "failed reconciliation mutated mapper state after its read failed"
 
-kcadm update realms/e-skylab-test -s ssoSessionMaxLifespan=123 >/dev/null
+kcadm update realms/e-skylab-test \
+  -s ssoSessionMaxLifespan=123 \
+  -s webAuthnPolicyPasswordlessPasskeysEnabled=false \
+  -s webAuthnPolicyPasswordlessMediation=none >/dev/null
 kcadm update authentication/required-actions/UPDATE_PASSWORD \
   -r e-skylab-test -s enabled=false >/dev/null
 
@@ -193,14 +196,14 @@ json_assert "$client" '.attributes["backchannel.logout.session.required"] == "tr
 
 realm=$(kcadm get realms/e-skylab-test -c)
 json_assert "$realm" \
-  '.sslRequired == "external" and .registrationAllowed == false and .resetPasswordAllowed == true and .ssoSessionIdleTimeout == 1800 and .ssoSessionMaxLifespan == 28800 and .accessCodeLifespanUserAction == 300 and .loginTheme == "e-skylab-theme-v1-1-1"' \
+  '.sslRequired == "external" and .registrationAllowed == false and .resetPasswordAllowed == true and .ssoSessionIdleTimeout == 1800 and .ssoSessionMaxLifespan == 28800 and .accessCodeLifespanUserAction == 300 and .internationalizationEnabled == true and .defaultLocale == "tr" and (.supportedLocales | sort) == ["en", "tr"] and .loginTheme == "e-skylab-theme"' \
   'realm security, session or theme desired state differs'
 json_assert "$realm" \
-  '.webAuthnPolicyPasswordlessRpEntityName == "SKY LAB" and .webAuthnPolicyPasswordlessResidentKey == "required" and .webAuthnPolicyPasswordlessUserVerificationRequirement == "required"' \
+  '.webAuthnPolicyPasswordlessRpEntityName == "SKY LAB" and .webAuthnPolicyPasswordlessResidentKey == "required" and .webAuthnPolicyPasswordlessUserVerificationRequirement == "required" and .webAuthnPolicyPasswordlessPasskeysEnabled == true and .webAuthnPolicyPasswordlessMediation == "conditional"' \
   'passwordless WebAuthn desired state differs'
 
 required_actions=$(kcadm get authentication/required-actions -r e-skylab-test -c)
-for required_action in UPDATE_PASSWORD CONFIGURE_TOTP webauthn-register-passwordless; do
+for required_action in UPDATE_PASSWORD CONFIGURE_TOTP webauthn-register-passwordless delete_credential; do
   json_assert "$required_actions" \
     '[.[] | select(.alias == $alias and .enabled == true and .defaultAction == false)] | length == 1' \
     "required action $required_action differs" \
@@ -362,7 +365,7 @@ login_page=$(curl --fail --silent --show-error --location \
   --cookie-jar "$TEST_STATE_DIR/login.cookies" \
   --cookie "$TEST_STATE_DIR/login.cookies" \
   "http://localhost:18080/realms/e-skylab-test/protocol/openid-connect/auth?client_id=account-center&request_uri=$request_uri_query")
-[[ $login_page == *e-skylab-theme-v1-1-1* ]] \
+[[ $login_page == *e-skylab-theme* ]] \
   || fail "the configured SKY LAB login theme did not render"
 
 CURRENT_STAGE='AIA PAR acceptance'
@@ -497,6 +500,40 @@ account_profile=$(curl --fail --silent --show-error \
 json_assert "$account_profile" \
   '.username == "account-fixture" and .email == "account-fixture@example.invalid"' \
   'live Account REST profile contract failed'
+
+CURRENT_STAGE='real Chromium login and AIA contracts'
+real_browser_config="$TEST_STATE_DIR/real-keycloak-browser.json"
+jq -n \
+  --arg baseUrl 'http://localhost:18080' \
+  --arg callbackUrl 'https://my.yildizskylab.com/api/auth/callback' \
+  --arg clientId 'account-center' \
+  --arg clientSecret "$client_secret" \
+  --arg username 'account-fixture' \
+  --arg password 'fixture-password-change-me' \
+  --arg changedPassword 'fixture-password-changed-by-browser' \
+  '{
+    baseUrl: $baseUrl,
+    callbackUrl: $callbackUrl,
+    clientId: $clientId,
+    clientSecret: $clientSecret,
+    username: $username,
+    password: $password,
+    changedPassword: $changedPassword
+  }' \
+  >"$real_browser_config"
+chmod 0600 "$real_browser_config"
+(
+  cd "$SCRIPT_DIR/../theme"
+  REAL_KEYCLOAK_BROWSER_CONFIG="$real_browser_config" \
+    npx --no-install playwright test \
+      --config=playwright.integration.config.ts \
+      tests/integration/real-keycloak.spec.ts
+)
+kcadm set-password \
+  -r e-skylab-test \
+  --userid "$fixture_user_uuid" \
+  --new-password fixture-password-change-me \
+  --temporary=false >/dev/null
 
 # Provision the RabbitMQ topology expected by the provider, then use an admin
 # event to prove the rebuilt provider can publish on Keycloak 26.7.4.

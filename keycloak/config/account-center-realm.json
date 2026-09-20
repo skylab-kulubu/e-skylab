@@ -10,12 +10,20 @@
   "accessCodeLifespan": 60,
   "accessCodeLifespanLogin": 1800,
   "accessCodeLifespanUserAction": 300,
-  "loginTheme": "e-skylab-theme-v1-1-1",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "tr",
+    "en"
+  ],
+  "defaultLocale": "tr",
+  "loginTheme": "e-skylab-theme",
   "webAuthnPolicyPasswordlessRpEntityName": "SKY LAB",
   "webAuthnPolicyPasswordlessSignatureAlgorithms": [
     "ES256",
     "RS256"
   ],
   "webAuthnPolicyPasswordlessResidentKey": "required",
-  "webAuthnPolicyPasswordlessUserVerificationRequirement": "required"
+  "webAuthnPolicyPasswordlessUserVerificationRequirement": "required",
+  "webAuthnPolicyPasswordlessPasskeysEnabled": true,
+  "webAuthnPolicyPasswordlessMediation": "conditional"
 }
