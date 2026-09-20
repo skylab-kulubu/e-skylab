@@ -1,0 +1,31 @@
+{
+  "realm": "e-skylab-test",
+  "enabled": true,
+  "displayName": "SKY LAB test realm",
+  "loginTheme": "e-skylab-theme-v1-1-1",
+  "eventsEnabled": true,
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": false,
+  "eventsListeners": [
+    "jboss-logging",
+    "keycloak-to-rabbitmq"
+  ],
+  "clients": [],
+  "users": [
+    {
+      "username": "account-fixture",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Account",
+      "lastName": "Fixture",
+      "email": "account-fixture@example.invalid",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "fixture-password-change-me",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
