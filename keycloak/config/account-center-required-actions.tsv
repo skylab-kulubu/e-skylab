@@ -1,4 +1,0 @@
-UPDATE_PASSWORD|true|false
-CONFIGURE_TOTP|true|false
-webauthn-register-passwordless|true|false
-delete_credential|true|false

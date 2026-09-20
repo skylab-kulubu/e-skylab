@@ -1,6 +1,6 @@
 # SKY LAB Platform
 
-Yıldız Teknik Üniversitesi SKY LAB kulübünün etkinlik, üyelik, kimlik ve yayın platformu. Kimlikte kaynak Keycloak; her uygulama kendi verisini tutar.
+Yıldız Teknik Üniversitesi SKY LAB kulübünün etkinlik, üyelik, kimlik ve yayın platformu. Kimlikte kaynak Keycloak; her uygulama kendi verisini tutar. Servis ve depo sahipliği için [`docs/repositories.md`](docs/repositories.md), sistem sınırları için [`docs/architecture.md`](docs/architecture.md) kanoniktir.
 
 ## Language
 
@@ -17,12 +17,12 @@ A User in the `UYELER` tree. There is no second flag or LDAP status; membership 
 _Avoid_: LDAP user, federated user, ldapUser, member flag
 
 **Account Console**:
-Keycloak's self-service UI on `e.yildizskylab.com` (`/realms/{realm}/account`) where a User changes password, sessions, passkeys, and profile. Cutover keeps people on this IdP console. Superadmin is club admin, not this panel. Club consoles (admin, forms, mail) and any sidebar switcher among them do not replace `e.`.
-_Avoid_: stuffing password/sessions into superadmin; treating waffle or the club switcher as the account UI; treating a custom branded origin as this cutover; writing a second IdP or user-store
+Keycloak's built-in self-service UI on `e.yildizskylab.com` (`/realms/{realm}/account`). It remains an identity-provider fallback and implementation surface, but it is not the primary SKY LAB account product. Superadmin is club admin, not this panel.
+_Avoid_: stuffing password/sessions into superadmin; treating the built-in console as the branded Account center; writing a second IdP or user-store
 
 **Account center**:
-A later SKY LAB-branded origin that would call Keycloak Account REST. Not this cutover and not Place. Do not build it now.
-_Avoid_: treating this as the cutover path; stuffing it into superadmin; a Keycloak theme as that later project's end state
+The SKY LAB-branded self-service product at `my.yildizskylab.com`, implemented by the separate `account-center` repository. Its BFF calls Keycloak Account/Admin contracts for profile, credentials and sessions; Keycloak remains the identity source. It is not Superadmin and not Place.
+_Avoid_: storing identity separately from Keycloak; exposing privileged Keycloak credentials to the browser; stuffing account settings into superadmin; treating a Keycloak login theme as the whole Account center
 
 **SkyPass**:
 A Member's club membership card (name and skyNumber on the face, no photo); door proof is SkyPass QR from sky-app or Wallet, or a bound Student card tapped at the door. Apple Wallet and Google Wallet are a required substitute when sky-app is not installed, and are not SkyPass itself.
