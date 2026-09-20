@@ -11,7 +11,9 @@ const { getKcContextMock } = createGetKcContextMock({
     themeName: themeNames[0],
     properties: { ...kcEnvDefaults }
   } satisfies KcContextExtension,
-  kcContextExtensionPerPage: {} satisfies KcContextExtensionPerPage,
+  kcContextExtensionPerPage: {
+    "passkey-offer.ftl": {}
+  } satisfies KcContextExtensionPerPage,
   overrides: {
     realm: {
       name: "e-skylab",
@@ -38,6 +40,17 @@ const { getKcContextMock } = createGetKcContextMock({
       enableWebAuthnConditionalUI: true,
       realm: { rememberMe: true },
       login: { rememberMe: "on" },
+      social: {
+        displayInfo: true,
+        providers: [
+          {
+            alias: "microsoft",
+            displayName: "Microsoft",
+            providerId: "microsoft",
+            loginUrl: "#microsoft"
+          }
+        ]
+      },
       authenticatorAttachment: "platform",
       mediation: "conditional"
     },
@@ -68,7 +81,8 @@ const allowedPages = new Set<KcContext["pageId"]>([
   "login-config-totp.ftl",
   "webauthn-register.ftl",
   "webauthn-error.ftl",
-  "login-passkeys-conditional-authenticate.ftl"
+  "login-passkeys-conditional-authenticate.ftl",
+  "passkey-offer.ftl"
 ]);
 
 export function getDevKcContext(): KcContext {

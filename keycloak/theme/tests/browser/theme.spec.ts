@@ -1,12 +1,16 @@
 import { expect, test } from "@playwright/test";
 
-test("login uses semantic landmarks and preserves remember-me for conditional passkeys", async ({ page }) => {
+test("login uses semantic landmarks and preserves remember-me for passkeys", async ({ page }) => {
   await page.goto("/?page=login.ftl");
 
-  await expect(page.getByRole("banner", { name: "SKY LAB kimlik hizmeti" })).toBeVisible();
   await expect(page.getByRole("main")).toBeVisible();
-  await expect(page.getByRole("contentinfo")).toContainText("Yıldız Teknik Üniversitesi");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("SKY LAB");
+  await expect(page.getByRole("heading", { name: "SKY LAB'e Hoş Geldin!" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "YTÜ Öğrencisiyim" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "YTÜ Öğrencisi Değilim" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Erişim anahtarı ile giriş yap" })).toBeVisible();
+  await expect(page.getByRole("contentinfo")).toContainText("e-skylab by WEBLAB");
+
+  await page.getByRole("button", { name: "YTÜ Öğrencisi Değilim" }).click();
   await expect(page.getByRole("button", { name: "Giriş yap", exact: true })).toBeVisible();
 
   const rememberMe = page.locator("#rememberMe");
@@ -20,27 +24,20 @@ test("login uses semantic landmarks and preserves remember-me for conditional pa
   await expect(passkeyRememberMe).toBeEnabled();
 });
 
-test("keyboard navigation exposes skip link and native locale menu", async ({ page }) => {
+test("keyboard navigation exposes the skip link and localized legacy copy", async ({ page }) => {
   await page.goto("/?page=login.ftl");
 
-  const skipLink = page.locator(".sl-skip-link");
+  const skipLink = page.locator(".sl-legacy-skip-link");
   await skipLink.focus();
   await expect(skipLink).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page.locator("#sl-main-content")).toBeFocused();
+  await expect(page.locator("#sl-legacy-main")).toBeFocused();
 
-  const languageMenu = page.locator(".sl-language");
-  await languageMenu.locator("summary").focus();
-  await page.keyboard.press("Enter");
-  await expect(languageMenu).toHaveAttribute("open", "");
-  await expect(languageMenu.getByRole("link", { name: "English" })).toBeVisible();
-
-  await languageMenu.getByRole("link", { name: "English" }).click();
+  await page.goto("/?page=login.ftl&lang=en");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.getByRole("banner", { name: "SKY LAB identity service" })).toBeVisible();
-  await expect(page.locator(".sl-card__eyebrow")).toContainText("Secure account action");
-  await expect(page.getByRole("heading", { name: "Sign in to your SKY LAB account" })).toBeVisible();
-  await expect(page.getByRole("contentinfo")).toContainText("Yıldız Technical University");
+  await expect(page.getByRole("heading", { name: "Welcome to SKY LAB!" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "I'm a YTÜ Student" })).toBeVisible();
+  await expect(page.getByRole("contentinfo")).toContainText("e-skylab by WEBLAB");
 });
 
 test("known-username pages keep a labelled landmark and page heading", async ({ page }) => {
@@ -77,6 +74,18 @@ test("WebAuthn registration carries the Keycloak 26.7 resident-key contract", as
   expect(source).toContain("requireResidentKey");
   expect(source).toContain("residentKey");
   expect(source).toContain('"required"');
+});
+
+test("optional passkey offer is explicit, branded and always has a safe exit", async ({ page }) => {
+  await page.goto("/?page=passkey-offer.ftl");
+
+  await expect(page.locator(".sl-legacy-shell")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Passkey ekle" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Şimdi ekle" })).toHaveCSS(
+    "background-color",
+    "rgb(41, 147, 228)"
+  );
+  await expect(page.getByRole("button", { name: "30 gün boyunca tekrar sorma" })).toBeVisible();
 });
 
 test("WebAuthn retry submits the actual execution and AIA screens expose cancel", async ({ page }) => {

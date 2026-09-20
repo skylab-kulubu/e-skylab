@@ -119,12 +119,16 @@ async function createPage(browser: Browser): Promise<BrowserPage> {
 async function openAction(page: Page, kcAction?: string): Promise<string> {
   const authorization = await createAuthorizationUrl(kcAction);
   await page.goto(authorization.url);
-  await expect(page.locator(".sl-shell")).toBeVisible();
+  await expect(page.locator(".sl-legacy-shell")).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("lang", "tr");
   return authorization.state;
 }
 
 async function signIn(page: Page, password = config.password): Promise<void> {
+  const passwordChoice = page.getByRole("button", { name: "YTÜ Öğrencisi Değilim" });
+  if (await passwordChoice.isVisible()) {
+    await passwordChoice.click();
+  }
   await page.locator("#username").fill(config.username);
   await page.locator("#password").fill(password);
   await page.locator("#kc-login").click();
@@ -189,14 +193,11 @@ test("real Keycloak 26.7 login and AIA contracts", async ({ browser }) => {
     const { callbackReached, context, page } = await createPage(browser);
     const state = await openAction(page);
 
-    await page.locator(".sl-skip-link").focus();
+    await page.locator(".sl-legacy-skip-link").focus();
     await page.keyboard.press("Enter");
-    await expect(page.locator("#sl-main-content")).toBeFocused();
-    await page.locator(".sl-language summary").click();
-    await page.getByRole("link", { name: "English" }).click();
-    await expect(page.locator("html")).toHaveAttribute("lang", "en");
-    await expect(page.getByRole("banner", { name: "SKY LAB identity service" })).toBeVisible();
-    await expect(page.locator("#kc-login")).toHaveCSS("background-color", "rgb(217, 31, 109)");
+    await expect(page.locator("#sl-legacy-main")).toBeFocused();
+    await expect(page.getByRole("heading", { name: "SKY LAB'e Hoş Geldin!" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "YTÜ Öğrencisi Değilim" })).toBeVisible();
 
     await signIn(page);
     await expectCallback(callbackReached, state);

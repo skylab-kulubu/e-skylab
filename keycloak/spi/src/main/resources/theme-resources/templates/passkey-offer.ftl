@@ -11,17 +11,16 @@
                 </p>
             </div>
 
-            <div class="${properties.kcFormGroupClass!}">
+            <div class="${properties.kcFormButtonsWrapperClass!}">
                 <button type="submit" name="passkey-choice" value="yes"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}">
+                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}">
                     Şimdi Ekle
                 </button>
                 <button type="submit" name="passkey-choice" value="no"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}">
-                    Sonra
+                        class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}">
+                    30 gün boyunca tekrar sorma
                 </button>
             </div>
         </form>
     </#if>
 </@layout.registrationLayout>
-

@@ -2,6 +2,8 @@ import { lazy, Suspense } from "react";
 import DefaultPage from "keycloakify/login/DefaultPage";
 import type { ClassKey } from "keycloakify/login";
 import type { KcContext } from "./KcContext";
+import Login from "./Login";
+import PasskeyOffer from "./PasskeyOffer";
 import Template from "./Template";
 import { useI18n } from "./i18n";
 import { usePasskeyRememberMeBridge } from "./rememberMeBridge";
@@ -14,6 +16,28 @@ export default function KcPage(props: { kcContext: KcContext }) {
   const { i18n } = useI18n({ kcContext });
 
   usePasskeyRememberMeBridge(kcContext);
+
+  if (kcContext.pageId === "login.ftl") {
+    return (
+      <Suspense fallback={<main className="sl-loading" aria-live="polite">Yükleniyor…</main>}>
+        <Login
+          kcContext={kcContext}
+          i18n={i18n}
+          classes={classes}
+          Template={Template}
+          doUseDefaultCss={false}
+        />
+      </Suspense>
+    );
+  }
+
+  if (kcContext.pageId === "passkey-offer.ftl") {
+    return (
+      <Suspense fallback={<main className="sl-loading" aria-live="polite">Yükleniyor…</main>}>
+        <PasskeyOffer kcContext={kcContext} i18n={i18n} />
+      </Suspense>
+    );
+  }
 
   return (
     <Suspense fallback={<main className="sl-loading" aria-live="polite">Yükleniyor…</main>}>
