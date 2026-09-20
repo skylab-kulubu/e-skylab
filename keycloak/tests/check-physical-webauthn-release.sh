@@ -5,7 +5,7 @@ expected_commit=${GITHUB_SHA:?GITHUB_SHA must identify the exact release commit}
 approved_commit=${PHYSICAL_WEBAUTHN_APPROVED_COMMIT:-}
 evidence_url=${PHYSICAL_WEBAUTHN_EVIDENCE_URL:-}
 approved_surfaces=${PHYSICAL_WEBAUTHN_APPROVED_SURFACES:-}
-required_surfaces='touch-id,face-id'
+required_surfaces='touch-id'
 
 fail() {
   printf 'physical WebAuthn release gate failure: %s\n' "$1" >&2

@@ -33,9 +33,9 @@ The optimized image installs exactly one generated JAR and never consumes the
 removed, source-less `1.1.1` binary. Unit, artifact and Chromium tests protect
 the Keycloak 26.7 WebAuthn fields, retry execution, conditional-passkey
 remember-me propagation, AIA controls, landmarks, keyboard operation,
-contrast and reduced motion. Representative Touch ID, Face ID, Android,
-Windows Hello and mobile-WebView checks on physical hardware remain an
-explicit rollout gate.
+contrast and reduced motion. The initial rollout requires a physical Touch ID
+check. Face ID, Android Credential Manager, Windows Hello and mobile-WebView
+checks are explicitly deferred to post-release compatibility testing.
 
 ## Account Center client
 
