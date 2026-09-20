@@ -19,6 +19,14 @@ services:
       KEYCLOAK_DB_NAME: ${KEYCLOAK_DB_NAME:-keycloak}
       KEYCLOAK_DB_USERNAME: ${KEYCLOAK_DB_USERNAME:?set the existing Keycloak database user}
       ACCOUNT_CENTER_BASE_URL: ${ACCOUNT_CENTER_BASE_URL:-https://my.yildizskylab.com}
+      SKY_NATIVE_BRIDGE_REDEEM_URL: ${SKY_NATIVE_BRIDGE_REDEEM_URL:?set the internal HTTPS redemption URL}
+      SKY_NATIVE_BRIDGE_HMAC_SECRET: ${SKY_NATIVE_BRIDGE_HMAC_SECRET:?set the native bridge HMAC secret}
+      SKY_NATIVE_BRIDGE_TLS_CERT_FILE: /run/secrets/native-bridge/keycloak.crt
+      SKY_NATIVE_BRIDGE_TLS_KEY_FILE: /run/secrets/native-bridge/keycloak.key
+      SKY_NATIVE_BRIDGE_CA_CERT_FILE: /run/secrets/native-bridge/ca.crt
+      SKY_NATIVE_BRIDGE_TIMEOUT_MILLISECONDS: ${SKY_NATIVE_BRIDGE_TIMEOUT_MILLISECONDS:-1500}
+    volumes:
+      - ${SKY_NATIVE_BRIDGE_SECRETS_DIR:?set the absolute native bridge secrets directory}:/run/secrets/native-bridge:ro
     networks:
       - skynet
     restart: "no"
@@ -50,6 +58,15 @@ services:
       KK_TO_RMQ_VHOST: ${RABBITMQ_VHOST:-/}
       KK_TO_RMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-keycloak.events}
       KK_TO_RMQ_USE_TLS: ${RABBITMQ_USE_TLS:-false}
+
+      SKY_NATIVE_BRIDGE_REDEEM_URL: ${SKY_NATIVE_BRIDGE_REDEEM_URL:?set the internal HTTPS redemption URL}
+      SKY_NATIVE_BRIDGE_HMAC_SECRET: ${SKY_NATIVE_BRIDGE_HMAC_SECRET:?set the native bridge HMAC secret}
+      SKY_NATIVE_BRIDGE_TLS_CERT_FILE: /run/secrets/native-bridge/keycloak.crt
+      SKY_NATIVE_BRIDGE_TLS_KEY_FILE: /run/secrets/native-bridge/keycloak.key
+      SKY_NATIVE_BRIDGE_CA_CERT_FILE: /run/secrets/native-bridge/ca.crt
+      SKY_NATIVE_BRIDGE_TIMEOUT_MILLISECONDS: ${SKY_NATIVE_BRIDGE_TIMEOUT_MILLISECONDS:-1500}
+    volumes:
+      - ${SKY_NATIVE_BRIDGE_SECRETS_DIR:?set the absolute native bridge secrets directory}:/run/secrets/native-bridge:ro
     depends_on:
       keycloak-preflight:
         condition: service_completed_successfully

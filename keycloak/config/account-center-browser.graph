@@ -1,3 +1,5 @@
+0|5|ALTERNATIVE|FLOW|NONE
+1|10|REQUIRED|sky-native-handoff|NONE
 0|10|ALTERNATIVE|auth-cookie|NONE
 0|20|DISABLED|auth-spnego|NONE
 0|25|ALTERNATIVE|identity-provider-redirector|NONE

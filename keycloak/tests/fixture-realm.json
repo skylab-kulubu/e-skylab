@@ -16,9 +16,23 @@
     "jboss-logging",
     "keycloak-to-rabbitmq"
   ],
-  "clients": [],
+  "clients": [
+    {
+      "clientId": "skyapp",
+      "name": "SKY LAB Mobile",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "com.yildizskylab.skyapp:/oauth/callback"
+      ]
+    }
+  ],
   "users": [
     {
+      "id": "11111111-1111-4111-8111-111111111111",
       "username": "account-fixture",
       "enabled": true,
       "emailVerified": true,
@@ -32,6 +46,15 @@
           "temporary": false
         }
       ]
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "username": "disabled-account-fixture",
+      "enabled": false,
+      "emailVerified": true,
+      "firstName": "Disabled",
+      "lastName": "Fixture",
+      "email": "disabled-account-fixture@example.invalid"
     }
   ]
 }

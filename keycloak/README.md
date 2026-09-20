@@ -8,7 +8,7 @@ This directory owns the Keycloak runtime used by `e.yildizskylab.com`.
 - Java 21 for Keycloak and both provider builds.
 - Digest-pinned Maven, PostgreSQL and RabbitMQ build/test images.
 - An optimized PostgreSQL image built with `kc.sh build`.
-- Exactly one SKY LAB SPI (`1.7.0`), one source-built SKY LAB login theme (`2.0.0`) and
+- Exactly one SKY LAB SPI (`1.8.0`), one source-built SKY LAB login theme (`2.0.0`) and
   one RabbitMQ event provider (`3.1.0`) in `/opt/keycloak/providers`.
 - `account-api:v1`, PAR, passkeys and WebAuthn are explicitly enabled at
   image build time.
@@ -47,7 +47,8 @@ The reconciler manages a confidential `account-center` client with:
   origins;
 - required S256 PKCE and Pushed Authorization Requests;
 - exact backchannel logout and post-logout callback URLs;
-- a client-specific copy of the browser flow;
+- a client-specific copy of the browser flow whose first alternative execution
+  atomically redeems `sky_native_handoff` over HMAC-authenticated mTLS;
 - one custom default client scope that limits and emits the built-in Account
   API audience and `manage-account` / `view-profile` roles;
 - one source-controlled core-claims scope that emits only access-token `sub`
@@ -68,10 +69,12 @@ The steady reconciler authenticates as the service-only
 audited bootstrap step; master administrator credentials are absent from the
 normal compose stack.
 
-The copied browser flow intentionally contains only Keycloak's standard browser
-executions. The `sky-native-handoff` authenticator does not exist yet. Native
-SSO bridge work must add that provider and execution before mobile handoff can
-be declared ready.
+The `sky-native-handoff` execution is bound only to the Account Center client.
+Without a bridge hint it marks itself attempted and leaves normal desktop login
+unchanged. With a hint it removes the note before network I/O, redeems exactly
+once, selects the enabled user only by `sub`, and carries the original
+`auth_time` into the new browser session. A failed or replayed bridge never
+falls back to the password form.
 
 ## Local verification
 

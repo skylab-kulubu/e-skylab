@@ -9,6 +9,26 @@ FIXTURE_REPOSITORY=ghcr.io/skylab-kulubu/e-skylab-keycloak
 FIXTURE_DIGEST=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 FIXTURE_IMAGE="$FIXTURE_REPOSITORY@sha256:$FIXTURE_DIGEST"
 FIXTURE_DB_HOST=sky-lab-production-postgres-ik33fe
+FIXTURE_SECRET_DIR=$(mktemp -d)
+
+cleanup() {
+  rm -rf "$FIXTURE_SECRET_DIR"
+}
+trap cleanup EXIT
+
+chmod 0755 "$FIXTURE_SECRET_DIR"
+printf '%s\n' \
+  '-----BEGIN CERTIFICATE-----' \
+  'fixture' \
+  '-----END CERTIFICATE-----' \
+  >"$FIXTURE_SECRET_DIR/ca.crt"
+cp "$FIXTURE_SECRET_DIR/ca.crt" "$FIXTURE_SECRET_DIR/keycloak.crt"
+printf '%s\n' \
+  '-----BEGIN PRIVATE KEY-----' \
+  'fixture' \
+  '-----END PRIVATE KEY-----' \
+  >"$FIXTURE_SECRET_DIR/keycloak.key"
+chmod 0644 "$FIXTURE_SECRET_DIR"/*
 
 fail() {
   printf 'production compose validation failure: %s\n' "$1" >&2
@@ -28,6 +48,13 @@ production_env() {
     KEYCLOAK_DB_SCHEMA=public \
     KEYCLOAK_CONFIG_CLIENT_SECRET=fixture-config-secret \
     ACCOUNT_CENTER_BASE_URL=https://my.yildizskylab.com \
+    SKY_NATIVE_BRIDGE_REDEEM_URL=https://account-center-internal/internal/v1/native-handoff/redeem \
+    SKY_NATIVE_BRIDGE_HMAC_SECRET=AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE \
+    SKY_NATIVE_BRIDGE_SECRETS_DIR="$FIXTURE_SECRET_DIR" \
+    SKY_NATIVE_BRIDGE_TLS_CERT_FILE="$FIXTURE_SECRET_DIR/keycloak.crt" \
+    SKY_NATIVE_BRIDGE_TLS_KEY_FILE="$FIXTURE_SECRET_DIR/keycloak.key" \
+    SKY_NATIVE_BRIDGE_CA_CERT_FILE="$FIXTURE_SECRET_DIR/ca.crt" \
+    SKY_NATIVE_BRIDGE_TIMEOUT_MILLISECONDS=1500 \
     RABBITMQ_HOST=rabbitmq \
     RABBITMQ_USERNAME=fixture-rabbit \
     RABBITMQ_PASSWORD=fixture-rabbit-password \
@@ -39,7 +66,10 @@ for missing_variable in \
   KEYCLOAK_DB_HOST \
   KEYCLOAK_DB_USERNAME \
   KEYCLOAK_DB_PASSWORD \
-  KEYCLOAK_PROXY_TRUSTED_ADDRESSES; do
+  KEYCLOAK_PROXY_TRUSTED_ADDRESSES \
+  SKY_NATIVE_BRIDGE_REDEEM_URL \
+  SKY_NATIVE_BRIDGE_HMAC_SECRET \
+  SKY_NATIVE_BRIDGE_SECRETS_DIR; do
   if production_env env -u "$missing_variable" \
     docker compose -f "$COMPOSE_FILE" config --quiet >/dev/null 2>&1; then
     fail "production compose accepted missing $missing_variable"
@@ -59,16 +89,19 @@ jq -e --arg image "$FIXTURE_IMAGE" '
 ' <<<"$rendered_json" >/dev/null \
   || fail 'production must use only the immutable custom image and the existing shared database'
 
-jq -e --arg host "$FIXTURE_DB_HOST" '
+jq -e --arg host "$FIXTURE_DB_HOST" --arg secrets "$FIXTURE_SECRET_DIR" '
   .services["keycloak-preflight"].user == "1000:0" and
   .services["keycloak-preflight"].read_only == true and
   .services["keycloak-preflight"].cap_drop == ["ALL"] and
   (.services["keycloak-preflight"] | has("cap_add") | not) and
   .services["keycloak-preflight"].security_opt == ["no-new-privileges:true"] and
   (.services["keycloak-preflight"].networks | keys) == ["skynet"] and
-  (.services["keycloak-preflight"].volumes // []) == [] and
+  .services["keycloak-preflight"].volumes == [{"type":"bind","source":$secrets,"target":"/run/secrets/native-bridge","read_only":true,"bind":{"create_host_path":true}}] and
   .services["keycloak-preflight"].environment.KEYCLOAK_DB_HOST == $host and
   (.services["keycloak-preflight"].environment | has("KEYCLOAK_DB_PASSWORD") | not) and
+  .services["keycloak-preflight"].environment.SKY_NATIVE_BRIDGE_TLS_CERT_FILE == "/run/secrets/native-bridge/keycloak.crt" and
+  .services["keycloak-preflight"].environment.SKY_NATIVE_BRIDGE_TLS_KEY_FILE == "/run/secrets/native-bridge/keycloak.key" and
+  .services["keycloak-preflight"].environment.SKY_NATIVE_BRIDGE_CA_CERT_FILE == "/run/secrets/native-bridge/ca.crt" and
   (.services["keycloak-preflight"].environment | has("KEYCLOAK_IMAGE_REPOSITORY") | not) and
   (.services.keycloak.user == null) and
   (.services["keycloak-config"].user == null)
@@ -99,6 +132,10 @@ jq -e --arg host "$FIXTURE_DB_HOST" '
   .services.keycloak.environment.KC_DB_SCHEMA == "public" and
   .services["keycloak-config"].environment.ACCOUNT_CENTER_REQUIRE_PRODUCTION_HOST == "true" and
   .services["keycloak-config"].environment.KEYCLOAK_CONFIG_CLIENT_SECRET == "fixture-config-secret" and
+  .services.keycloak.environment.SKY_NATIVE_BRIDGE_REDEEM_URL == "https://account-center-internal/internal/v1/native-handoff/redeem" and
+  .services.keycloak.environment.SKY_NATIVE_BRIDGE_TLS_CERT_FILE == "/run/secrets/native-bridge/keycloak.crt" and
+  .services.keycloak.environment.SKY_NATIVE_BRIDGE_TLS_KEY_FILE == "/run/secrets/native-bridge/keycloak.key" and
+  .services.keycloak.environment.SKY_NATIVE_BRIDGE_CA_CERT_FILE == "/run/secrets/native-bridge/ca.crt" and
   ([.services[].environment // {} | keys[] | select(startswith("KC_BOOTSTRAP_ADMIN_"))] | length) == 0
 ' <<<"$rendered_json" >/dev/null \
   || fail 'database, proxy, reconciler or steady-state credential boundary differs'
