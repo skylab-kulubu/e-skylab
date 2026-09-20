@@ -3,7 +3,7 @@
     <img src="https://raw.githubusercontent.com/skylab-kulubu/skylab-assets/main/logos/skylab/skylab-colored.svg" alt="SKY LAB Logo" width="120" />
   </a>
 
-  <h1>SKY LAB Platform Hub</h1>
+  <h1>SKY LAB Platform Merkezi</h1>
 
   <p>
     Yıldız Teknik Üniversitesi SKY LAB kulüp platformunun<br />
@@ -11,8 +11,8 @@
   </p>
 
   <p>
-    <img src="https://img.shields.io/badge/Platform-Architecture-003694?style=for-the-badge" alt="Platform Architecture" />
-    <img src="https://img.shields.io/badge/Source_of_Truth-Documentation-ffffff?style=for-the-badge&labelColor=003694" alt="Documentation Source of Truth" />
+    <img src="https://img.shields.io/badge/Platform-Mimarisi-003694?style=for-the-badge" alt="Platform Mimarisi" />
+    <img src="https://img.shields.io/badge/Ana_Kaynak-Dokümantasyon-ffffff?style=for-the-badge&labelColor=003694" alt="Ana Dokümantasyon Kaynağı" />
   </p>
 </div>
 
@@ -21,6 +21,14 @@
 Bu depo SKY LAB'in çalışan bir servisi değildir. Platformun mimari haritasını,
 depo kataloğunu, ortak alan dilini ve servisler arası kararları tek yerde tutar.
 Kod, sürümleme ve dağıtım her ürünün kendi deposunda yapılır.
+
+## Genel amaç
+
+SKY LAB'in web, mobil, kimlik, etkinlik, form ve posta ürünleri farklı
+depolarda geliştirilir. Bu merkez; yeni katılan bir geliştiricinin hangi
+ürünün ne yaptığını, verinin sahibini, servislerin nasıl konuştuğunu ve eski
+bir sistemin yerine neyin geçtiğini tek bakışta bulmasını sağlar. Buradaki
+kararlar ürün depolarının yerine geçmez; aralarındaki ortak sözleşmeyi kurar.
 
 ## Başlangıç noktaları
 
@@ -72,3 +80,21 @@ deposuna taşındı. Artık kullanılmayan Eureka, Gateway, LDAP, OPA ve eski Ja
 servisleri ana daldan kaldırıldı. Taşıma öncesi ağaç
 `legacy/e-skylab-monolith-2026-09-20` etiketinde salt okunur referans olarak
 durur.
+
+## Katkıda bulunanlar
+
+Bu merkezin içeriğine katkı veren kişiler GitHub geçmişinden otomatik olarak
+listelenir.
+
+<a href="https://github.com/skylab-kulubu/e-skylab/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=skylab-kulubu/e-skylab" alt="Katkıda bulunanlar" />
+</a>
+
+## Geliştiren ekip
+
+<div align="center">
+  <p>SKY LAB dijital ürünleri, kulüp ekiplerinin geri bildirimleriyle <strong>WebLab</strong> tarafından geliştirilmektedir.</p>
+  <a href="https://github.com/skylab-kulubu">
+    <img src="https://raw.githubusercontent.com/skylab-kulubu/skylab-assets/main/logos/arge/weblab/weblab-colored.svg" alt="SKY LAB WebLab" width="150" />
+  </a>
+</div>
