@@ -13,21 +13,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: read, packages: write }
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Extract Clean Version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/gateway/}" >> $GITHUB_OUTPUT
 
       - name: Login to GHCR
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Gateway
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: ./gateway
           push: true
@@ -40,21 +40,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: read, packages: write }
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Extract Clean Version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/eureka/}" >> $GITHUB_OUTPUT
 
       - name: Login to GHCR
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Eureka
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: ./eureka
           push: true
@@ -185,7 +185,6 @@ jobs:
     env:
       KEYCLOAK_TEST_IMAGE: e-skylab-keycloak-candidate:${{ github.sha }}
       PUBLISH_IMAGE: ghcr.io/skylab-kulubu/e-skylab-keycloak
-      CANDIDATE_DIR: ${{ runner.temp }}/keycloak-candidate
     steps:
       - uses: actions/checkout@v7
 
@@ -193,10 +192,11 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: keycloak-candidate-${{ github.sha }}
-          path: ${{ env.CANDIDATE_DIR }}
+          path: ${{ runner.temp }}/keycloak-candidate
 
       - name: Verify and load the tested candidate
         env:
+          CANDIDATE_DIR: ${{ runner.temp }}/keycloak-candidate
           VERSION: ${{ needs.keycloak-build.outputs.version }}
         run: |
           test "$(cat "$CANDIDATE_DIR/commit-sha")" = "$GITHUB_SHA"
