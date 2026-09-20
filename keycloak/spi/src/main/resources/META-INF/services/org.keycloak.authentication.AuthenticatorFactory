@@ -1,3 +1,0 @@
-com.skylab.authenticator.Oauth2UserCreatorFactory
-com.skylab.nativehandoff.NativeHandoffAuthenticatorFactory
-com.skylab.passkey.PasskeyOfferAuthenticatorFactory

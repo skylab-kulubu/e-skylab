@@ -1,4 +1,2 @@
-ldap/data/
 .DS_Store
-**/target/
-keycloak/tests/.state/
+.idea/
