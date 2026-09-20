@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 FIXTURE_DIGEST=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 POSTGRES_IMAGE=postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
 TEST_IMAGE=${KEYCLOAK_TEST_IMAGE:?set KEYCLOAK_TEST_IMAGE to the already-built candidate image}
@@ -33,16 +34,35 @@ docker run -d --name "$POSTGRES_CONTAINER" \
   -e POSTGRES_USER=keycloak \
   -e POSTGRES_PASSWORD=fixture-db-password \
   -v "$INITIALIZED_DB_VOLUME:/var/lib/postgresql/data" \
+  -v "$SCRIPT_DIR/postgres-readiness-race.sql:/docker-entrypoint-initdb.d/00-readiness-race.sql:ro" \
   "$POSTGRES_IMAGE" >/dev/null
+postgres_ready=false
+temporary_server_observed=false
 for _ in $(seq 1 60); do
+  # initdb briefly starts a temporary PostgreSQL server before the entrypoint
+  # replaces PID 1 with the durable server. pg_isready alone can observe that
+  # temporary process and race its shutdown on a fast fresh runner.
   if docker exec "$POSTGRES_CONTAINER" pg_isready -U keycloak -d keycloak \
     >/dev/null 2>&1; then
-    break
+    pid_one_name=$(docker exec "$POSTGRES_CONTAINER" cat /proc/1/comm)
+    if [[ $pid_one_name == postgres ]]; then
+      postgres_ready=true
+      break
+    fi
+    temporary_server_observed=true
+  fi
+  if [[ $(docker inspect --format '{{.State.Running}}' "$POSTGRES_CONTAINER") != true ]]; then
+    docker logs "$POSTGRES_CONTAINER" >&2 || true
+    fail 'PostgreSQL permission fixture exited during initialization'
   fi
   sleep 1
 done
-docker exec "$POSTGRES_CONTAINER" pg_isready -U keycloak -d keycloak \
-  >/dev/null 2>&1 || fail 'PostgreSQL permission fixture did not initialize'
+[[ $temporary_server_observed == true ]] \
+  || fail 'PostgreSQL fixture did not reproduce temporary init-server readiness'
+if [[ $postgres_ready != true ]]; then
+  docker logs "$POSTGRES_CONTAINER" >&2 || true
+  fail 'PostgreSQL permission fixture did not reach its durable server'
+fi
 docker stop "$POSTGRES_CONTAINER" >/dev/null
 
 pgdata_stat=$(docker run --rm --user 0:0 \
