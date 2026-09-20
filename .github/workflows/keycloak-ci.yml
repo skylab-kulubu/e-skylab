@@ -1,0 +1,44 @@
+name: Keycloak CI
+
+on:
+  pull_request:
+    paths:
+      - "keycloak/**"
+      - ".github/workflows/keycloak-ci.yml"
+      - ".github/workflows/deploy.yml"
+  push:
+    branches: [main]
+    paths:
+      - "keycloak/**"
+      - ".github/workflows/keycloak-ci.yml"
+      - ".github/workflows/deploy.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Verify Keycloak and fixture image pins
+        run: |
+          bash keycloak/tests/check-version-consistency.sh
+          bash keycloak/tests/check-fresh-runner.sh
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build optimized Keycloak image
+        uses: docker/build-push-action@v7
+        with:
+          context: keycloak
+          load: true
+          platforms: linux/amd64
+          tags: account-keycloak:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Keycloak, OIDC and RabbitMQ contracts
+        run: bash keycloak/tests/run-integration.sh

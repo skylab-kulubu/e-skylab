@@ -1,0 +1,2 @@
+com.github.aznamier.keycloak.event.provider.RabbitMqEventListenerProviderFactory
+

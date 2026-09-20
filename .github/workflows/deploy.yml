@@ -5,6 +5,7 @@ on:
     tags:
       - 'gateway/v*'
       - 'eureka/v*'
+      - 'keycloak/v*'
 
 jobs:
   gateway-build:
@@ -60,3 +61,94 @@ jobs:
           tags: |
             ghcr.io/skylab-kulubu/e-skylab-eureka:latest
             ghcr.io/skylab-kulubu/e-skylab-eureka:${{ steps.get_version.outputs.VERSION }}
+
+  keycloak-build:
+    if: startsWith(github.ref, 'refs/tags/keycloak/')
+    runs-on: ubuntu-latest
+    permissions: { contents: read, packages: write }
+    env:
+      CANDIDATE_IMAGE: e-skylab-keycloak-candidate:${{ github.sha }}
+      PUBLISH_IMAGE: ghcr.io/skylab-kulubu/e-skylab-keycloak
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Require the tag to point at current main
+        run: |
+          git fetch --no-tags origin main
+          tagged_commit=$(git rev-parse "${GITHUB_SHA}^{commit}")
+          main_commit=$(git rev-parse origin/main)
+          if [[ "$tagged_commit" != "$main_commit" ]]; then
+            echo "The Keycloak release tag must point at the current main commit." >&2
+            exit 1
+          fi
+
+      - name: Verify Keycloak and fixture image pins
+        run: |
+          bash keycloak/tests/check-version-consistency.sh
+          bash keycloak/tests/check-fresh-runner.sh
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Extract and validate version
+        id: get_version
+        run: |
+          version=${GITHUB_REF#refs/tags/keycloak/v}
+          approved_version=$(sed -n \
+            's|^ARG KEYCLOAK_IMAGE=.*keycloak:\([^@]*\)@sha256:.*|\1|p' \
+            keycloak/Dockerfile)
+          if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "The Keycloak release tag must contain a semantic version." >&2
+            exit 1
+          fi
+          if [[ "$version" != "$approved_version" ]]; then
+            echo "Tag version $version does not match image version $approved_version." >&2
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build candidate image once
+        uses: docker/build-push-action@v7
+        with:
+          context: ./keycloak
+          load: true
+          push: false
+          platforms: linux/amd64
+          tags: ${{ env.CANDIDATE_IMAGE }}
+
+      - name: Test candidate image
+        env:
+          KEYCLOAK_TEST_IMAGE: ${{ env.CANDIDATE_IMAGE }}
+        run: bash keycloak/tests/run-integration.sh
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish the tested image bytes
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: |
+          version_image="$PUBLISH_IMAGE:$VERSION"
+          latest_image="$PUBLISH_IMAGE:latest"
+          candidate_id=$(docker image inspect --format '{{.Id}}' "$CANDIDATE_IMAGE")
+          docker tag "$CANDIDATE_IMAGE" "$version_image"
+          docker tag "$CANDIDATE_IMAGE" "$latest_image"
+          test "$(docker image inspect --format '{{.Id}}' "$version_image")" = "$candidate_id"
+          test "$(docker image inspect --format '{{.Id}}' "$latest_image")" = "$candidate_id"
+          docker push "$version_image"
+          docker push "$latest_image"
+          version_digest="sha256:$(docker buildx imagetools inspect --raw "$version_image" | sha256sum | cut -d' ' -f1)"
+          latest_digest="sha256:$(docker buildx imagetools inspect --raw "$latest_image" | sha256sum | cut -d' ' -f1)"
+          test "$version_digest" = "$latest_digest"
+          {
+            echo "### Tested Keycloak artifact"
+            echo
+            echo "\`$version_image@$version_digest\`"
+            echo
+            echo "Candidate commit: \`$GITHUB_SHA\`"
+          } >> "$GITHUB_STEP_SUMMARY"

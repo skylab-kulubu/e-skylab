@@ -1,0 +1,85 @@
+name: e-skylab-keycloak-integration
+
+services:
+  postgres:
+    image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: integration-db-password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  rabbitmq:
+    image: rabbitmq:4.2-management-alpine@sha256:643139a7e9b4d7e2c1d6a06295d0296c3c58e5de7666a09630b4564a15c951cd
+    environment:
+      RABBITMQ_DEFAULT_USER: keycloak
+      RABBITMQ_DEFAULT_PASS: integration-rabbit-password
+    ports:
+      - "127.0.0.1:15673:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  keycloak:
+    image: ${KEYCLOAK_TEST_IMAGE:-account-keycloak:test}
+    command: ["start", "--optimized", "--import-realm"]
+    environment:
+      KC_HOSTNAME: http://localhost:18080
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: integration-admin-password
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: integration-db-password
+      KK_TO_RMQ_URL: rabbitmq
+      KK_TO_RMQ_PORT: 5672
+      KK_TO_RMQ_USERNAME: keycloak
+      KK_TO_RMQ_PASSWORD: integration-rabbit-password
+      KK_TO_RMQ_VHOST: /
+      KK_TO_RMQ_EXCHANGE: keycloak.events
+    volumes:
+      - ./fixture-realm.json:/opt/keycloak/data/import/e-skylab-test-realm.json:ro
+    ports:
+      - "127.0.0.1:18080:8080"
+      - "127.0.0.1:19000:9000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  keycloak-config:
+    image: ${KEYCLOAK_TEST_IMAGE:-account-keycloak:test}
+    entrypoint: ["/opt/keycloak/config/reconcile-account-center.sh"]
+    environment:
+      KEYCLOAK_ADMIN_URL: http://keycloak:8080
+      KEYCLOAK_REALM: e-skylab-test
+      KEYCLOAK_CONFIG_CLIENT_ID: account-center-config
+      KEYCLOAK_CONFIG_CLIENT_SECRET: integration-config-client-secret
+      ACCOUNT_CENTER_BASE_URL: https://my.yildizskylab.com
+    depends_on:
+      keycloak:
+        condition: service_started
+
+  keycloak-bootstrap:
+    image: ${KEYCLOAK_TEST_IMAGE:-account-keycloak:test}
+    entrypoint: ["/opt/keycloak/config/bootstrap-reconciler.sh"]
+    environment:
+      KEYCLOAK_ADMIN_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN_REALM: master
+      KEYCLOAK_REALM: e-skylab-test
+      KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME: admin
+      KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD: integration-admin-password
+      KEYCLOAK_CONFIG_CLIENT_ID: account-center-config
+      KEYCLOAK_CONFIG_CLIENT_SECRET: integration-config-client-secret
+    depends_on:
+      keycloak:
+        condition: service_started

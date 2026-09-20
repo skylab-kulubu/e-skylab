@@ -1,0 +1,3 @@
+com.skylab.authenticator.Oauth2UserCreatorFactory
+com.skylab.passkey.PasskeyOfferAuthenticatorFactory
+
