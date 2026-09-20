@@ -20,6 +20,8 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      KEYCLOAK_TEST_IMAGE: account-keycloak:ci
     steps:
       - uses: actions/checkout@v7
 
@@ -36,7 +38,7 @@ jobs:
           context: keycloak
           load: true
           platforms: linux/amd64
-          tags: account-keycloak:test
+          tags: ${{ env.KEYCLOAK_TEST_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

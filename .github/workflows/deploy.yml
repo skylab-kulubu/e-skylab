@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: read, packages: write }
     env:
-      CANDIDATE_IMAGE: e-skylab-keycloak-candidate:${{ github.sha }}
+      KEYCLOAK_TEST_IMAGE: e-skylab-keycloak-candidate:${{ github.sha }}
       PUBLISH_IMAGE: ghcr.io/skylab-kulubu/e-skylab-keycloak
     steps:
       - uses: actions/checkout@v7
@@ -115,11 +115,9 @@ jobs:
           load: true
           push: false
           platforms: linux/amd64
-          tags: ${{ env.CANDIDATE_IMAGE }}
+          tags: ${{ env.KEYCLOAK_TEST_IMAGE }}
 
       - name: Test candidate image
-        env:
-          KEYCLOAK_TEST_IMAGE: ${{ env.CANDIDATE_IMAGE }}
         run: bash keycloak/tests/run-integration.sh
 
       - name: Login to GHCR
@@ -135,9 +133,9 @@ jobs:
         run: |
           version_image="$PUBLISH_IMAGE:$VERSION"
           latest_image="$PUBLISH_IMAGE:latest"
-          candidate_id=$(docker image inspect --format '{{.Id}}' "$CANDIDATE_IMAGE")
-          docker tag "$CANDIDATE_IMAGE" "$version_image"
-          docker tag "$CANDIDATE_IMAGE" "$latest_image"
+          candidate_id=$(docker image inspect --format '{{.Id}}' "$KEYCLOAK_TEST_IMAGE")
+          docker tag "$KEYCLOAK_TEST_IMAGE" "$version_image"
+          docker tag "$KEYCLOAK_TEST_IMAGE" "$latest_image"
           test "$(docker image inspect --format '{{.Id}}' "$version_image")" = "$candidate_id"
           test "$(docker image inspect --format '{{.Id}}' "$latest_image")" = "$candidate_id"
           docker push "$version_image"

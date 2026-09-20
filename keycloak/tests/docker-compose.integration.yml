@@ -27,7 +27,7 @@ services:
       retries: 30
 
   keycloak:
-    image: ${KEYCLOAK_TEST_IMAGE:-account-keycloak:test}
+    image: ${KEYCLOAK_TEST_IMAGE:?set KEYCLOAK_TEST_IMAGE to the already-built candidate image}
     command: ["start", "--optimized", "--import-realm"]
     environment:
       KC_HOSTNAME: http://localhost:18080
@@ -57,7 +57,7 @@ services:
         condition: service_healthy
 
   keycloak-config:
-    image: ${KEYCLOAK_TEST_IMAGE:-account-keycloak:test}
+    image: ${KEYCLOAK_TEST_IMAGE:?set KEYCLOAK_TEST_IMAGE to the already-built candidate image}
     entrypoint: ["/opt/keycloak/config/reconcile-account-center.sh"]
     environment:
       KEYCLOAK_ADMIN_URL: http://keycloak:8080
@@ -70,7 +70,7 @@ services:
         condition: service_started
 
   keycloak-bootstrap:
-    image: ${KEYCLOAK_TEST_IMAGE:-account-keycloak:test}
+    image: ${KEYCLOAK_TEST_IMAGE:?set KEYCLOAK_TEST_IMAGE to the already-built candidate image}
     entrypoint: ["/opt/keycloak/config/bootstrap-reconciler.sh"]
     environment:
       KEYCLOAK_ADMIN_URL: http://keycloak:8080

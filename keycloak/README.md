@@ -81,7 +81,7 @@ Requirements: Docker, `bash`, `curl` and `jq`.
 
 ```bash
 docker build --platform linux/amd64 -t account-keycloak:test keycloak
-bash keycloak/tests/run-integration.sh
+KEYCLOAK_TEST_IMAGE=account-keycloak:test bash keycloak/tests/run-integration.sh
 ```
 
 For a local image build, use the standalone build definition. It deliberately

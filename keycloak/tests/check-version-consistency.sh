@@ -32,13 +32,13 @@ done
 grep -Fq 'x-keycloak-image: &keycloak-image ghcr.io/skylab-kulubu/e-skylab-keycloak@sha256:${KEYCLOAK_IMAGE_DIGEST:?' \
   "$KEYCLOAK_DIR/docker-compose.yml" \
   || fail 'production compose does not hardcode the approved repository and require a digest'
-if rg -q 'KEYCLOAK_IMAGE_REPOSITORY' \
+if grep -Eq 'KEYCLOAK_IMAGE_REPOSITORY' \
   "$KEYCLOAK_DIR/docker-compose.yml" \
   "$KEYCLOAK_DIR/docker-compose.bootstrap.yml" \
   "$KEYCLOAK_DIR/.env.example"; then
   fail 'production repository must not be operator-overridable'
 fi
-if rg -q 'KEYCLOAK_IMAGE_REF' \
+if grep -Eq 'KEYCLOAK_IMAGE_REF' \
   "$KEYCLOAK_DIR/docker-compose.yml" \
   "$KEYCLOAK_DIR/docker-compose.bootstrap.yml" \
   "$KEYCLOAK_DIR/.env.example" \

@@ -2,12 +2,18 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+TEST_IMAGE=${KEYCLOAK_TEST_IMAGE:?set KEYCLOAK_TEST_IMAGE to the already-built candidate image}
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.integration.yml"
 COMPOSE=(docker compose -f "$COMPOSE_FILE")
 KCADM=("${COMPOSE[@]}" exec -T keycloak /opt/keycloak/bin/kcadm.sh)
 ADMIN_CONFIG=/tmp/integration-kcadm.config
 TEST_STATE_DIR=$(mktemp -d)
 CURRENT_STAGE=startup
+
+docker image inspect "$TEST_IMAGE" >/dev/null 2>&1 || {
+  printf 'integration candidate image is not built locally: %s\n' "$TEST_IMAGE" >&2
+  exit 1
+}
 
 trap 'status=$?; printf "integration command failed during %s (line %s)\n" "$CURRENT_STAGE" "$LINENO" >&2; exit "$status"' ERR
 
