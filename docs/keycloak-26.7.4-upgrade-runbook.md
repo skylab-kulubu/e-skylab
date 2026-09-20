@@ -12,13 +12,14 @@ below have recorded evidence and an owner.
   passwordless assertion with a Chromium virtual authenticator, plus
   conditional-passkey remember-me, locale, keyboard,
   reduced motion and contrast contracts. CI cannot supply production platform
-  authenticators. The initial rollout records successful registration,
-  cancellation, passwordless login and failure recovery on the available
-  Touch ID surface; mocked or virtual credentials are not a substitute for
-  this evidence. Face ID, Android Credential Manager, Windows Hello and mobile
-  WebView coverage are explicitly deferred to post-release compatibility
-  testing. A failure on a deferred surface is handled as a compatibility fix
-  and does not retroactively expand the recorded release evidence.
+  authenticators. The initial rollout records successful registration and
+  passwordless login on the available Touch ID surface; mocked or virtual
+  credentials are not a substitute for this evidence. Cancellation and failure
+  recovery remain covered by the real-Keycloak automated fixture. Face ID,
+  Android Credential Manager, Windows Hello and mobile WebView coverage are
+  explicitly deferred to post-release compatibility testing. A failure on a
+  deferred surface is handled as a compatibility fix and does not retroactively
+  expand the recorded release evidence.
 
   The production clone must report
   `webAuthnPolicyPasswordlessPasskeysEnabled=true` and
