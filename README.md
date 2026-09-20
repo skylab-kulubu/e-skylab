@@ -1,4 +1,22 @@
-# SKY LAB platform hub
+<div align="center">
+  <a href="https://yildizskylab.com">
+    <img src="https://raw.githubusercontent.com/skylab-kulubu/skylab-assets/main/logos/skylab/skylab-colored.svg" alt="SKY LAB Logo" width="120" />
+  </a>
+
+  <h1>SKY LAB Platform Hub</h1>
+
+  <p>
+    Yıldız Teknik Üniversitesi SKY LAB kulüp platformunun<br />
+    mimari haritası, depo kataloğu ve ortak karar merkezi.
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/Platform-Architecture-003694?style=for-the-badge" alt="Platform Architecture" />
+    <img src="https://img.shields.io/badge/Source_of_Truth-Documentation-ffffff?style=for-the-badge&labelColor=003694" alt="Documentation Source of Truth" />
+  </p>
+</div>
+
+---
 
 Bu depo SKY LAB'in çalışan bir servisi değildir. Platformun mimari haritasını,
 depo kataloğunu, ortak alan dilini ve servisler arası kararları tek yerde tutar.
