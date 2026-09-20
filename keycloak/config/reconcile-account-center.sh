@@ -12,8 +12,11 @@ BASE_URL=${ACCOUNT_CENTER_BASE_URL:-https://my.yildizskylab.com}
 CONFIG_CLIENT_ID=${KEYCLOAK_CONFIG_CLIENT_ID:-account-center-config}
 CLIENT_ID=account-center
 FLOW_ALIAS=account-center-browser
+NATIVE_FLOW_ALIAS=account-center-native-handoff
 SCOPE_NAME=account-center-account-api
 CORE_SCOPE_NAME=account-center-core-claims
+SKYAPP_CLIENT_ID=skyapp
+SKYAPP_SCOPE_NAME=skyapp-account-center-audience
 KCADM_CONFIG=$(mktemp /tmp/account-center-kcadm.XXXXXX)
 
 # shellcheck source=account-center-origin.sh
@@ -208,6 +211,64 @@ flow_graph_signature() {
   done <<<"$executions_csv"
 }
 
+add_native_handoff_execution() {
+  local alias=$1
+  local executions_csv native_flow_execution_id native_execution_id
+  local id level display_name provider_id authentication_flow
+
+  kcadm create "authentication/flows/$alias/executions/flow" \
+    -r "$TARGET_REALM" \
+    -b "{\"alias\":\"$NATIVE_FLOW_ALIAS\",\"type\":\"basic-flow\",\"provider\":\"basic-flow\",\"priority\":5,\"description\":\"Redeems one-time Account Center native handoff codes\"}" >/dev/null
+
+  kcadm create "authentication/flows/$NATIVE_FLOW_ALIAS/executions/execution" \
+    -r "$TARGET_REALM" \
+    -b '{"provider":"sky-native-handoff","priority":10}' >/dev/null
+
+  if ! executions_csv=$(kcadm get "authentication/flows/$alias/executions" \
+    -r "$TARGET_REALM" \
+    --fields id,level,displayName,providerId,authenticationFlow \
+    --format csv \
+    --noquotes); then
+    printf 'Failed to read authentication executions after adding native handoff\n' >&2
+    return 2
+  fi
+
+  native_flow_execution_id=''
+  native_execution_id=''
+  while IFS=, read -r id level display_name provider_id authentication_flow; do
+    if [[ $level == 0 && $display_name == "$NATIVE_FLOW_ALIAS" && $authentication_flow == true ]]; then
+      if [[ -n $native_flow_execution_id ]]; then
+        printf 'Duplicate %s subflows were created\n' "$NATIVE_FLOW_ALIAS" >&2
+        return 1
+      fi
+      native_flow_execution_id=$id
+    fi
+    if [[ $level == 1 && $provider_id == sky-native-handoff && $authentication_flow != true ]]; then
+      if [[ -n $native_execution_id ]]; then
+        printf 'Duplicate sky-native-handoff executions were created\n' >&2
+        return 1
+      fi
+      native_execution_id=$id
+    fi
+  done <<<"$executions_csv"
+
+  if [[ -z $native_flow_execution_id || -z $native_execution_id ]]; then
+    printf 'Observed native handoff execution inventory:\n%s\n' "$executions_csv" >&2
+    printf 'Native handoff subflow and execution were not created as expected\n' >&2
+    return 1
+  fi
+
+  kcadm update "authentication/flows/$alias/executions" \
+    -r "$TARGET_REALM" \
+    -n \
+    -b "{\"id\":\"$native_flow_execution_id\",\"priority\":5,\"requirement\":\"ALTERNATIVE\"}" >/dev/null
+
+  kcadm update "authentication/flows/$NATIVE_FLOW_ALIAS/executions" \
+    -r "$TARGET_REALM" \
+    -n \
+    -b "{\"id\":\"$native_execution_id\",\"priority\":10,\"requirement\":\"REQUIRED\"}" >/dev/null
+}
+
 ensure_browser_flow() {
   local client_id=$1
   local flow_id actual_graph expected_graph
@@ -224,7 +285,7 @@ ensure_browser_flow() {
     fi
     if [[ $actual_graph != "$expected_graph" ]]; then
       kcadm update "clients/$client_id" -r "$TARGET_REALM" \
-        -d 'attributes."authentication.flow.binding.override.browser"' >/dev/null
+        -s 'authenticationFlowBindingOverrides.browser=' >/dev/null
       kcadm delete "authentication/flows/$flow_id" -r "$TARGET_REALM" >/dev/null
       flow_id=''
     fi
@@ -239,6 +300,7 @@ ensure_browser_flow() {
     else
       return $?
     fi
+    add_native_handoff_execution "$FLOW_ALIAS"
   fi
 
   if ! actual_graph=$(flow_graph_signature "$FLOW_ALIAS"); then
@@ -381,7 +443,7 @@ kcadm update "clients/$client_uuid" -r "$TARGET_REALM" \
   -s 'attributes."backchannel.logout.session.required"=true' \
   -s 'attributes."backchannel.logout.revoke.offline.tokens"=true' \
   -s "attributes.\"post.logout.redirect.uris\"=$logout_uri" \
-  -s "attributes.\"authentication.flow.binding.override.browser\"=$flow_uuid" >/dev/null
+  -s "authenticationFlowBindingOverrides.browser=$flow_uuid" >/dev/null
 
 scope_uuid=$(optional_lookup client_scope_id_by_name "$SCOPE_NAME")
 if [[ -z $scope_uuid ]]; then
@@ -428,6 +490,43 @@ ensure_protocol_mapper "$core_scope_uuid" sub \
 
 ensure_protocol_mapper "$core_scope_uuid" auth_time \
   '{"name":"auth_time","protocol":"openid-connect","protocolMapper":"oidc-usersessionmodel-note-mapper","consentRequired":false,"config":{"user.session.note":"AUTH_TIME","id.token.claim":"true","introspection.token.claim":"true","access.token.claim":"true","claim.name":"auth_time","jsonType.label":"long"}}'
+
+skyapp_client_uuid=$(optional_lookup client_id_by_client_id "$SKYAPP_CLIENT_ID")
+if [[ -z $skyapp_client_uuid ]]; then
+  printf 'Required client was not found: %s\n' "$SKYAPP_CLIENT_ID" >&2
+  exit 1
+fi
+
+skyapp_scope_uuid=$(optional_lookup client_scope_id_by_name "$SKYAPP_SCOPE_NAME")
+if [[ -z $skyapp_scope_uuid ]]; then
+  skyapp_scope_uuid=$(kcadm create client-scopes -r "$TARGET_REALM" -i \
+    -s "name=$SKYAPP_SCOPE_NAME" \
+    -s protocol=openid-connect \
+    -s 'attributes."include.in.token.scope"=false' \
+    -s 'attributes."display.on.consent.screen"=false')
+fi
+
+kcadm update "client-scopes/$skyapp_scope_uuid" -r "$TARGET_REALM" \
+  -s "name=$SKYAPP_SCOPE_NAME" \
+  -s protocol=openid-connect \
+  -s 'attributes."include.in.token.scope"=false' \
+  -s 'attributes."display.on.consent.screen"=false' >/dev/null
+
+prune_protocol_mappers "$skyapp_scope_uuid" account-center-audience
+ensure_protocol_mapper "$skyapp_scope_uuid" account-center-audience \
+  '{"name":"account-center-audience","protocol":"openid-connect","protocolMapper":"oidc-audience-mapper","consentRequired":false,"config":{"included.client.audience":"account-center","id.token.claim":"false","access.token.claim":"true","introspection.token.claim":"true"}}'
+
+skyapp_default_scopes=$(kcadm get "clients/$skyapp_client_uuid/default-client-scopes" \
+  -r "$TARGET_REALM" \
+  --fields id,name \
+  --format csv \
+  --noquotes)
+if ! grep -Eq "^$skyapp_scope_uuid," <<<"$skyapp_default_scopes"; then
+  kcadm update "clients/$skyapp_client_uuid/default-client-scopes/$skyapp_scope_uuid" \
+    -r "$TARGET_REALM" \
+    -n \
+    -b '{}' >/dev/null
+fi
 
 default_scopes=$(kcadm get "clients/$client_uuid/default-client-scopes" \
   -r "$TARGET_REALM" \
