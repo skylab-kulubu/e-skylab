@@ -7,6 +7,7 @@ KEYCLOAK_DIR=$(cd -- "$SCRIPT_DIR/.." && pwd)
 KEYCLOAK_VERSION=26.7.4
 KEYCLOAK_IMAGE="quay.io/keycloak/keycloak:$KEYCLOAK_VERSION@sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c"
 MAVEN_IMAGE='maven:3.9.11-eclipse-temurin-21@sha256:6fdc855a6ed81d288ca7ca37ac6ff5e9308b612485c0801d70b25a858c83d237'
+NODE_IMAGE='node:22.22.1-bookworm-slim@sha256:4f77a690f2f8946ab16fe1e791a3ac0667ae1c3575c3e4d0d4589e9ed5bfaf3d'
 POSTGRES_IMAGE='postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94'
 RABBITMQ_IMAGE='rabbitmq:4.2-management-alpine@sha256:643139a7e9b4d7e2c1d6a06295d0296c3c58e5de7666a09630b4564a15c951cd'
 KEYCLOAK_CI="$KEYCLOAK_DIR/../.github/workflows/keycloak-ci.yml"
@@ -54,6 +55,13 @@ grep -Fq "KEYCLOAK_IMAGE: \${KEYCLOAK_BASE_IMAGE_REF:-$KEYCLOAK_IMAGE}" \
 
 grep -Fqx "FROM $MAVEN_IMAGE AS providers" "$KEYCLOAK_DIR/Dockerfile" \
   || fail 'Maven builder image is not digest-pinned'
+grep -Fqx "ARG NODE_IMAGE=$NODE_IMAGE" "$KEYCLOAK_DIR/Dockerfile" \
+  || fail 'Node builder image is not the approved atomic tag and digest'
+grep -Fqx 'COPY --from=theme --chown=keycloak:keycloak --chmod=0644 /build/theme/dist_keycloak/e-skylab-theme-2.0.0.jar /opt/keycloak/providers/e-skylab-theme-2.0.0.jar' "$KEYCLOAK_DIR/Dockerfile" \
+  || fail 'optimized image does not install the one source-built SKY LAB theme'
+if grep -Fq 'providers/e-skylab-theme-1.1.1.jar' "$KEYCLOAK_DIR/Dockerfile"; then
+  fail 'optimized image still installs the source-less legacy theme'
+fi
 
 for compose_file in "$KEYCLOAK_DIR/docker-compose.yml" "$SCRIPT_DIR/docker-compose.integration.yml"; do
   grep -Fq "image: $POSTGRES_IMAGE" "$compose_file" \

@@ -6,15 +6,41 @@ below have recorded evidence and an owner.
 
 ## Known gates
 
-- The original Keycloakify source for `e-skylab-theme-v1-1-1` is missing from
-  every known ref, repository, JAR and source map. The binary was built with
-  Keycloakify 11.15.0 and has known P1 contract failures: WebauthnRegister drops
-  `residentKey` and `authenticatorAttachment`; WebauthnError submits a literal
-  `${execution}` retry value; and conditional mediation/remember-me behavior is
-  stale. Unsanitized HTML rendering and contrast/accessibility problems also
-  remain. Do not treat the smoke test as proof of these paths. Issue 05 must
-  deliver a source-controlled Keycloakify 11.16-or-newer rebuild plus real
-  WebAuthn and AIA Playwright gates before Account Center production rollout.
+- `e-skylab-theme` is now rebuilt from source with Keycloakify 11.16.0. CI
+  covers real Keycloak 26.7 password login, password/TOTP AIA cancel and
+  completion, WebAuthn error retry, registration and a cookie-cleared
+  passwordless assertion with a Chromium virtual authenticator, plus
+  conditional-passkey remember-me, locale, keyboard,
+  reduced motion and contrast contracts. CI cannot supply production platform
+  authenticators. Record successful registration, cancellation, passwordless
+  login and failure recovery on representative Touch ID, Face ID, Android
+  Credential Manager, Windows Hello and supported mobile WebViews before
+  rollout; mocked or virtual credentials are not a substitute for this
+  evidence.
+
+  The production clone must report
+  `webAuthnPolicyPasswordlessPasskeysEnabled=true` and
+  `webAuthnPolicyPasswordlessMediation=conditional` after reconciliation.
+  Without both fields Keycloak renders only password login even when the user
+  owns a valid passwordless WebAuthn credential.
+
+  The `keycloak-production` release environment must define all three variables
+  below. The release gate rejects absent data, evidence for another commit, or
+  a partial surface list before registry login or image publication:
+
+  - `KEYCLOAK_PHYSICAL_WEBAUTHN_APPROVED_COMMIT`: the exact candidate commit
+    from the release job;
+  - `KEYCLOAK_PHYSICAL_WEBAUTHN_EVIDENCE_URL`: HTTPS URL to the retained test
+    record;
+  - `KEYCLOAK_PHYSICAL_WEBAUTHN_APPROVED_SURFACES`:
+    `touch-id,face-id,android-credential-manager,windows-hello,mobile-webview`.
+
+  The protected build/test job has read-only repository permission and no
+  registry write capability. It packages the already-tested image and exact
+  theme JAR only after the commit-bound physical gate. The dependent publish
+  job alone receives `packages: write`; it verifies the one-day artifact's
+  commit SHA, checksums, image ID and one-JAR/theme contract, and cannot rebuild
+  the candidate.
 - The `sky-native-handoff` authenticator and its protected redemption endpoint
   are not part of this foundation. The `account-center-browser` flow is a
   client-specific standard browser-flow copy until that work lands.
@@ -23,12 +49,13 @@ below have recorded evidence and an owner.
   tests before production enablement.
 - A production-clone database upgrade and rollback have not been performed by
   repository tests. They require an operator and production-derived data.
-- The fixture proves minimal `openid` PAR acceptance, negative redirect
-  and plain-PKCE rejection, a real browser Authorization Code + S256 exchange,
-  ID-token `sub`/`sid`/`auth_time`, token audience/roles, Account REST profile
-  read and login-theme password-form rendering. It does not validate the binary
-  theme's WebAuthn/AIA behavior, complete a real AIA mutation or deliver
-  backchannel logout to the BFF; those remain release gates.
+- The fixture proves minimal `openid` PAR acceptance, negative redirect and
+  plain-PKCE rejection, a browser-driven Authorization Code flow, password and
+  TOTP AIA mutation, virtual WebAuthn registration/retry/passwordless
+  assertion, ID-token
+  `sub`/`sid`/`auth_time`, token audience/roles, Account REST profile read and
+  source-built theme rendering. It does not complete physical WebAuthn or
+  deliver backchannel logout to the BFF; those remain release gates.
 
 ## 1. Capture and verify a backup
 

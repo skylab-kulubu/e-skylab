@@ -8,7 +8,7 @@ This directory owns the Keycloak runtime used by `e.yildizskylab.com`.
 - Java 21 for Keycloak and both provider builds.
 - Digest-pinned Maven, PostgreSQL and RabbitMQ build/test images.
 - An optimized PostgreSQL image built with `kc.sh build`.
-- Exactly one SKY LAB SPI (`1.7.0`), one SKY LAB login theme (`1.1.1`) and
+- Exactly one SKY LAB SPI (`1.7.0`), one source-built SKY LAB login theme (`2.0.0`) and
   one RabbitMQ event provider (`3.1.0`) in `/opt/keycloak/providers`.
 - `account-api:v1`, PAR, passkeys and WebAuthn are explicitly enabled at
   image build time.
@@ -30,14 +30,14 @@ This directory owns the Keycloak runtime used by `e.yildizskylab.com`.
 - Forwarded headers are accepted only from the required
   `KEYCLOAK_PROXY_TRUSTED_ADDRESSES` allowlist.
 
-The theme JAR is the latest known deployed binary. Its original Keycloakify
-source is not present in this repository and has **not** been reconstructed or
-represented as source. The binary was built with Keycloakify 11.15.0 and is not
-production-ready for Account Center: its passkey pages lose required WebAuthn
-options, its retry action is malformed, and its HTML/a11y behavior has not met
-the release contract. Issue 05 must replace it with a source-controlled
-Keycloakify 11.16-or-newer rebuild and real WebAuthn/AIA browser tests. The
-fixture here proves only that the currently deployed binary loads and renders.
+The login theme is rebuilt from [`theme/`](theme/) with Keycloakify `11.16.0`.
+The optimized image installs exactly one generated JAR and never consumes the
+removed, source-less `1.1.1` binary. Unit, artifact and Chromium tests protect
+the Keycloak 26.7 WebAuthn fields, retry execution, conditional-passkey
+remember-me propagation, AIA controls, landmarks, keyboard operation,
+contrast and reduced motion. Representative Touch ID, Face ID, Android,
+Windows Hello and mobile-WebView checks on physical hardware remain an
+explicit rollout gate.
 
 ## Account Center client
 
@@ -97,16 +97,21 @@ volume, accepts it, and rejects the former marker-only false-positive fixture.
 The main fixture then starts PostgreSQL, RabbitMQ and the optimized image; runs
 reconciliation twice with deliberate configuration drift between runs; checks
 the exact OIDC client contract and a live minimal `openid` PAR request;
-completes a real browser Authorization Code + S256 exchange; asserts the ID
+completes a browser Authorization Code + S256 exchange; asserts the ID
 token's `sub`, `sid` and integer/non-future `auth_time`; and proves an actual
-Keycloak admin event reaches RabbitMQ. Theme verification is a load/render and
-password-form smoke test, not a WebAuthn/AIA behavior or accessibility test.
+Keycloak admin event reaches RabbitMQ. Source-level Chromium coverage runs
+before the image build; the runtime fixture verifies the generated theme loads
+on Keycloak 26.7.4. Physical-authenticator evidence remains a release gate.
 
 `keycloak/vX.Y.Z` releases are accepted only when the tag points at the current
 `main` commit and matches the version in the pinned Keycloak image reference.
-CI builds and loads one candidate image, runs the full fixture against it, then
-retags and pushes those same local image bytes as `X.Y.Z` and `latest` without a
-second build.
+The protected build job has no package-write permission: it builds and loads
+one candidate image, runs the full fixture and commit-bound physical WebAuthn
+gate, then uploads a one-day artifact containing the tested image, its exact
+source-built theme JAR, commit SHA, image ID and checksums. Only the dependent
+publish job receives package-write permission. It verifies those identities,
+the one-JAR/theme contract and the transferred checksums before retagging and
+pushing the same image bytes as `X.Y.Z` and `latest`; it never rebuilds them.
 
 Production deployment must follow
 [`docs/keycloak-26.7.4-upgrade-runbook.md`](../docs/keycloak-26.7.4-upgrade-runbook.md).

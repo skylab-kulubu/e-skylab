@@ -1,0 +1,35 @@
+{
+  "name": "e-skylab-keycloak-theme",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "prebuild": "keycloakify update-kc-gen",
+    "build": "tsc --noEmit && vite build",
+    "build-keycloak-theme": "npm run build && npm run clean-keycloak-theme && keycloakify build",
+    "clean-keycloak-theme": "node ./scripts/clean-keycloak-output.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:browser": "playwright test"
+  },
+  "dependencies": {
+    "keycloakify": "11.16.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.8.0",
+    "@testing-library/react": "16.3.0",
+    "@playwright/test": "1.63.0",
+    "@types/react": "18.3.24",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "5.2.0",
+    "jsdom": "26.1.0",
+    "typescript": "5.9.2",
+    "vite": "7.3.6",
+    "vitest": "4.1.11"
+  }
+}
