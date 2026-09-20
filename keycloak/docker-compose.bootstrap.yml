@@ -16,6 +16,5 @@ services:
         condition: service_started
     networks:
       - skynet
-      - keycloak-db
     restart: "no"
     profiles: [bootstrap]

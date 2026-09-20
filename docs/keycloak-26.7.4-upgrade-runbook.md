@@ -157,54 +157,45 @@ Keep Keycloak's HTTP and management ports bound to loopback or private networks;
 only the trusted proxy may reach the HTTP listener across the application
 network.
 
-## 6. Existing-volume preflight
+## 6. Shared PostgreSQL preflight
 
-The old compose declared `keycloak_db_data` and `keycloak_data` without explicit
-external names. Docker therefore used `<compose-project>_keycloak_db_data` and
-`<compose-project>_keycloak_data`, where the project may have come from `-p`,
-`COMPOSE_PROJECT_NAME` or the directory name. The new compose must not guess
-that prefix or create a new project-prefixed volume.
+Production stores Keycloak alongside the other SKY LAB databases in the
+existing PostgreSQL 18 service. The Keycloak deployment must not start another
+PostgreSQL container, attach the shared `PGDATA` volume or create a Keycloak
+data volume. Keycloak's durable state remains in its existing database.
 
-1. Identify the currently running PostgreSQL container. Read the actual mounted
-   volume name rather than deriving it:
-
-   ```bash
-   docker inspect --format '{{range .Mounts}}{{if eq .Destination "/var/lib/postgresql/data"}}{{.Name}}{{end}}{{end}}' <current-keycloak-db-container>
-   ```
-
-2. Repeat for the current Keycloak container's `/opt/keycloak/data` mount. Set
-   the exact results as `KEYCLOAK_DB_VOLUME_NAME` and
-   `KEYCLOAK_DATA_VOLUME_NAME`. Empty output, bind mounts or ambiguous mounts
-   stop the rollout and require an explicit migration plan.
-3. Run `docker volume inspect` for both names and record their mountpoints and
-   Compose labels. Confirm the database volume is the one covered by the backup
-   and clone rehearsal. Never create a missing volume to make this check pass.
-4. With production secrets injected, run the preflight alone:
+1. Record the running PostgreSQL service name, port, database, user and schema.
+   The current service hostname is `sky-lab-production-postgres-ik33fe`, the
+   database is `keycloak`, and the schema is `public`. Retrieve the existing
+   username and password from the platform secret store; never copy them from
+   process output into the repository or change record.
+2. Confirm the Keycloak and PostgreSQL services share only the intended Dokploy
+   application network. Do not publish PostgreSQL's port on the host.
+3. Confirm the fresh backup has been copied off the server, restored into an
+   isolated PostgreSQL 18 clone and checked before changing the image.
+4. With production inputs injected, run the preflight alone:
 
    ```bash
    docker compose -f keycloak/docker-compose.yml run --rm --no-deps keycloak-preflight
    ```
 
-   It must validate the immutable image inputs, exact Account Center origin and
-   an exact PostgreSQL 17 version, the sized control file, fixed global and
-   template-database catalogs, transaction/multixact state, configuration and
-   a complete 16 MiB WAL segment. A few fabricated marker files are not enough.
-   The preflight alone runs as UID 0 with only
-   `DAC_READ_SEARCH`, a read-only root filesystem and database mount, no
-   network, and `no-new-privileges`; this permits inspection of 0700 PGDATA
-   owned by the old Debian UID or the pinned Alpine UID without widening the
-   database, Keycloak, or reconciler. A missing, unreadable or empty external
-   volume fails before PostgreSQL or Keycloak starts.
+   It must validate the immutable image, exact Account Center origin and shared
+   database endpoint, then prove the endpoint is reachable. The preflight runs
+   as UID 1000 with a read-only root filesystem, all capabilities dropped and
+   `no-new-privileges`. It does not receive the database password. Authenticated
+   database and schema validation happens when Keycloak starts.
 5. Render `docker compose ... config` and verify all three Keycloak services use
-   the same `repository@sha256:digest`, and both volumes show the exact external
-   names captured above.
+   the same `repository@sha256:digest`, only the external `skynet` network is
+   present, and there is no `keycloak-db` service or production volume.
 
 ## 7. Production rollout
 
 1. Reconfirm a fresh backup and the tested rollback owner.
-2. Deploy the exact candidate by setting only `KEYCLOAK_IMAGE_DIGEST`; the GHCR
-   repository is source-controlled and cannot be overridden. Do not mount the
-   old provider directory: providers are already inside the optimized image.
+2. Deploy the exact candidate by setting `KEYCLOAK_IMAGE_DIGEST` and the
+   recorded shared PostgreSQL endpoint inputs; the GHCR repository is
+   source-controlled and cannot be overridden. Do not mount the old provider
+   directory: providers are already inside the optimized image. Do not mount
+   the shared PostgreSQL volume into the Keycloak deployment.
 3. Confirm `/health/ready` on the management port before routing traffic.
 4. Run `reconcile-account-center.sh` once, then inspect the client contract with
    read-only admin calls. Save redacted evidence.
