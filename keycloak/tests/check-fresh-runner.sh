@@ -46,14 +46,21 @@ fi
 if GITHUB_SHA="$fake_commit" \
   PHYSICAL_WEBAUTHN_APPROVED_COMMIT=ffffffffffffffffffffffffffffffffffffffff \
   PHYSICAL_WEBAUTHN_EVIDENCE_URL=https://evidence.example.invalid/keycloak \
-  PHYSICAL_WEBAUTHN_APPROVED_SURFACES=touch-id,face-id,android-credential-manager,windows-hello,mobile-webview \
+  PHYSICAL_WEBAUTHN_APPROVED_SURFACES=touch-id,face-id \
   "$release_gate" >/dev/null 2>&1; then
   fail 'physical WebAuthn release gate accepted evidence for another commit'
+fi
+if GITHUB_SHA="$fake_commit" \
+  PHYSICAL_WEBAUTHN_APPROVED_COMMIT="$fake_commit" \
+  PHYSICAL_WEBAUTHN_EVIDENCE_URL=https://evidence.example.invalid/keycloak \
+  PHYSICAL_WEBAUTHN_APPROVED_SURFACES=touch-id,face-id,android-credential-manager,windows-hello,mobile-webview \
+  "$release_gate" >/dev/null 2>&1; then
+  fail 'physical WebAuthn release gate accepted untested rollout surfaces'
 fi
 GITHUB_SHA="$fake_commit" \
   PHYSICAL_WEBAUTHN_APPROVED_COMMIT="$fake_commit" \
   PHYSICAL_WEBAUTHN_EVIDENCE_URL=https://evidence.example.invalid/keycloak \
-  PHYSICAL_WEBAUTHN_APPROVED_SURFACES=touch-id,face-id,android-credential-manager,windows-hello,mobile-webview \
+  PHYSICAL_WEBAUTHN_APPROVED_SURFACES=touch-id,face-id \
   "$release_gate" >/dev/null
 
 ruby -ryaml - "$REPOSITORY_ROOT" <<'RUBY'
