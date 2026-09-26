@@ -1,0 +1,3 @@
+# Certificate issuance follows attendance finalization and runs as durable jobs
+
+An Oturum Check-in recomputes eligibility but does not issue a Certificate. An authorized organizer explicitly finalizes attendance after the Event is closed, which snapshots the eligible recipients and queues one durable, idempotent issuance job per recipient; manual issue remains available. Workers resolve and pin the template version, render through Gotenberg with bounded concurrency, store the result, and hand the notification to skymail. Rendering and storage retry in the durable job; delivery lifecycle belongs to skymail after the handoff. This avoids attendees collecting a Certificate before the Event ends and prevents a large Event from rendering every PDF inside one HTTP request.

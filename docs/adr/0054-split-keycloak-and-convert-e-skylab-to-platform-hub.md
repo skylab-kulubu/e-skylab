@@ -1,7 +1,8 @@
-# ADR 0038: Split Keycloak and convert e-skylab to the platform hub
+# ADR 0054: Split Keycloak and convert e-skylab to the platform hub
 
 - Status: accepted
 - Date: 2026-09-20
+- Renumbered: e-skylab'da 0038 olarak yayımlandı; 0038 numarası bu seride sertifika şablonlarına ait olduğu için 0054 oldu (2026-09-26)
 
 ## Context
 

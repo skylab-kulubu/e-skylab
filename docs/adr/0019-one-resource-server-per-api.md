@@ -1,0 +1,3 @@
+# One resource server client per API process
+
+After skyl.app Java is gone, URL routes live in Go `core`. OAuth resource server is that process: Keycloak client `core`. Access tokens must have `aud` that contains `core` (audience mapper on the token). Roles come from `resource_access.core` only; `skylapp` client roles are not an authorization path. Core verifies RS256 against Keycloak JWKS and matching `iss`; unsigned payloads are rejected. The logged-in UI is superadmin, not a skyl.app SPA (ADR 0020). Callers (forms service account) get `url:create` on `core`.

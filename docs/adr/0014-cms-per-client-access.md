@@ -1,0 +1,3 @@
+# CMS access is per site client; scope inside a site comes from Groups
+
+Accepted. Person management is Keycloak groups only. Product access to a site's editor is a client role `cms:access` on that site's Keycloak client, assigned by group → client-role mapping. inscribed and cms-backend honour `cms:access` on the token's `azp` (the site you logged into), not a global skycms role aggregated across all clients. Page blocks stay stored per `clientId`. Within one multi-team site (arge), which team item you may edit comes from group path, not `*_LEADER` realm roles. Club-wide News and the main skylab-site are Privileged groups only.
