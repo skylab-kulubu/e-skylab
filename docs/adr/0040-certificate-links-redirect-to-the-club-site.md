@@ -1,0 +1,3 @@
+# Certificate links stay short while the club site owns verification UI
+
+The canonical Certificate address remains `https://skyl.app/c/{opaque-serial}` so printed QRs stay compact and their destination can move without reissuing credentials. The active core-backend owns that route and responds with a temporary redirect to `https://yildizskylab.com/sertifika/{opaque-serial}`. The active `skylab-site` project owns the human verification UI and reads only the minimal public Certificate endpoint. `skyl.app` is a link service, not a separate presentation frontend; no Certificate UI belongs in the inactive skyl-app frontend or backend repositories.

@@ -1,0 +1,3 @@
+# Certificate templates resolve by scope and issued certificates pin a version
+
+Certificate-template resolution is Event override → Owner-team default → required SKY LAB default; Gecekodu and AGC are Owner teams, not EventTypes. A template is edited as a draft and publishing creates an immutable version; issuance pins that version, so later edits affect only future Certificates and reissue means revoke plus a new Certificate and serial. External Canva or Figma artwork remains editable in its source and synchronizes into a draft background, while SKY LAB owns the dynamic fields and never accepts arbitrary executable HTML. This keeps brand artwork faithful without building a lossy clone of either editor or allowing historical credentials to drift.

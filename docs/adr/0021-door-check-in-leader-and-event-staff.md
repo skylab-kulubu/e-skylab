@@ -1,0 +1,3 @@
+# Door check-in is owner-team Leader plus per-event staff
+
+Leaders of an Event's Owner team (and Privileged people) may check attendees in at that team's events (grant A — existing Go `Validate` on TypeTicket). Superadmin can also assign specific people as Door staff for that Event (grant B). Both apply together. Ordinary owner-team members do not scan by default; they scan only if Superadmin puts them on that Event's B roster. A Group attribute (same pattern as `public_listing`, default off) may let that team's members scan at that team's events without each person on B. Rejected: every ownerTeam member is Door staff.

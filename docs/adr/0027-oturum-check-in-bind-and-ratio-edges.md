@@ -1,0 +1,3 @@
+# Current Oturum is clock plus pick; ratio counts remaining scheduled talks
+
+Staff Check-in targets the current Oturum: schedule-clock when talks on that EventDay do not overlap; staff pick when they overlap (two rooms) or the clock is wrong. Ratio denominator is scheduled Oturum that still exist; cancelled talks are deleted or marked cancelled and excluded so they do not inflate the %. An Event with zero Oturum rows issues no certificate until at least one talk exists — even a one-talk day is 1 EventDay + 1 Oturum; `once` is one Oturum Check-in, not an EventDay. Bind Check-in to the existing schedule Session under EventDay, not a second talk table. Rejected: clock-only; pick-only; counting cancelled talks; a fallback certificate on EventDays with no talks.
