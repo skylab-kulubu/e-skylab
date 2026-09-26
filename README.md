@@ -48,7 +48,7 @@ kararlar ürün depolarının yerine geçmez; aralarındaki ortak sözleşmeyi k
 Kullanıcı
    │
    ├── yildizskylab.com ─────── skylab-site
-   ├── admin.yildizskylab.com ─ superadmin
+   ├── admin.yildizskylab.com ─ core-frontend
    ├── my.yildizskylab.com ──── account-center
    ├── forms.yildizskylab.com ─ forms-frontend
    ├── mail.yildizskylab.com ── skymail-frontend
