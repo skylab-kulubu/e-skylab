@@ -62,3 +62,4 @@ Yeni bir ADR bu klasöre PR ile eklenir ve numarası mevcut en büyük numaranı
 | 0054 | Split Keycloak and convert e-skylab to the platform hub | [0054-split-keycloak-and-convert-e-skylab-to-platform-hub.md](0054-split-keycloak-and-convert-e-skylab-to-platform-hub.md) |
 | 0055 | skylcn-ui is the shared design system for SKY LAB web products | [0055-skylcn-ui-is-the-shared-design-system.md](0055-skylcn-ui-is-the-shared-design-system.md) |
 | 0056 | CMS, Fatih'in inscribed imajıdır; cms-backend emekli edilir | [0056-cms-is-stock-inscribed-cms-backend-is-retired.md](0056-cms-is-stock-inscribed-cms-backend-is-retired.md) |
+| 0057 | Etkinlik uygulamaları platformla aynı sunucuda, ayrı bir Dokploy projesinde çalışır | [0057-event-apps-run-in-their-own-dokploy-project.md](0057-event-apps-run-in-their-own-dokploy-project.md) |
