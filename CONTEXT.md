@@ -221,12 +221,16 @@ A CMS collection item (title, summary, body, hero, tags). Club announcements in 
 _Avoid_: Announcement as a core-API entity, `/api/announcements` on super-skylab
 
 **Site client**:
-The Keycloak OAuth client of one public site (for example `skylab-site`, `arge`). CMS page blocks are stored under that client's id (`azp`). Editor access is a client role on that client (`content:write`; `cms:access` until the inscribed cutover, ADR-0056), not a global CMS master key.
-_Avoid_: one `cms:access` on `skycms` that unlocks every site
+The Keycloak OAuth client of one public site (for example `frontend-main` for the main club site, `frontend-arge` for arge) and that site's CMS tenant: its content is stored under the client's id (`azp`). CMS rights are client roles on that client (`content:read`, `content:write`, `schema:sync`; people get them through `cms:access`), not a global CMS master key; the site's own server-side account only reads.
+_Avoid_: one `cms:access` on `skycms` that unlocks every site; a site's server-side account that can write content
 
 **cms:access**:
-A client role meaning this User may open the CMS editor for that Site client. It does not mean they may edit every team or every site. Which team pages they may change follows Group membership. Retired by the inscribed cutover (ADR-0056); its successor is `content:write` on the same Site client.
-_Avoid_: treating cms:access as superuser of all content
+A client role on a Site client meaning this User is a CMS editor of that site: it bundles `content:read` and `content:write`, and the site shows its editor only to holders of it. It is granted only to Groups (Privileged and Leader groups; which ones per site is in ADR-0056), never to single people. Write access is site-wide, so it covers every page of that site but no other site; which Teams items a Leader may change still follows Group membership.
+_Avoid_: treating cms:access as superuser of all content; treating it as retired by the inscribed cutover (ADR-0056); granting it to a single person, to all members, or as a default role
+
+**client:admin**:
+A client role on a Site client for CMS tenant administration: creating a team and fixing any team's Teams item, for example after its Leader leaves. It can also change that site's CMS tenant settings, so only the `ADMIN` group holds it until the CMS separates tenant settings from content administration.
+_Avoid_: giving it to Leaders or to YK; treating it as the editor role (that is `cms:access`)
 
 ### Event operations
 
