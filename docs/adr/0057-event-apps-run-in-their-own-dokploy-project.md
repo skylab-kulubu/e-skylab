@@ -4,7 +4,7 @@ status: accepted
 
 # Etkinlik uygulamaları platformla aynı sunucuda, ayrı bir Dokploy projesinde çalışır
 
-Place, Guessr ve 3aşağı5yukarı kulübün etkinlik uygulamalarıdır: bir stant haftası, jam ya da sponsor etkinliği için yazılırlar, etkinlik bitince bakımları azalır. Bu uygulamalar da Dokploy'a taşınır ama "SKY LAB Production" projesine girmez. Hepsi "SKY LAB Etkinlik" adlı ayrı bir Dokploy projesinde, `production` adlı tek bir ortamda çalışır. "SKY LAB Production" yalnız platformu taşır: Keycloak, core, Forms, SkyMail, CMS, OpenBao ve onların veri katmanı. ADR-0028 bu uygulamaların "kendi ortamlarında" kaldığını söylüyordu; bu karar o ortamın Dokploy'daki karşılığını belirler.
+Place, Guessr ve 3aşağı5yukarı kulübün etkinlik uygulamalarıdır: bir stant haftası, jam ya da sponsor etkinliği için yazılırlar, etkinlik bitince bakımları azalır. Bu uygulamalar da Dokploy'a taşınır ama "SKY LAB Production" projesine girmez. Hepsi "SKY LAB Etkinlik" adlı ayrı bir Dokploy projesinde, `production` adlı tek bir ortamda çalışır. "SKY LAB Production" platformu ve kulübün web sitelerini taşır: Keycloak, core, Forms, SkyMail, CMS, OpenBao ve onların veri katmanı; ana site ve artlab, gecekodu gibi statik tanıtım siteleri. Ayrım uygulamanın ne tuttuğuna göredir: kendi verisini, kendi login'ini ya da kendi sırlarını tutan etkinlik uygulamaları "SKY LAB Etkinlik"e girer; veri tutmayan, yalnız sayfa sunan kulüp siteleri ana siteyle birlikte Production'da durur (2026-09-29). ADR-0028 bu uygulamaların "kendi ortamlarında" kaldığını söylüyordu; bu karar o ortamın Dokploy'daki karşılığını belirler.
 
 Ayrı proje dört şey sağlar:
 - **Erişim:** Bir etkinlik ekibine yalnız kendi projesi açılır. Platform uygulamalarını ve değişkenlerini görmez.
