@@ -102,7 +102,7 @@ _Avoid_: treating EventDay as oturum, session, or a talk (that lock is **retract
 
 **Oturum**:
 A talk or slot **on an EventDay**. Many per day. English name in the model is Session — already the schedule table `sessions` under EventDay (`core-backend/db/migrations/20260916180000_create_schedule.up.sql`); Check-in binds to that row. ARTLAB used to be one day with five Oturum; this year day 1 had five and day 2 had three (eight total). Operators add and edit talks only on the Event hub; there is no global Oturum product page.
-_Avoid_: treating EventDay as Oturum; treating Session as agenda-only and not yoklama; treating a calendar day as one talk; inventing a second talk entity beside schedule Session; a global `/sessions` catalogue as a second editor
+_Avoid_: using Oturum for a Sign-in session; treating EventDay as Oturum; treating Session as agenda-only and not yoklama; treating a calendar day as one talk; inventing a second talk entity beside schedule Session; a global `/sessions` catalogue as a second editor
 
 **Oturum QR**:
 A shared QR for **one Oturum** the attendee scans at the end of that talk to Check-in their Ticket (same family as Event QR: attendee scans, no person id). Not an EventDay QR.
@@ -167,6 +167,14 @@ _Avoid_: client roles as the way to represent a team; realm roles; `skylapp` cli
 **Resource server**:
 The Keycloak client that stands for one API process. Core's resource server is `core`. A token is for core when `aud` contains `core`. Core reads roles only from `resource_access.core`.
 _Avoid_: unsigned JWT as an auth path; aggregating `skylapp` (or any other client) roles; treating `azp` as audience for core
+
+**Sign-in session**:
+A person's signed-in state with SKY LAB: their single sign-on session at Keycloak together with each application's own session that rides on it. In Turkish, "giriş oturumu".
+_Avoid_: "oturum" on its own (that is a talk on an EventDay, see Oturum); treating an access token or its cookie as the session
+
+**Group overage**:
+The state where a person is in more Groups than a token carries (above 30 paths). Their tokens carry a marker instead of the group list, and a service that needs their Groups asks for them.
+_Avoid_: reading a missing group list as "no Groups"; cutting the group list short
 
 **Promote**:
 Granting Member status by placing a User into the right Keycloak groups. No directory write.
