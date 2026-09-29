@@ -63,3 +63,5 @@ Yeni bir ADR bu klasöre PR ile eklenir ve numarası mevcut en büyük numaranı
 | 0055 | skylcn-ui is the shared design system for SKY LAB web products | [0055-skylcn-ui-is-the-shared-design-system.md](0055-skylcn-ui-is-the-shared-design-system.md) |
 | 0056 | CMS, Fatih'in inscribed imajıdır; cms-backend emekli edilir | [0056-cms-is-stock-inscribed-cms-backend-is-retired.md](0056-cms-is-stock-inscribed-cms-backend-is-retired.md) |
 | 0057 | Etkinlik uygulamaları platformla aynı sunucuda, ayrı bir Dokploy projesinde çalışır | [0057-event-apps-run-in-their-own-dokploy-project.md](0057-event-apps-run-in-their-own-dokploy-project.md) |
+| 0058 | Admin paneli token'larını kendi sunucusunda tutar; token'ı yalnız çağırdığı API'lere açıktır | [0058-admin-panel-keeps-tokens-on-its-server.md](0058-admin-panel-keeps-tokens-on-its-server.md) |
+| 0059 | Yetki Microsoft modelindedir: uygulama geneli izinler client rolü, takım izinleri grup yolu; çok gruplu kişinin grupları sorulur | [0059-authorization-follows-the-microsoft-model.md](0059-authorization-follows-the-microsoft-model.md) |
