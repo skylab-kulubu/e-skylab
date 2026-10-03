@@ -38,3 +38,24 @@ Yetki tarafı ilk metinden şu noktalarda ayrıldı:
 - **Koleksiyon kuralları ayrıca daraltır.** News oluşturma ve düzenleme, News koleksiyonunun kendi kuralıyla Privileged gruplara sınırlıdır. Her Teams kaydı, eşleşen takımın Leader grubuna aittir.
 - **`client:admin` şimdilik yalnız ADMIN'de.** Yeni takım açmak ve lideri ayrılmış bir takımın sayfasını düzeltmek bu rolü ister. Aynı rol sitenin CMS tenant ayarlarını da değiştirebiliyor. CMS, tenant ayarı yetkisini içerik yöneticiliğinden ayırana kadar bu rol yalnız ADMIN grubundadır.
 - **Bilinen sınır.** inscribed'da yazma yetkisi site genelidir; bir takım lideri o sitenin bütün sayfalarını da düzenleyebilir. CMS'e yalnız koleksiyona yazma yetkisi gelene kadar bu kabul edildi. Bu yüzden ADR-0014'teki "ana site yalnız Privileged" kuralı şimdilik gevşemiş durumda.
+
+## Ek: etkinlik siteleri de tenant (2026-10-03)
+
+ARTLAB, YıldızJam ve SkyDays sitelerinin de editörle düzenlenebilmesi istendi. Karar değişmedi, kapsamı genişledi: bu siteler de aynı inscribed'ı kullanır.
+
+- **Backend aynı.** Her site canlıdaki inscribed'da kendi tenant'ıdır; tenant sitenin Site client'ıdır (`frontend-artlab`, `frontend-yildizjam`, `frontend-skydays`). Yeni backend, fork ya da site başına ikinci bir CMS yoktur. cms-backend emekli kalır ve yeniden kurulmaz; 2026-10-05 temizliği (eski uygulamanın kaldırılması, reponun arşivlenmesi) planlandığı gibi yapılır, çünkü bu yol eski CMS'ten hiçbir şey kullanmaz.
+- **Yeni site kod istemez.** Gerekenler: Keycloak'ta bir Site client'ı (yapılandırma betiğiyle, elle değil), inscribed'da tenant kaydı (yayınlanmış içerik anonim okunur), CORS'ta sitenin origin'i ve sitenin kendi Dokploy uygulaması. Bu siteler veri tutmadığı için ana siteyle birlikte "SKY LAB Production"da durur (ADR-0057).
+- **Site client'ının biçimi** ana site ve arge ile aynıdır, şu farklarla: sunucu tarafındaki hesap yalnız okur (`content:read` + `schema:sync`, `cms:access` yok); Full scope kapalıdır, yoksa token başka sitenin `cms:access`'ini taşır ve o sitenin editörü açılır (ADR-0058/0059); redirect adresi birebir eşleşir ve production client'ında yerel adres yoktur. `skycms` audience'ı ortak bir scope'tan, görsel yüklemesi için core audience'ı site başına bir scope'tan gelir.
+- **Editörler mevcut grup ağacından gelir.** Bir etkinlik sitesinde `cms:access` Privileged gruplara ve siteye sahip takımın Leader gruplarına verilir. Site başına ayrı bir editör grubu açılmaz; Group kulübün ağacıdır, ikinci bir üyelik bayrağı değildir. Yazma site geneli olduğu için etkinlik sitesi bütün Leader gruplarına verilmez. `client:admin` yine yalnız ADMIN'dedir. Hangi takımın hangi siteye sahip olduğu atamalarla, yönetim panelinden kaydedilir.
+- **Sırlar elle dolaşmaz** (ADR-0049). Client sırrı Keycloak'tan doğrudan sır deposuna yazılır, uygulama yalnız referansı tutar. Build sırasında sır gerekmez: siteler içeriği çalışma anında okur, yayınlanmış içerik token'sız okunur. Yerel geliştirmede sandbox CMS'i token'sız okunur, editör sandbox dağıtımında denenir; geliştiricinin makinesine sır verilmez.
+- **Görseller core'a gider** (ADR-0052). Site, editörün token'ıyla core'a yükleyen kendi sunucu tarafı köprüsünü kullanır; ayrı bir CMS medya servisi yoktur. CMS'e özgü purpose, inscribed görseli kendine ekleyebildiğinde açılır.
+- **Yönetim panelinde siteler.** İlk adımda panel düzenlenebilir sitelerin sabit listesini gösterir; "Düzenle" sitenin kendi giriş adresine gider, editörü site yalnız `cms:access` sahibine açar. Sonra core'un "yeteneklerim" yanıtı kişinin düzenleyebileceği siteleri (`editableSites`) döner; core bunu Keycloak'a sunucudan sorar (ADR-0059). Bu liste yetki kararı değil, arayüz ipucudur; yetkiyi inscribed verir. Hiçbir client'ta Full scope bunun için açılmaz.
+- **Sıra.** Önce ARTLAB (önce sandbox, sonra production). Sonra YıldızJam: statik export'tan sunuculu Next'e geçer ve Dokploy'a taşınır. SkyDays Vite'tan Next'e geçince, geliştiricinin zamanına göre gelir. inscribed'ın SDK'sı ve giriş paketi sunuculu Next istediği için statik ya da Vite sitesi önce geçirilir.
+- **Koleksiyon yok, başta.** Etkinlik siteleri ilk aşamada yalnız sayfa blokları kullanır. inscribed'da koleksiyonlar tenant'a bağlı değil, bütün sitelerde ortaktır; etkinlik sitesine koleksiyon gerekirse ayrı karar verilir.
+
+Değerlendirilen ve seçilmeyenler:
+
+- **cms-backend'i yeniden kurmak:** bu ADR'nin kararıyla çelişir; istenen uçların hepsi inscribed'da zaten var.
+- **Site başına editör grubu ağacı:** grup ağacına rol yerine ikinci bir üyelik bayrağı ekler.
+- **Paneldeki liste için Full scope açmak:** token büyür ve istemci token okumuş olur; ADR-0058/0059 tam tersini ister.
+- **Yeni ADR:** karar ("CMS stok inscribed'dır") aynı kaldı, yalnız tenant sayısı arttı.

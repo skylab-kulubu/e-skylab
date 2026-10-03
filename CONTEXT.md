@@ -189,7 +189,7 @@ Membership in a team's `LIDERLER` or `KOORDINATORLER` subgroup.
 _Avoid_: `*_LEADER` role, synthetic leader role
 
 **Owner team**:
-The Keycloak group that owns a domain resource (an event, ticket, session) when one exists. Authorization checks whether the caller is a member or leader of that group. An Event may have no Owner team; then only Privileged people may mutate it. Certificate-template resolution may use the Event and this string before falling back to the SKY LAB default; it never uses an EventType table. HTTP paths and query names use `ownerTeam` / `team`.
+The Keycloak group that owns a domain resource (an event, ticket, session, event site) when one exists. Authorization checks whether the caller is a member or leader of that group. An Event may have no Owner team; then only Privileged people may mutate it. Certificate-template resolution may use the Event and this string before falling back to the SKY LAB default; it never uses an EventType table. HTTP paths and query names use `ownerTeam` / `team`.
 _Avoid_: event type as a separate identity source, a fake GENEL team, ownerGroup as something other than a Group; reviving EventType for certificate templates; URLs or query names that say eventType
 
 **Attendance rule**:
@@ -229,11 +229,19 @@ A CMS collection item (title, summary, body, hero, tags). Club announcements in 
 _Avoid_: Announcement as a core-API entity, `/api/announcements` on super-skylab
 
 **Site client**:
-The Keycloak OAuth client of one public site (for example `frontend-main` for the main club site, `frontend-arge` for arge) and that site's CMS tenant: its content is stored under the client's id (`azp`). CMS rights are client roles on that client (`content:read`, `content:write`, `schema:sync`; people get them through `cms:access`), not a global CMS master key; the site's own server-side account only reads.
-_Avoid_: one `cms:access` on `skycms` that unlocks every site; a site's server-side account that can write content
+The Keycloak OAuth client of one public site (for example `frontend-main` for the main club site, `frontend-arge` for arge, `frontend-artlab`, `frontend-yildizjam` and `frontend-skydays` for event sites) and that site's Site tenant: its content is stored under the client's id (`azp`). CMS rights are client roles on that client (`content:read`, `content:write`, `schema:sync`; people get them through `cms:access`), not a global CMS master key; the site's own server-side account only reads. Full scope is off, so a token for one site never carries another site's roles. One site, one client; it is made by the Keycloak configuration scripts, and its secret goes from Keycloak straight into the secret store.
+_Avoid_: one `cms:access` on `skycms` that unlocks every site; a site's server-side account that can write content; Full scope on a Site client; a localhost redirect on a production Site client; one client shared by several sites; handing a client secret to a developer or putting it in a build
+
+**Site tenant**:
+One public site's content space in the CMS (inscribed), keyed by its Site client's id. Every site that is edited in the CMS, event sites included, is its own tenant on the one live CMS; adding a site adds a Site client, a tenant registration with anonymous reads of published content, a CORS origin and the site's own deployment, but no backend code. Published content is read at run time without a token; editing uses the editor's own token for that site. Collections are not per tenant: they are shared by every site, so event sites start with page blocks only.
+_Avoid_: a new CMS backend, fork or reborn cms-backend per site; reading the CMS with a secret at build time; treating a collection key as private to one site
+
+**Site editor**:
+A User who may edit one site in the CMS, that is, who holds `cms:access` on that Site client through a Group. For an event site the rule is: Privileged Groups plus the Leader groups of the team that owns the site (its Owner team); for the main site and arge the groups are listed in ADR-0056. The existing Group tree carries it; there is no separate editor group. The admin panel's list of sites a person can edit is a hint for the UI, not the authorization; the CMS decides.
+_Avoid_: a `site-editorleri` (per-site editor) group tree; granting an event site to every Leader group; granting `cms:access` to a single person; turning on Full scope to learn which sites a person edits
 
 **cms:access**:
-A client role on a Site client meaning this User is a CMS editor of that site: it bundles `content:read` and `content:write`, and the site shows its editor only to holders of it. It is granted only to Groups (Privileged and Leader groups; which ones per site is in ADR-0056), never to single people. Write access is site-wide, so it covers every page of that site but no other site; which Teams items a Leader may change still follows Group membership.
+A client role on a Site client meaning this User is a CMS editor of that site: it bundles `content:read` and `content:write`, and the site shows its editor only to holders of it. It is granted only to Groups (Privileged and Leader groups; which ones per site is in ADR-0056, and for an event site the Site editor rule), never to single people. Write access is site-wide, so it covers every page of that site but no other site; which Teams items a Leader may change still follows Group membership.
 _Avoid_: treating cms:access as superuser of all content; treating it as retired by the inscribed cutover (ADR-0056); granting it to a single person, to all members, or as a default role
 
 **client:admin**:
