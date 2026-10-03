@@ -8,7 +8,7 @@ Bugün sunucudaki her Dokploy servisi tek bir overlay ağında, `dokploy-network
 
 Karar (Yusuf, 2026-10-03):
 
-- **Veri servisi `dokploy-network`'te durmaz.** Postgres, Redis, OpenBao ve Dokploy'un kendi veritabanları, yalnız onları kullanan uygulamalarla paylaştıkları özel bir overlay ağındadır. Etkinlik uygulamaları platformun veri servislerine ne adla ne adresle ulaşabilir.
+- **Veri servisi `dokploy-network`'te durmaz.** Postgres, Redis, OpenBao ve Dokploy'un kendi veritabanları, yalnız onları kullanan uygulamalarla paylaştıkları özel bir overlay ağındadır. Etkinlik uygulamaları platformun veri servislerine adla da adresle de ulaşamaz.
 - **`dokploy-network`'te yalnız Traefik'in ulaşması gereken servisler kalır:** alan adı olan uygulamalar, Traefik'in kendisi ve Dokploy'un paneli. Veri servisini kullanan bir uygulama iki ağda durur: `dokploy-network` (Traefik için) ve veri ağı.
 - **Bir veri ağı bir ortama aittir.** Production ile sandbox ayrı veri ağlarındadır; bir etkinlik projesinin veritabanı kendi projesinin ağındadır. Ortamlar arası tek istisna OpenBao'dur: tek kurulum iki ortama hizmet eder (ADR-0049).
 - **Ağ üyeliğinin tek kaynağı Dokploy'dur.** Dokploy'un yönettiği servislerde üyelik Dokploy'un Networks özelliğine (`networkIds`, `detachDokployNetwork`) yazılır; böylece her deploy aynı ağları kurar. Dokploy'un yönetmediği servislerde (Dokploy'un kendisi ve veritabanları) Docker'a yazılır ve olgu betiğiyle denetlenir.
@@ -41,7 +41,7 @@ Kaynak okundu (`Dokploy/dokploy` `v0.30.7`):
 - **Postgres ve Redis `dnsrr` kipindedir** (sanal IP yok); servis adı her ağda doğrudan konteynerin adresine çözülür.
 - **Traefik bağımsız bir konteynerdir ve yalnız `dokploy-network`'tedir.** Dokploy onu yalnız "Isolated Deployment" seçili compose projelerinin ağlarına bağlar (`reconnectServicesToTraefik`). Application'lar için Traefik'i özel ağlara bağlamaz; alan adı olan bir Application `dokploy-network`'ten ayrılırsa yönlendirme kırılır (panel de uyarır).
 - **Şifreli overlay kuramaz.** `network.create` yalnız MTU seçeneğini geçirir; `--opt encrypted` yok. Panelden "recreate" da Docker'a yalnız kayıttaki alanları gönderir.
-- **Dokploy'un kendi Postgres'i ve Redis'i** kurulumda (`setup.ts`) `dokploy-network`'e konur; sunucu açılışında yeniden yaratılmaz (`server.ts` yalnız ağın varlığını denetler). Bu yüzden onların ağı Docker'da değiştirilir ve Dokploy güncellemesinden sonra olgu betiğiyle denetlenir. Eski kurulumlarda bu Postgres'in parolası Dokploy kaynağında yazan sabit değerdir; v0.26.6 güvenlik betiği onu Docker secret'a taşır. Production'da hangisinin geçerli olduğu olgu betiğinin ilk sorusudur.
+- **Dokploy'un kendi Postgres'i ve Redis'i** kurulumda (`setup.ts` ve kurulum betiği) `dokploy-network`'e konur; Dokploy açılışında yeniden yaratılmaz (`server.ts` yalnız ağın varlığını denetler). Bu yüzden onların ağı Docker'da değiştirilir ve Dokploy güncellemesinden sonra olgu betiğiyle denetlenir. Eski kurulumlarda bu Postgres'in parolası Dokploy kaynağında yazan sabit değerdir; v0.26.6 güvenlik betiği onu Docker secret'a taşır. Production'da hangisinin geçerli olduğu olgu betiğinin ilk sorusudur.
 
 ## Geçiş sırası
 
@@ -51,7 +51,7 @@ Her adım ayrı bir wizard koşusudur; bir sonrakine, öncekinin ertesi günkü 
 1. **media-frame** (kare servisi açılırken ya da açıksa): `sky-lab-<ortam>-frame`; media-frame `dokploy-network`'ten ayrılır, core ikinci ağ olarak alır. Önce sandbox.
 2. **Sandbox veri** (`ops/wizards/network-separation-sandbox-wizard.sh`): ağ yaratılır; istemci uygulamalar ağa eklenir (her biri ayrı doğrulanır); Postgres ve Redis ağa eklenir; doğrulama; Postgres ve Redis `dokploy-network`'ten ayrılır; doğrulama; üye olmayan bir konteynerden (Traefik, `dokploy-network`'teki bir yoklama, etkinlik uygulaması) adın çözülmediği ve bağlantı kurulamadığı kanıtlanır.
 3. **Etkinlik veritabanları** (production; etki alanı küçük).
-4. **Production Postgres ve Redis** (bakım penceresinde; her veri servisi bir kez yeniden başlar, birkaç saniye).
+4. **Production Postgres ve Redis** (bakım penceresinde): önce istemci uygulamalar ağa (her biri bir kez yeniden başlar), sonra her veri servisi tek güncellemede ağa eklenir ve `dokploy-network`'ten ayrılır (bir kez yeniden başlar, birkaç saniye).
 5. **Kapı Redis'i** (`networkSwarm` düzenlenir; takma ad ve `attachable` korunur, çünkü OpenBao rotatorunun kapı adımı ağı bu takma addan bulur ve yan konteynerini o ağa bağlar).
 6. **OpenBao → `sky-lab-secrets`;** Dokploy servisi ağa eklenir (referans çözümü). Ardından bir sandbox deploy'unda referansların çözüldüğü denetlenir.
 7. **Dokploy'un Postgres'i ve Redis'i → `dokploy-internal`;** önce parola Docker secret'ta olmalı.
