@@ -61,3 +61,11 @@ Değerlendirilen ve seçilmeyenler:
 - **Organizasyon takımının bütün üyeleri:** yazma site geneli olduğu için yetki takımın liderleri ve koordinatörleriyle sınırlı kalır.
 - **Paneldeki liste için Full scope açmak:** token büyür ve istemci token okumuş olur; ADR-0058/0059 tam tersini ister.
 - **Yeni ADR:** karar ("CMS stok inscribed'dır") aynı kaldı, yalnız tenant sayısı arttı.
+
+## Ek: hesap silme (2026-10-03)
+
+Yukarıdaki "Hesap silme ve erişim kapısı" maddesi daraldı: inscribed'a erişim kapısı gelmez, tam silme ucu da gerekmez (ayrıntı ve gerekçe ADR-0051'in 2026-10-03 ekinde).
+
+- **Küçük uç, sahibinden.** Fatih inscribed'a core'un silme komutunu karşılayan küçük bir uç ekler. Uç düzenleyen kolonlarındaki (`UpdatedBy`) kişinin `sub`'ını herkes için aynı "Silinmiş kullanıcı" yer tutucusuna çevirir; içerik, sürüm ve tarih değişmez. Makbuz tablosu ve tenant çözümü yoktur; token `core-erasure`'ın, rol `skycms` üzerindeki `cms:account:erase`'tir.
+- **Kapı yok.** inscribed hesap tutmaz; eski token bir hesabı diriltemez. Kalan risk, kişi kapatılmadan önce alınmış access token'ın ömrü (300 sn + 30 sn skew) içinde yapılan bir düzenlemedir. Core CMS adımını kimlik kapandıktan 6 dk sonra gönderir; o düzenleme de temizlenir.
+- **Eski `ArchivedBy` kolonları** (cms-backend kopyası) bir kez, herkes için boşaltılır.
