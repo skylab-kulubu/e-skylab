@@ -40,6 +40,22 @@ _Avoid_: event, message or webhook (there is no broker); a service pulling delet
 The one shared stand-in that replaces an erased person wherever a service keeps a record that must name an actor (who sent, approved, edited, archived). Everyone erased becomes the same placeholder, so it links nothing and cannot be signed in as.
 _Avoid_: a per-person pseudonym; keeping the former name or e-mail beside it; treating it as a User; ghost user
 
+**Retention period**:
+How long one category of personal data is kept, set by its purpose and its KVKK art. 5 basis (ADR-0062). It runs from an anchor: the end of the Event, the close of the form, the send, or the record time. When it ends, the data is erased or anonymized. The record stays and the person goes, as in the Deletion lifecycle. "Indefinite" is allowed only while the purpose lasts (the account is open, the consent stands, the certificate is verified, the result is published) or once the data is anonymous. Archiving a record does not stop its clock.
+_Avoid_: keeping data "just in case"; an indefinite period with no purpose behind it; treating archived as expired or expired as archived; one period for a whole table when its columns serve different purposes (an IP and the click it belongs to)
+
+**Contact consent** (Davet onayı):
+A person's explicit, optional consent to receive SKY LAB's future event invitations by e-mail. It is the only basis for inviting someone who is not a Member: a guest, a player, or a rejected applicant. Core keeps the single record in `contact_consents`: e-mail, purpose, channel, text version, source, given, withdrawn, end reason, last event. Guest apply, Forms, Place and Guessr write to it, and SkyMail reads its invitation list only from it. The box is unticked, separate from the aydınlatma, and never a condition of the service. Every invitation carries a signed opt-out link, and withdrawing can be repeated with the same result. Three years without attendance triggers one renewal question. Account erasure deletes it. Member and alumni announcements are not Contact consent; they run on legitimate interest with an opt-out.
+_Avoid_: a pre-ticked box; folding it into the aydınlatma or the terms; staff ticking it for someone else; asking past guests for consent by mailing them; each app keeping its own consent list; sponsor or commercial content in an invitation; a suppression list after erasure
+
+**Club archive**:
+What the club keeps indefinitely as its history: published winners, speakers and event photos, issued Certificates (name, Event, serial), announcements without recipients, a Member's attendance and contest history while the account exists, and anonymous counts. A guest's history joins it only after the guest identity is cleared. It is published with notice at registration and at the venue, and a person may ask to be removed. Groups smaller than ten are merged in statistics, so that they cannot point to a person.
+_Avoid_: treating the archive as a reason to keep contact data, IPs or mail bodies; keeping unpublished results as "archive"; refusing a removal request because the item is archived
+
+**Periodic destruction run**:
+One daily execution of a service's retention job. It erases or anonymizes whatever passed its Retention period that day and writes a person-free receipt (rule, time, row count) that is kept at least three years. Each service runs its own job over its own data. The 90-day `PERIODIC_DESTRUCTION_INTERVAL` is the reporting and alarm unit, not the run frequency: each period ends with a destruction report, and a period with no successful run raises an alarm. Modes are `off`, `dry-run` and `apply`, and every service starts in dry-run. After a backup restore it runs once in apply mode.
+_Avoid_: a 90-day batch as the only run; an in-process timer that restarts with every release; core writing into another service's database; receipts that name a person, an e-mail or a row id; switching straight to apply without a dry-run
+
 **Sudo mode**:
 A fresh re-verification inside Account center that a sensitive action (password, passkey, TOTP, e-mail, delete) requires: the person proves it is them with their password, a passkey or a TOTP code, and the proof is good for five minutes. A person who has none of these re-authenticates with Microsoft instead.
 _Avoid_: a Keycloak `prompt=login` hop as the default step-up; treating the login `auth_time` as sudo; skipping sudo because the session is fresh

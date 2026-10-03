@@ -66,3 +66,4 @@ Yeni bir ADR bu klasöre PR ile eklenir ve numarası mevcut en büyük numaranı
 | 0058 | Admin paneli token'larını kendi sunucusunda tutar; token'ı yalnız çağırdığı API'lere açıktır | [0058-admin-panel-keeps-tokens-on-its-server.md](0058-admin-panel-keeps-tokens-on-its-server.md) |
 | 0059 | Yetki Microsoft modelindedir: uygulama geneli izinler client rolü, takım izinleri grup yolu; çok gruplu kişinin grupları sorulur | [0059-authorization-follows-the-microsoft-model.md](0059-authorization-follows-the-microsoft-model.md) |
 | 0060 | Place'in giriş yöntemi ortamdan seçilir; e-skylab girişini backend yürütür, yetkiler Keycloak rollerinden gelir | [0060-place-login-mode-is-configurable-and-roles-come-from-keycloak.md](0060-place-login-mode-is-configurable-and-roles-come-from-keycloak.md) |
+| 0062 | Saklama süreleri ve periyodik imha | [0062-retention-periods-and-periodic-destruction.md](0062-retention-periods-and-periodic-destruction.md) |
