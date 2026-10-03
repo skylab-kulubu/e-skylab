@@ -15,7 +15,7 @@ Ayrı proje dört şey sağlar:
 ## Consequences
 
 - **Veri:** Her etkinlik uygulamasının kendi veritabanı vardır. Platform Postgres'i ve Redis'i kullanılmaz (ADR-0028). İmajlar GHCR'dan çekilir, sunucuda derleme yapılmaz.
-- **Ağ yalıtımı yok:** Ayrı proje ağı ayırmaz; Dokploy servisleri aynı Docker ağını paylaşır. Ayrım erişim, sır ve düzen düzeyindedir. Platform veritabanlarını yalnız kimlik bilgileri korur.
+- **Ağ yalıtımı yok:** Ayrı proje ağı ayırmaz; Dokploy servisleri aynı Docker ağını paylaşır. Ayrım erişim, sır ve düzen düzeyindedir. Platform veritabanlarını yalnız kimlik bilgileri korur. *(2026-10-03: ADR-0061 bu maddeyi değiştirir; bkz. aşağıdaki ek.)*
 - **Kaynak sınırı:** Etkinlik uygulamaları platformla aynı sunucudadır. Bu yüzden her birine CPU ve RAM sınırı konur; bir etkinliğin trafiği platformu yavaşlatmamalı.
 - **Başkası adına barındırılan siteler:** Kulübün başkası adına barındırdığı, etkinlik uygulaması olmayan bir site etkinlik projesini paylaşmaz, kendi projesine girer. Ekstremspor'un hangi projeye gireceği, sahibi netleşince bu kurala göre belirlenir.
 
@@ -24,3 +24,7 @@ Ayrı proje dört şey sağlar:
 - **"SKY LAB Production" projesine eklemek:** En az iştir. Ama etkinlik uygulamalarını platformun erişimi, sırları ve proje değişkenleriyle aynı yere koyar.
 - **"SKY LAB Production" içinde ayrı bir Dokploy ortamı:** Ortamın aşama anlamını bozar. Proje düzeyindeki paylaşılan değişkenler bu ortamdan da görünür.
 - **Her uygulamaya ayrı proje:** Etkinlik başına bir proje, bu ölçekte panelde gereksiz kalabalık yapar. Ortak kural ve sınırlar tek projede daha kolay tutulur.
+
+## Ek: ağ ayrımı (2026-10-03)
+
+"Ağ yalıtımı yok" maddesi ADR-0061 ile değişti. Veri servisleri (platform ve etkinlik veritabanları, Redis'ler, OpenBao, Dokploy'un veritabanı) `dokploy-network`'ten çıkar ve yalnız onları kullanan uygulamalarla paylaştıkları özel ağlarda durur. Etkinlik projesinin veritabanları kendi projesinin veri ağındadır; etkinlik uygulamaları platformun veri servislerine ulaşamaz. Etkinlik uygulamaları alan adları için `dokploy-network`'te kalır; platform uygulamalarına iç erişimi token korur.

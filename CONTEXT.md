@@ -385,3 +385,7 @@ _Avoid_: building this site in the current Event-ops loop; treating a microsite 
 **Secret reference**:
 What a service's environment holds in place of a secret value: a pointer to the secret in OpenBao, resolved by Dokploy at deploy time (ADR-0049). Production and sandbox references resolve only through their own provider, so a production reference copied into a sandbox application fails the deploy.
 _Avoid_: pasting a secret value into Dokploy, GitHub or a chat; copying one environment's settings into another; one provider token that reads both production and sandbox
+
+**Data network**:
+A private Docker overlay network that holds one environment's data services (Postgres, Redis, OpenBao, Dokploy's own database) and only the applications that use them (ADR-0061). Membership is written in Dokploy (Advanced → Networks), so every deploy rebuilds it. `dokploy-network` keeps only what Traefik must reach; event applications cannot reach the platform's data services.
+_Avoid_: putting a data service on `dokploy-network`; adding a network to a service by hand with `docker service update` on a Dokploy-managed service (the next deploy drops it); deleting a network in Dokploy while a service still uses it; one data network shared by production and sandbox
