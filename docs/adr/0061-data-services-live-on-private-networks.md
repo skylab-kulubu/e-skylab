@@ -10,7 +10,7 @@ Karar (Yusuf, 2026-10-03):
 
 - **Veri servisi `dokploy-network`'te durmaz.** Postgres, Redis, OpenBao ve Dokploy'un kendi veritabanları, yalnız onları kullanan uygulamalarla paylaştıkları özel bir overlay ağındadır. Etkinlik uygulamaları platformun veri servislerine adla da adresle de ulaşamaz.
 - **`dokploy-network`'te yalnız Traefik'in ulaşması gereken servisler kalır:** alan adı olan uygulamalar, Traefik'in kendisi ve Dokploy'un paneli. Veri servisini kullanan bir uygulama iki ağda durur: `dokploy-network` (Traefik için) ve veri ağı.
-- **Bir veri ağı bir ortama aittir.** Production ile sandbox ayrı veri ağlarındadır; bir etkinlik projesinin veritabanı kendi projesinin ağındadır. Ortamlar arası tek istisna OpenBao'dur: tek kurulum iki ortama hizmet eder (ADR-0049).
+- **Bir veri ağı bir ortama aittir.** Production ile sandbox ayrı veri ağlarındadır; bir etkinlik projesinin veritabanı kendi projesinin ağındadır. Ortamlar arası tek istisna OpenBao'dur: tek kurulum iki ortama hizmet eder (ADR-0049). İkinci istisna tarama ağı `sky-lab-scan`'dir (2026-10-05 eki).
 - **Ağ üyeliğinin tek kaynağı Dokploy'dur.** Dokploy'un yönettiği servislerde üyelik Dokploy'un Networks özelliğine (`networkIds`, `detachDokployNetwork`) yazılır; böylece her deploy aynı ağları kurar. Dokploy'un yönetmediği servislerde (Dokploy'un kendisi ve veritabanları) Docker'a yazılır ve olgu betiğiyle denetlenir.
 - **İlk somut adım media-frame'dir:** core'un video kare servisi token istemez; yalnız core'la paylaştığı özel ağla korunur, kod değişmez (core-internal-auth ticket 07).
 - **Önce sandbox.** Her adım bir wizard'la, ölü adam anahtarlı geri dönüşle yapılır.
@@ -103,3 +103,41 @@ Her adım ayrı bir wizard koşusudur; bir sonrakine, öncekinin ertesi günkü 
 - **Her veri servisine ayrı ağ:** Daha ince ayrım ama Dokploy'da her uygulamaya üç dört ağ, panelde kalabalık. Ortam başına bir veri ağı bu ölçekte yeterli; sapma 3 olarak kayıtlı.
 - **Etkinlik uygulamalarını da `dokploy-network`'ten çıkarmak (compose + Isolated Deployment ya da Traefik'i elle bağlayan systemd birimi):** Uygulamadan uygulamaya erişimi de keser ama Traefik yeniden yaratıldığında bir sonraki deploy'a kadar yönlendirme kopar. Ayrı karar (ticket 10).
 - **Şifreli overlay:** Tek düğümde etkisiz, Dokploy kuramıyor; sapma 1.
+
+## Ek: tek ClamAV, ortamlar arası ikinci ağ `sky-lab-scan` (2026-10-05)
+
+Karar (Yusuf, 2026-10-04; uygulama planı 2026-10-05). core'un kötü amaçlı yazılım taraması (ADR-0052) için sunucuda **tek** bir ClamAV (clamd) koşar. "SKY LAB Production" projesinde durur. production core'u ve sandbox core'u ona yalnız onlarla paylaştığı bir overlay ağdan ulaşır.
+
+Neden tek kurulum: bellek. clamd imza veritabanını yükleyince ~1 GiB tutar ve sunucuda swap yok. Ortam başına bir kopya bu belleği ikiye katlardı (yeniden deploy'da birkaç dakika dört kopya). Sandbox'ın tarama yükü ise denemelerden ibaret.
+
+| Ağ | Üyeler | `internal` | `attachable` | Not |
+|---|---|---|---|---|
+| `sky-lab-scan` | clamav (production projesinde), core (production), core (sandbox) | hayır | hayır | freshclam imza veritabanını internetten indirir, bu yüzden internal değil. clamav `dokploy-network`'ten ayrılır; alan adı ve yayınlanmış portu yok. İki core `dokploy-network`'te kalır ve bu ağı ek olarak alır. |
+
+- **Bu, "bir ağ bir ortama aittir" kuralının OpenBao'dan sonra ikinci istisnasıdır.** Ad, ortamı olmayanların kuralıyla verildi (`<proje>-<amaç>`), çünkü ağ iki ortama hizmet ediyor; `sky-lab-secrets` gibi.
+- **Koruma yalnız ağ üyeliğidir.** clamd'nin kimlik denetimi yoktur; tarama dışında `SHUTDOWN` gibi komutları da vardır. Bu yüzden `dokploy-network`'te durmaz. Üyelik Dokploy'un alanlarına yazılır, her deploy aynı ağları kurar:
+  - clamav: `networkIds` = [`sky-lab-scan`] ve `detachDokployNetwork`;
+  - core'lar: var olan `networkIds`'e eklenir.
+- **Yalıtımı kurulum wizard'ı her koşuda denetler:**
+  - Üye olmayanların ağ ad alanından (Traefik, `dokploy-network`'teki yeni bir konteyner, bir etkinlik uygulaması, iki Forms) clamd'ye PING gönderilir; yanıt gelmemelidir.
+  - Aynı yoklama clamav'ın kendi ad alanından PONG almalıdır. Bu, yoklama aracının çalıştığını kanıtlar.
+  - İki core'dan EICAR öz-denemesi FOUND dönmelidir.
+  - Sonuçlardan biri tutmazsa wizard FAIL verir.
+- **Ortamlar arası etki.** İki core aynı ağda olduğu için sandbox core'u production core'una bu ağdan da ulaşabilir. Ama ikisi zaten `dokploy-network`'te birbirine ulaşıyordu; yeni bir yol açılmaz (sapma 4).
+  - Sandbox core'unu ele geçiren biri clamd'yi meşgul edebilir ya da kapatabilir. Tarama durur, Swarm clamd'yi yeniden başlatır.
+  - core taranamayan dosyayı hiçbir zaman temiz saymaz (fail-closed). Production'daki dosyalar `scanning` durumunda bekler ve açılmaz.
+  - Gizlilik etkisi yoktur: clamd dosyayı yalnız tarar, saklamaz ve kimseye geri vermez.
+- **Geçiş sırası 4 (production Postgres ve Redis)** core'un `networkIds`'ine yalnız ekleme yapar; `sky-lab-scan`'i korur. İki ortamın core'unun bu ağda buluşması o adımda engel sayılmaz.
+- **Geri dönüş.** Tarama adresi core'ların ortamından silinir (tarama kapanır, taranması gereken purpose'lar reddedilir) ve clamav durdurulur. Ağ kaydı yalnız ona başvuran servis kalmayınca silinir (yukarıdaki kural).
+
+Sapmalar (bu ekle gelenler):
+
+8. **Ortamlar arası ikinci ağ.** Ortam ayrımı (NIST SP 800-190 §4.3.3) bir yardımcı servis için kaldırıldı. Bedeli yukarıda: yalnız erişilebilirlik, fail-closed.
+9. **clamd protokolü kimliksiz ve şifresiz.** Gerekçe sapma 6 ile aynı: trafik tek makinede ve özel ağda kalır.
+
+Değerlendirilen ve seçilmeyenler:
+
+- **Ortam başına bir ClamAV** (2026-10-04'e kadarki plan; sandbox kopyası kuruldu, sonra durduruldu): ~1 GiB daha bellek ister.
+- **clamav'ı `dokploy-network`'te bırakmak:** ağdaki her konteyner clamd'ye komut gönderebilirdi.
+- **Ağı `internal` yapıp clamav'a ayrı bir çıkış ağı vermek:** üyelik aynı kalır, kazanç yok, bir ağ fazla.
+- **Dışarıdan bir tarama hizmeti:** kişisel veri içeren Answer file'lar üçüncü bir tarafa giderdi. Medya kararlarında kendi konteyner seçilmişti.
