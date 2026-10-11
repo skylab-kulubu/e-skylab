@@ -48,6 +48,7 @@ aynı işi yeniden yapmak ve ayrışmayı büyütmek demektir.
   tutulur, yayın GitHub Actions üzerinden npm'e provenance ile yapılır.
   Ürün depolarında Renovate veya Dependabot güncelleme PR'larını açar; kırıcı
   değişiklikler yalnızca major sürümde gelir ve geçiş notuyla duyurulur.
+  *(2026-10-11: ADR-0064 Dependabot'u seçer; bkz. aşağıdaki ek.)*
 - Bileşenler shadcn yaklaşımıyla yazılır ve temel katman Base UI'dır (shadcn
   `base-nova` stili). Tailwind 4 kullanan ürünler temayı içe aktarır ve paketi
   `@source` ile tarar.
@@ -59,6 +60,7 @@ aynı işi yeniden yapmak ve ayrışmayı büyütmek demektir.
 - Tailwind kullanmayan yüzeyler için framework'ten bağımsız bir `tokens.css`
   yayımlanır. Keycloak login teması token'ları buradan alır.
 - Yazı tipleri Space Grotesk (metin) ve Space Mono (kimlik, kod, sayı).
+  *(2026-10-11: ADR-0064 bunu ürünlerle sınırlar; bkz. aşağıdaki ek.)*
 - Hareket süreleri ve eğrileri token'dır; `prefers-reduced-motion` her
   bileşende uygulanır.
 - Marka logoları `skylab-assets` deposundan alınır. Yükleniyor göstergesi tek
@@ -66,6 +68,7 @@ aynı işi yeniden yapmak ve ayrışmayı büyütmek demektir.
 - Dokümantasyon ve önizlemeler Türkçe ve İngilizcedir. Kulübün proje wiki'si
   hazır olana kadar deponun GitHub Pages yüzeyinde yayımlanır; wiki hazır
   olduğunda oraya taşınır. Paketin kendisi bu taşımadan etkilenmez.
+  *(2026-10-11: ADR-0064 bu maddeyi değiştirir; bkz. aşağıdaki ek.)*
 - Depo herkese açıktır. Dokümantasyona iç adres, ortam ayrıntısı veya kimlik
   bilgisi yazılmaz.
 - `components` deposu eski/kullanılmayan olarak işaretlenir; yerine
@@ -118,3 +121,7 @@ Geçiş ürün ürün yapılır ve her ürünün kendi deposunda yürür:
   olarak bir registry sunulabilir.
 - `components` deposunu canlandırmak: 2023'ün Storybook, Rollup ve SCSS
   yığını bugünkü Next.js, React 19 ve Tailwind 4 ürünleriyle uyumsuz.
+
+## Ek: public siteler, yazı tipi, hareket, güncelleme botu, dokümantasyon (2026-10-11)
+
+Kaan'ın 2026-10-11 kararları [ADR-0064](0064-public-sites-take-only-tokens-and-interactive-components-from-skylcn-ui.md)'te. Public siteler (`skylab-site`, `arge`, `artlab-site`) skylcn-ui'den yalnız token'ları ve etkileşimli bileşenleri alır, kendi görsel katmanlarını yazı tipi dahil korur. Space Grotesk / Space Mono yalnız ürünlerin (admin paneli, Forms, SkyMail, Account Center, Keycloak login teması) yazı tipidir. skylcn-ui kullanan her depo `framer-motion` 12'den `motion` 13'e geçer. Güncelleme botu Dependabot'tur: haftalık, `@skylab-kulubu/*` tek gruplu PR'da. `skylab-site`'ın `/kapi` ve `/sertifika` sayfaları hep koyudur. Dokümantasyon GitHub Pages'te değil, admin panelinin `/playground` yolundadır.
