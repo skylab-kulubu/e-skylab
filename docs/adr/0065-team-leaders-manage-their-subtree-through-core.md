@@ -47,6 +47,7 @@ Karar (Yusuf, 2026-10-12; sektör karşılaştırması hub'daki admin paneli ara
    - Kayıt 3 yıl tutulur.
    - Kaydı core'un `audit:read` rolü olanlar görür; rol ADMIN ve YK köklerine verilir.
 10. **Rol taşıyan grup devredilmez.** core'un Privileged izin rollerinden, `audit:read`'den, bir client'ın `client:admin`'inden ya da Keycloak yönetim rollerinden birini doğrudan ya da atasından taşıyan grubun üyeliğini yalnız Privileged değiştirir (Entra'nın role-assignable gruplarının karşılığı). Grup rol eşlemeleri yalnız Privileged'dadır.
+   *(2026-10-12: site editörlüğü taşıyan grup da devredilmez; bkz. aşağıdaki ek.)*
 
 Kaynaklar:
 - **Yusuf'un:** 1, 2, 4, 8'in ilk üç maddesi, 9'un ana kuralı (her değişiklik kayda, YK ve ADMIN görür, 3 yıl) ve "devirden önce yetki ad eşleşmesinden çıkar, ayrılmış adlar alınamaz" önkoşulu.
@@ -116,3 +117,26 @@ Kaynaklar:
 - **Lider kendi ekibine eş lider ekleyebilir** (Entra ve GitHub gibi): Yusuf reddetti; Leader grubu ana sitenin CMS yazma yetkisini taşıyor.
 - **Onay akışı** (lider ister, YK onaylar): Yusuf "onay beklenmez" dedi; denetim kaydı hesap verebilirliği sağlar.
 - **Değişiklikleri Keycloak olaylarından izlemek:** aktör hep core'un service account'u görünür, süre 30 gün.
+
+## Ek: site editörlüğü taşıyan grup devredilmez (2026-10-12)
+
+Kaan sordu: liderler alt ekip açıp lider atadıkça ana sitenin tamamını düzenleyen kişi sayısı artar mı; alt ekip liderlerine `cms:access` verilmesin mi? Hub'daki güvenlik incelemesinin (2026-10-12) cevabı: kendiliğinden artmaz, hiçbir betik ya da core işlemi yeni bir gruba client rolü eşlemez. Ama `cms:access` karar 10'un listesinde yoktu. Bir admin bir alt ekibin Leader grubuna `cms:access` eşlerse grup devredilebilir kalıyordu; üst ekibin Leader'ı oraya istediği etkin hesabı ekleyip site geneli yazma verebiliyordu. ADR-0056'daki "bütün takımların Leader grupları" ifadesi ve Keycloak runbook'u adminleri tam bu eşlemeye yönlendiriyordu.
+
+Karar (Kaan'ın önerisi, 2026-10-12):
+
+- **Site editörlüğü taşıyan grup devredilmez (karar 10'a ek).** Bir Site client'ında inscribed'ın site geneli yazmasını (`content:write`) taşıyan grubun ve onun altındaki her grubun üyeliğini yalnız Privileged değiştirir. Rol doğrudan eşlenmiş ya da `cms:access` gibi bir composite içinde olabilir. `content:read` tek başına okumadır, korunmaz. core bunu korunan rollere her client'ta `content:write`'ı ekleyerek uygular. Mevcut composite taraması `cms:access`'i ve onun SkyApp zincirini de yakalar.
+- **`cms:access` yalnız en üst takımların Leader gruplarına verilir.** Ana sitede, arge'de ve etkinlik sitelerinde editörlük Privileged gruplarda ve en üst takımların (`/UYELER/<alan>/<ekip>`) `LIDERLER`/`KOORDINATORLER` gruplarındadır. Alt ekiplerin Leader gruplarına ve takım ya da alan gruplarının kendisine verilmez. Bu kural, inscribed'a koleksiyon ve kayıt bazında yazma gelene kadar geçerlidir (Fatih, F2-yazma). O gelince alt ekip liderlerinin kendi Teams kaydını yazması ayrıca kararlaştırılır.
+- **Araçlar kurala uyar.** `e-skylab-keycloak`'taki `config/site-editor-grants.sh --team` alt ekip yolunu reddeder. Runbook "her `…/LIDERLER`" yerine "yalnız en üst takımlar" der.
+
+Sonuçlar:
+
+- En üst takımın Leader grubundaki `cms:access` devri değiştirmez. O grubu zaten yalnız Privileged değiştirir (karar 4). Alt ekipler o grubun altında değil, kardeşidir; yönetimleri devredilmeye devam eder.
+- Bir takım ya da alan grubuna `cms:access` eşlenirse o ağacın tamamı devirden çıkar ve yalnız Privileged'ca yönetilir. Bu bilinçlidir: rol aşağı doğru miras alınır.
+- Alt ekip liderleri site editörü değildir. Alt ekibin sitedeki içeriği (Teams kaydı) üst takımın lideri ya da Privileged üzerinden düzenlenir.
+- Devir açılmadan önce, karar 6'daki production ağaç raporu en üst takımlar dışındaki her Leader grubunun ve her takım ya da alan grubunun client rol eşlemelerini de listeler. Liste temiz olmadan devir açılmaz.
+- Açık: korunan sınıfı "her client rol eşlemesi, bir muafiyet listesi dışında" diye genişletmek (Entra'nın varsayılan reddine daha yakın) bu rapordan sonra Yusuf'a sorulur.
+
+Endüstri uygulamasıyla karşılaştırma:
+
+- **Uyan:** Entra'da dizin rolü yalnız role-assignable gruba verilir; bu grubun üyeliğini yalnız Privileged Role Administrator ya da Global Administrator değiştirir. Google Workspace'te admin rolü yalnız güvenlik grubuna atanır ve grubun Manager'ı sahip atayamaz. Site editörlüğü taşıyan grup bu desene girdi.
+- **Sapma:** Entra'da uygulama rolleri (enterprise application role assignment) sıradan gruplara verilir; grup sahibi üye ekleyerek uygulama erişimini dağıtabilir. `cms:access` bir uygulama rolüdür, ama biz onu role-assignable sınıfına alıyoruz, yani Entra'dan daha sıkıyız. Gerekçe: inscribed'da yazma site genelidir ve kaynak başına yetki yoktur. Rol fiilen site yöneticisi olduğu için korunan sınıfta durur.

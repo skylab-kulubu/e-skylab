@@ -31,8 +31,9 @@ Yetki tarafı ilk metinden şu noktalarda ayrıldı:
 
 - **`cms:access` emekli edilmedi.** Her Site client'ında inscribed'ın `content:read` ve `content:write` rollerini bir arada veren editör composite'i olarak kalır. Siteler editörü yalnız `cms:access` sahibine gösteriyor; rolü kaldırmak editörü herkesten gizlerdi. inscribed yetkiyi kendisi Site client'ındaki `content:read`, `content:write` ve `schema:sync` rolleriyle verir; tenant, token'ın client'ıdır. Rolün ileride kaldırılması ayrı bir karardır.
 - **Editör yetkisi kullanıcı → grup → client rolü yolunu izler.** Yetki Gruplara verilir; tek bir kişiye, bütün üyeler grubuna ya da varsayılan rollere verilmez. Atamalar SKY LAB yönetim panelinden yönetilir; ilk atamalar bir kez betikle yazıldı. Kimde ne var:
-  - ana site (`cms:access`): ADMIN, YK, DK ve bütün takımların Leader grupları (liderler ve koordinatörler);
-  - arge sitesi (`cms:access`): ADMIN, YK ve Leader grupları;
+  - ana site (`cms:access`): ADMIN, YK, DK ve ~~bütün takımların~~ en üst takımların (`/UYELER/<alan>/<ekip>`) Leader grupları (liderler ve koordinatörler);
+  - arge sitesi (`cms:access`): ADMIN, YK ve en üst takımların Leader grupları;
+  *(2026-10-12'de daraldı: alt ekiplerin Leader gruplarına `cms:access` verilmez ve site editörlüğü taşıyan grup devredilmez; bkz. ADR-0065'in 2026-10-12 eki.)*
   - yönetim paneli, News için (`content:read` + `content:write`): ADMIN, YK, DK.
 - **Sunucu tarafındaki site hesapları yalnız okur:** `content:read` + `schema:sync`.
 - **Koleksiyon kuralları ayrıca daraltır.** News oluşturma ve düzenleme, News koleksiyonunun kendi kuralıyla Privileged gruplara sınırlıdır. Her Teams kaydı, eşleşen takımın Leader grubuna aittir.

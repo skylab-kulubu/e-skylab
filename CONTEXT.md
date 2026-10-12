@@ -225,7 +225,7 @@ Whoever may manage a team through core: its Leaders, the Leaders of any ancestor
 _Avoid_: Keycloak fine-grained admin permissions as the delegation path; a person's own token on the Keycloak Admin REST API; deciding from a token path that may be stale
 
 **Protected group**:
-A group that carries, directly or through an ancestor, one of core's Privileged permission roles, `audit:read`, a client's `client:admin`, or a Keycloak management role. Only Privileged people change its membership or role mappings; Team managers cannot (Entra's role-assignable groups).
+A group that carries, directly or through an ancestor, one of core's Privileged permission roles, `audit:read`, a client's `client:admin`, a Keycloak management role, or a Site's site-wide write (`content:write`, so `cms:access` too; ADR-0065 addendum of 2026-10-12). Only Privileged people change its membership or role mappings; Team managers cannot (Entra's role-assignable groups).
 _Avoid_: delegating membership of a group that grants privilege
 
 **Team audit record**:
@@ -289,8 +289,8 @@ A User who may edit one site in the CMS, that is, who holds `cms:access` on that
 _Avoid_: a `site-editorleri` (per-site editor) group tree; granting an event site to every Leader group or to every member of its organization team; granting `cms:access` to a single person; turning on Full scope to learn which sites a person edits; a SkyApp tenant, a server that writes for SkyApp, or granting SkyApp's CMS roles to a Group
 
 **cms:access**:
-A client role on a Site client meaning this User is a CMS editor of that site: it bundles `content:read` and `content:write`, and the site shows its editor only to holders of it. It is granted only to Groups (Privileged and Leader groups; which ones per site is in ADR-0056, and for an event site the Site editor rule), never to single people. Write access is site-wide, so it covers every page of that site but no other site; which Teams items a Leader may change still follows Group membership.
-_Avoid_: treating cms:access as superuser of all content; treating it as retired by the inscribed cutover (ADR-0056); granting it to a single person, to all members, or as a default role
+A client role on a Site client meaning this User is a CMS editor of that site: it bundles `content:read` and `content:write`, and the site shows its editor only to holders of it. It is granted only to Groups (Privileged and the Leader groups of top teams, `/UYELER/<area>/<team>`; which ones per site is in ADR-0056, and for an event site the Site editor rule), never to single people or to a Sub-team's Leader group (ADR-0065 addendum of 2026-10-12). Write access is site-wide, so it covers every page of that site but no other site; which Teams items a Leader may change still follows Group membership.
+_Avoid_: treating cms:access as superuser of all content; treating it as retired by the inscribed cutover (ADR-0056); granting it to a single person, to all members, to a Sub-team's Leader group, or as a default role
 
 **client:admin**:
 A client role on a Site client for CMS tenant administration: creating a team and fixing any team's Teams item, for example after its Leader leaves. It can also change that site's CMS tenant settings, so only the `ADMIN` group holds it until the CMS separates tenant settings from content administration.
