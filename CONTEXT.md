@@ -113,8 +113,16 @@ A Member's club membership card (name and skyNumber on the face, no photo); door
 _Avoid_: Wallet as a synonym for SkyPass; treating SkyPass as parked until another conversation; treating Wallet as optional, patron-only, or visual-only; treating a bound Student card as needing sky-app at the door; putting a photo or profilePicture on SkyPass; treating SkyPass as a student ID with photo
 
 **Event**:
-A named club happening that may span several calendar days (ARTLAB, Gecekodu). Tickets and the Attendance rule belong to the Event, not to one day.
-_Avoid_: treating one calendar day as the Event; treating EventDay as the Event
+A named club happening that may span several calendar days (ARTLAB, Gecekodu). Tickets and the Attendance rule belong to the Event, not to one day. Its `active` field is not stored: it is derived as "Published and not yet ended" and keeps its name and type for old clients (ADR-0066).
+_Avoid_: treating one calendar day as the Event; treating EventDay as the Event; treating `active` as a stored flag or writing it from a client
+
+**Event status**:
+The one stored state of an Event: Draft, Published or Cancelled (ADR-0066). Ended is not stored; it follows from the dates (end date, else start date plus one day; an Event with no dates never ends). A Draft is seen only by those who may edit the Event: public reads, sky-app, the site and the door get 404, and no self-apply or Check-in is written. Published goes back to Draft only while it has no Ticket and no Check-in. Cancelled is final: the Event stays visible, new applies, Check-ins and Certificates stop, and existing Tickets and issued Certificates stay. Status changes only through its own transitions, never through the Event body. Archiving is a separate axis (Deletion lifecycle) and is allowed only on a Draft, except that YK and ADMIN may archive a Published or Cancelled Event.
+_Avoid_: a stored "ended" status; changing status from a `PUT`/`PATCH` body; cancelling a Draft instead of deleting it; deleting a Published Event as an organizer; showing a Draft to old clients without a badge
+
+**Event copy**:
+A new Draft Event made from another Event in one transaction (ADR-0066). Structure comes over: details, cover, capacity, Attendance rule, an Event-scoped certificate template binding when the caller may bind it, EventDays and Oturum rows, with all dates shifted by the gap between the chosen new start and the source start. People and history never come over: Tickets, Check-ins, Certificates, competitors, mail lists, gallery and files. Door staff come only when the caller may assign them and asks. Form slots start empty, because a Form has one current Short link and its responses write Tickets to every Event that names it; a new Form is made from the old one in Skyforms instead.
+_Avoid_: copying a Form slot onto the copy; copying Tickets or Check-ins; publishing a copy directly
 
 **Event QR**:
 A shared event **poster** QR the **attendee** scans to join (`dahil olmak`). If they have no Ticket, that scan is Walk-in. Staff does **not** scan the poster; it has no person id and is not a door credential. Oturum QR is the same family (attendee scans a shared code) but marks Check-in for that talk, not join.
@@ -225,8 +233,8 @@ A participation credential for one person on one Event: an immutable issued reco
 _Avoid_: treating eligibility as issuance; issuing immediately after a Check-in; regenerating an existing Certificate when its template changes; putting email, User id, or Ticket id on public verification; an EventType table for templates; Typeform lists as the source of truth
 
 **Attendance finalization**:
-An organizer's explicit declaration that an Event's Check-in ledger is complete and automatic Certificate issuance may begin. Passing the Event end date or making an Event inactive is not Attendance finalization.
-_Avoid_: issuing on the first eligible Check-in; using `active=false` as certificate finalization; silently finalizing from the clock alone
+An organizer's explicit declaration that an Event's Check-in ledger is complete and automatic Certificate issuance may begin. It is allowed once a Published Event has ended (ADR-0066); a Draft or Cancelled Event cannot be finalized. The Event ending opens the action but is not Attendance finalization.
+_Avoid_: issuing on the first eligible Check-in; using `active=false` as certificate finalization; silently finalizing from the clock alone; asking organizers to make an Event inactive before finalizing
 
 **Certificate template**:
 An editable certificate design identity whose published version is selected for future issuance. Resolution order is Event binding, then Owner-team binding, then the required SKY LAB default.
