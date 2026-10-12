@@ -101,7 +101,7 @@ A six-digit, single-use code that Keycloak mails for signing in or Self-registra
 _Avoid_: magic link; the code in the subject line; letting it skip TOTP; saying whether an account exists before the code is verified; treating it as a 2FA step for a person with a password or passkey
 
 **Permissions view**:
-The read-only, human-language rendering in Account center of a person's teams, leadership, privilege level and application permissions (client roles), with technical codes collapsed. Changes are made in superadmin, never here.
+The read-only, human-language rendering in Account center of a person's teams, leadership, privilege level and application permissions (client roles), with technical codes collapsed. Changes are made in the admin panel, by Privileged people or by a Team manager for their teams (ADR-0065), never here.
 _Avoid_: raw role codes as the primary UI; showing realm roles; editing groups or roles from Account center
 
 **Passkey RP ID**:
@@ -113,8 +113,16 @@ A Member's club membership card (name and skyNumber on the face, no photo); door
 _Avoid_: Wallet as a synonym for SkyPass; treating SkyPass as parked until another conversation; treating Wallet as optional, patron-only, or visual-only; treating a bound Student card as needing sky-app at the door; putting a photo or profilePicture on SkyPass; treating SkyPass as a student ID with photo
 
 **Event**:
-A named club happening that may span several calendar days (ARTLAB, Gecekodu). Tickets and the Attendance rule belong to the Event, not to one day.
-_Avoid_: treating one calendar day as the Event; treating EventDay as the Event
+A named club happening that may span several calendar days (ARTLAB, Gecekodu). Tickets and the Attendance rule belong to the Event, not to one day. Its `active` field is not stored: it is derived as "Published and not yet ended" and keeps its name and type for old clients (ADR-0066).
+_Avoid_: treating one calendar day as the Event; treating EventDay as the Event; treating `active` as a stored flag or writing it from a client
+
+**Event status**:
+The one stored state of an Event: Draft, Published or Cancelled (ADR-0066). Ended is not stored; it follows from the dates (end date, else start date plus one day; an Event with no dates never ends). A Draft is seen only by those who may edit the Event: public reads, sky-app, the site and the door get 404, and no self-apply or Check-in is written. Published goes back to Draft only while it has no Ticket and no Check-in. Cancelled is final: the Event stays visible, new applies, Check-ins and Certificates stop, and existing Tickets and issued Certificates stay. Status changes only through its own transitions, never through the Event body. Archiving is a separate axis (Deletion lifecycle) and is allowed only on a Draft, except that YK and ADMIN may archive a Published or Cancelled Event.
+_Avoid_: a stored "ended" status; changing status from a `PUT`/`PATCH` body; cancelling a Draft instead of deleting it; deleting a Published Event as an organizer; showing a Draft to old clients without a badge
+
+**Event copy**:
+A new Draft Event made from another Event in one transaction (ADR-0066). Structure comes over: details, cover, capacity, Attendance rule, an Event-scoped certificate template binding when the caller may bind it, EventDays and Oturum rows, with all dates shifted by the gap between the chosen new start and the source start. People and history never come over: Tickets, Check-ins, Certificates, competitors, mail lists, gallery and files. Door staff come only when the caller may assign them and asks. Form slots start empty, because a Form has one current Short link and its responses write Tickets to every Event that names it; a new Form is made from the old one in Skyforms instead.
+_Avoid_: copying a Form slot onto the copy; copying Tickets or Check-ins; publishing a copy directly
 
 **Event QR**:
 A shared event **poster** QR the **attendee** scans to join (`dahil olmak`). If they have no Ticket, that scan is Walk-in. Staff does **not** scan the poster; it has no person id and is not a door credential. Oturum QR is the same family (attendee scans a shared code) but marks Check-in for that talk, not join.
@@ -201,19 +209,35 @@ The state where a person is in more Groups than a token carries (above 30 paths)
 _Avoid_: reading a missing group list as "no Groups"; cutting the group list short
 
 **Promote**:
-Granting Member status by placing a User into the right Keycloak groups. No directory write.
+Granting Member status by placing a User into the right Keycloak groups. No directory write. Privileged people promote anyone; a Team manager adds any enabled account to a team they manage (ADR-0065), and the person gets the team-membership mail.
 _Avoid_: promote to LDAP, federation link
 
 **Privileged**:
-Membership in `ADMIN`, `YK`, or `DK` (or a subgroup under them). These people can manage club resources regardless of team ownership.
-_Avoid_: superuser, admin role (unless you mean the `ADMIN` group itself)
+Membership in one of six fixed roots or a subgroup under them: `/ADMIN`, `/YK`, `/DK`, `/UYELER/ADMIN`, `/UYELER/YK`, `/UYELER/DK` (ADR-0065). The match is anchored to those paths; a group elsewhere that happens to be named `ADMIN`, `YK` or `DK` is not Privileged. These people can manage club resources regardless of team ownership. The target is still the roles-only mode of ADR-0059.
+_Avoid_: superuser, admin role (unless you mean the `ADMIN` group itself); deciding privilege from a group name anywhere in the path
+
+**Team code**:
+A team's Keycloak group name (`WEBLAB`). Owner team, the CMS Teams item key and Forms template matching all use it. New codes are ASCII capitals, digits and hyphens, at most 24 characters, and unique across the whole system regardless of case: realm groups, core records that name a team, and retired codes. A deleted or renamed code is never reused. Reserved names (`ADMIN`, `YK`, `DK`, `UYELER`, `LIDERLER`, `KOORDINATORLER` and codes named in core's rules) are created only by Privileged people at a root or by core's leader-assignment step. A Team manager renames a code only while no core record is bound to it; moving a team keeps its code. The name the site shows is a separate field (ADR-0065).
+_Avoid_: two groups with the same code anywhere in the tree; reusing a retired code; treating the shown name as the code
+
+**Team manager**:
+Whoever may manage a team through core: its Leaders, the Leaders of any ancestor team, and Privileged people (ADR-0065). A Team manager adds and removes members, opens, renames, deletes (only when empty) and moves sub-teams, assigns Leaders to sub-teams, and edits the team's shown name, short description and logo. Moving a sub-team needs management of both the current parent and the target. Core decides with the Keycloak group id and the caller's current Keycloak membership, not the path in the token, and only core's service account writes to Keycloak. No approval step; every change goes to the Team audit record.
+_Avoid_: Keycloak fine-grained admin permissions as the delegation path; a person's own token on the Keycloak Admin REST API; deciding from a token path that may be stale
+
+**Protected group**:
+A group that carries, directly or through an ancestor, one of core's Privileged permission roles, `audit:read`, a client's `client:admin`, or a Keycloak management role. Only Privileged people change its membership or role mappings; Team managers cannot (Entra's role-assignable groups).
+_Avoid_: delegating membership of a group that grants privilege
+
+**Team audit record**:
+Core's record of every team and group change, including refused writes: who, when, what, old and new value. If it cannot be written, the change is not made. It stores only the actor's id; name and e-mail are resolved on read, and never after Account erasure. Kept 3 years. Read with core's `audit:read` role, given to the ADMIN and YK roots (ADR-0065).
+_Avoid_: Keycloak admin events as the audit trail (the actor is always core's service account, and they last 30 days); storing names or e-mails in the record
 
 **Leader**:
-Membership in a team's `LIDERLER` or `KOORDINATORLER` subgroup.
-_Avoid_: `*_LEADER` role, synthetic leader role
+Membership in a team's `LIDERLER` or `KOORDINATORLER` subgroup, matched as a whole path segment. A Leader is a Team manager of that team and everything under it, and a Leader of the team's Events and of its sub-teams' Events (ADR-0065). A team's Leader group is changed only by the parent team's Leader or by Privileged people: nobody makes themselves Leader or removes their own leadership, and a Leader cannot add co-leaders to their own team. Top-level team Leaders are set by Privileged people only.
+_Avoid_: `*_LEADER` role, synthetic leader role; matching `LIDERLER` as a substring; letting a Leader change their own team's Leader group
 
 **Owner team**:
-The Keycloak group that owns a domain resource (an event, ticket, session, event site) when one exists. Authorization checks whether the caller is a member or leader of that group. An Event may have no Owner team; then only Privileged people may mutate it. Certificate-template resolution may use the Event and this string before falling back to the SKY LAB default; it never uses an EventType table. HTTP paths and query names use `ownerTeam` / `team`.
+The Keycloak group that owns a domain resource (an event, ticket, session, event site) when one exists, named by its Team code. Authorization checks whether the caller is a member or leader of that group; a Leader of one of its ancestor teams counts as its Leader (ADR-0065). An Event may have no Owner team; then only Privileged people may mutate it. Certificate-template resolution may use the Event and this string before falling back to the SKY LAB default; it never uses an EventType table. HTTP paths and query names use `ownerTeam` / `team`.
 _Avoid_: event type as a separate identity source, a fake GENEL team, ownerGroup as something other than a Group; reviving EventType for certificate templates; URLs or query names that say eventType
 
 **Attendance rule**:
@@ -225,8 +249,8 @@ A credential for one person, of one of two kinds: participation in one Event, or
 _Avoid_: treating eligibility as issuance; issuing immediately after a Check-in; regenerating an existing Certificate when its template changes; reprinting a participation Certificate as a "winner" certificate; putting email, User id, or Ticket id on public verification; an EventType table for templates; Typeform lists as the source of truth
 
 **Attendance finalization**:
-An organizer's explicit declaration that an Event's Check-in ledger is complete and automatic Certificate issuance may begin. Passing the Event end date or making an Event inactive is not Attendance finalization.
-_Avoid_: issuing on the first eligible Check-in; using `active=false` as certificate finalization; silently finalizing from the clock alone
+An organizer's explicit declaration that an Event's Check-in ledger is complete and automatic Certificate issuance may begin. It is allowed once a Published Event has ended (ADR-0066); a Draft or Cancelled Event cannot be finalized. The Event ending opens the action but is not Attendance finalization.
+_Avoid_: issuing on the first eligible Check-in; using `active=false` as certificate finalization; silently finalizing from the clock alone; asking organizers to make an Event inactive before finalizing
 
 **Certificate template**:
 An editable certificate design identity whose published version is selected for future issuance. Resolution order is Event binding, then Owner-team binding, then the required SKY LAB default.
