@@ -221,8 +221,8 @@ Per-Event certificate eligibility: `none` (no certificates), `once` (at least on
 _Avoid_: counting EventDays; treating `once` as one EventDay; a global ratio; EventType-keyed rule; the retracted EventDay=oturum lock; counting cancelled talks in the denominator; issuing a certificate on EventDays with zero Oturum
 
 **Certificate**:
-A participation credential for one person on one Event: an immutable issued record, a human public-verification page, and a PDF containing a verification QR. The canonical QR target is the stable `skyl.app/c/{serial}` Short link; core redirects it to the human page at `yildizskylab.com/sertifika/{serial}`. Check-ins update eligibility but do not issue it; automatic issuance begins only after Attendance finalization, while an authorized operator may issue one manually. An issued Certificate pins its Certificate template version and remains unchanged when the template changes.
-_Avoid_: treating eligibility as issuance; issuing immediately after a Check-in; regenerating an existing Certificate when its template changes; putting email, User id, or Ticket id on public verification; an EventType table for templates; Typeform lists as the source of truth
+A credential for one person, of one of two kinds: participation in one Event, or an Award in a Result publication (award certificate, ADR-0068). It is an immutable issued record, a human public-verification page, and a PDF containing a verification QR. The canonical QR target is the stable `skyl.app/c/{serial}` Short link; core redirects it to the human page at `yildizskylab.com/sertifika/{serial}`. Check-ins update eligibility but do not issue it; automatic issuance begins only after Attendance finalization, while an authorized operator may issue one manually. An issued Certificate pins its Certificate template version and remains unchanged when the template changes. Award certificates go to the Tickets of the Entrant that won the Award; template resolution checks Award and Competition bindings before the Event. When a published result is corrected, affected award certificates are revoked and issued again.
+_Avoid_: treating eligibility as issuance; issuing immediately after a Check-in; regenerating an existing Certificate when its template changes; reprinting a participation Certificate as a "winner" certificate; putting email, User id, or Ticket id on public verification; an EventType table for templates; Typeform lists as the source of truth
 
 **Attendance finalization**:
 An organizer's explicit declaration that an Event's Check-in ledger is complete and automatic Certificate issuance may begin. Passing the Event end date or making an Event inactive is not Attendance finalization.
@@ -313,6 +313,42 @@ _Avoid_: storing plate on the User as a global profile field; a second identity 
 **Walk-in**:
 A person with no Ticket who scans the Event QR and receives a Ticket. No ticket mail, or a mail that says they are already in if that scan also wrote Check-in. Staff still do not scan that poster at the door.
 _Avoid_: staff scanning Event QR; treating Walk-in as a second door credential beside SkyPass QR and Ticket QR; Walk-up as a second term
+
+**Competition** (Yarışma):
+A contest inside one Event, with its own rules, Stages and result (ADR-0068). The Event's Owner team, Season, registration (Tickets), authorization and certificates are the Competition's too; ownership is not stored again. An Event may hold several Competitions. Code-judged contests run on an outside platform (for example Codeforces Gym) and their results are imported; SKY LAB runs no code judge. Large CTFs stay on SKY-SEC's CTFd and are imported; small ones run here.
+_Avoid_: Competitor (the old one-row-per-person model with an `isWinner` flag); treating the Event's `ranked` field as a Competition; running untrusted code in core or on the platform server
+
+**Stage** (Aşama):
+A time-boxed part of a Competition with exactly one Scoring strategy and its settings. Invisible in a single-stage Competition.
+_Avoid_: treating a Stage as an EventDay or an Oturum
+
+**Entrant** (Yarışmacı):
+One row in the standings: a person or a team. Its members are Tickets of the Event, REGISTERED or GUEST; signing up goes through the Event's own apply paths. A person is in at most one Entrant per Competition.
+_Avoid_: Competitor; a separate identity store for teams; a Competition-only application form
+
+**Scoring strategy** (Puanlama stratejisi):
+A pure function that computes score, tie-break keys and display detail for a Stage from its ledger: `manual`, `problems`, `rubric`, `ctf` or `metric`. The ledger (submissions, verdicts, judge scores, imported results, corrections) is append-only; a correction reverses a row with a reason and writes a new one, and standings can be rebuilt from it at any time. Scores are fixed-point integers. Equal scores share a rank (1, 1, 3). A new kind of scoring is a new strategy in code.
+_Avoid_: separate tables and endpoints per contest type; runtime plugins or a formula language; floating-point scores; editing or deleting a ledger row
+
+**Leaderboard** (Puan tablosu):
+The standings as shown to one viewer: hidden, live, frozen, or entrants-only. A freeze is applied on the server: public reads ignore every row after the freeze time, while organizers see the live table.
+_Avoid_: freezing only in the client; treating the Leaderboard as the result
+
+**Result publication** (Sonuç ilanı):
+An organizer's explicit act that publishes a Competition's result as an immutable, versioned snapshot: rank, score, Award and the display name at that moment. A correction is a new version with a reason; the public sees the latest. Passing the end time or the Event ending is not a Result publication.
+_Avoid_: deriving results from the clock or from `active=false`; silently editing a published result
+
+**Award** (Derece):
+A title given to an Entrant in a Result publication (first place, honourable mention, "best design"). An award certificate is issued for it.
+_Avoid_: an `isWinner` flag
+
+**Series** (Seri):
+A table that totals the published results of several Competitions under one rule, ranked per period: the year (Season) or a named date range inside the Series (AGC's term). A Competition falls into a period by its Event's start date.
+_Avoid_: EventType; an implicit total per Owner team; counting unpublished results; treating a period as a second Season
+
+**Competition staff** (Yarışma görevlisi):
+People assigned to one Competition. Staff manage it like organizers, except publishing results and assigning staff. A Judge (jüri üyesi) is assigned to a Competition, Stage or category, sees only what is assigned to them, cannot score their own Entrant, and does not see others' scores before publication.
+_Avoid_: making every Owner-team Member a manager; deriving judges from team membership
 
 **Mail template**:
 A SkyMail message definition — a subject, an HTML body and a plain-text body — rendered for each recipient with the variables of that send. Archived, never deleted.
