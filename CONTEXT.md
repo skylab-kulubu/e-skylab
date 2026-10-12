@@ -273,8 +273,20 @@ A Group attribute (`public_leaders=true`). Visitors may see Leaders only. Use wh
 _Avoid_: a second Group tree for "visible SKYSEC"
 
 **News**:
-A CMS collection item (title, summary, body, hero, tags). Club announcements in the new world live here. Only Privileged people may edit News.
-_Avoid_: Announcement as a core-API entity, `/api/announcements` on super-skylab
+A CMS item (title, summary, body, hero, tags) of one of two kinds, news (haber) or announcement (duyuru); every feature works for both kinds (ADR-0067). Club announcements in the new world live here. The body is the HTML subset the inscribed editor produces, sanitized wherever it is read. An item may carry a publish date, an end date, a pin end date, a call-to-action link, and an audience: everyone, Members only, or named teams with their sub-teams. The audience is a real access boundary enforced by the CMS on every read path; a public read never returns a restricted item, and the site and SkyApp read with the signed-in person's token instead of filtering themselves. Restricted items are not written until that rule and the leak tests pass; until then (step one) the audience field holds only "everyone" and every item is public. Only Privileged people may edit News.
+_Avoid_: Announcement as a core-API entity, `/api/announcements` on super-skylab; audience as a display hint filtered by the reader; a writer that sends back only the fields it knows (the update replaces the whole item)
+
+**News send** (Haber gönderimi):
+Mailing one published News item through SkyMail, started from SkyMail's send screen (the panel and the site link to it). It stores a snapshot of the item; later edits change only the web. Core resolves the audience: Members of the chosen teams and their sub-teams plus their Team followers, cut down to the item's audience, minus people whose Announcement preference is off, disabled or unverified accounts, and accounts without an address. Mail goes only to the Primary e-mail. YK, DK and ADMIN send directly; others submit it for Mail onayı. Every mail carries a one-click opt-out for its own category.
+_Avoid_: SkyMail resolving the audience from its own Keycloak group lookup; e-mailing automatically on publish; sending a restricted item to a Team follower; tracking opens
+
+**Announcement preference** (Duyuru tercihi):
+A Member's choice of which News mail to receive (ADR-0067). A category is a source, club-wide or one team, times a kind, news or announcement, plus one master switch. Club-wide and the Member's own teams are on by default under legitimate interest (ADR-0062); following another team is off by default. A setting on a parent team covers its sub-teams, and the most specific setting wins. Teams are kept by Keycloak group id, so renaming or moving a team keeps the choice. Kept in core, edited in Account center or through the signed one-click link in each mail, which turns off only that mail's category. Transactional mail (login codes, tickets, certificates) ignores it. Account erasure deletes it.
+_Avoid_: treating it as Contact consent; one club-wide switch only; storing it in Keycloak attributes or SkyMail; an opt-out link that silences every category
+
+**Team follow** (Ekip takibi):
+A Member's own choice to receive the News mail of a visible team they are not in. Off by default. A follower receives only items open to everyone or to all Members, never team-restricted items.
+_Avoid_: making a follower a team member; following hidden teams
 
 **Site client**:
 The Keycloak OAuth client of one public site (for example `frontend-main` for the main club site, `frontend-arge` for arge, `frontend-artlab`, `frontend-yildizjam` and `frontend-skydays` for event sites) and that site's Site tenant: its content is stored under the client's id (`azp`). CMS rights are client roles on that client (`content:read`, `content:write`, `schema:sync`; people get them through `cms:access`), not a global CMS master key; the site's own server-side account only reads. Full scope is off, so a token for one site never carries another site's roles. One site, one client; it is made by the Keycloak configuration scripts, and its secret goes from Keycloak straight into the secret store.
