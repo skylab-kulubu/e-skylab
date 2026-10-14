@@ -47,6 +47,7 @@ Karar (Yusuf, 2026-10-12; sektör karşılaştırması hub'daki admin paneli ara
    - Kayıt 3 yıl tutulur.
    - Kaydı core'un `audit:read` rolü olanlar görür; rol ADMIN ve YK köklerine verilir.
 10. **Rol taşıyan grup devredilmez.** core'un Privileged izin rollerinden, `audit:read`'den, bir client'ın `client:admin`'inden ya da Keycloak yönetim rollerinden birini doğrudan ya da atasından taşıyan grubun üyeliğini yalnız Privileged değiştirir (Entra'nın role-assignable gruplarının karşılığı). Grup rol eşlemeleri yalnız Privileged'dadır.
+   *(2026-10-12: liste yerine rol sınıfları geldi; yönetici rolü taşıyan grup devredilmez, uygulama rolü taşıyan devredilir; bkz. aşağıdaki ek.)*
 
 Kaynaklar:
 - **Yusuf'un:** 1, 2, 4, 8'in ilk üç maddesi, 9'un ana kuralı (her değişiklik kayda, YK ve ADMIN görür, 3 yıl) ve "devirden önce yetki ad eşleşmesinden çıkar, ayrılmış adlar alınamaz" önkoşulu.
@@ -116,3 +117,37 @@ Kaynaklar:
 - **Lider kendi ekibine eş lider ekleyebilir** (Entra ve GitHub gibi): Yusuf reddetti; Leader grubu ana sitenin CMS yazma yetkisini taşıyor.
 - **Onay akışı** (lider ister, YK onaylar): Yusuf "onay beklenmez" dedi; denetim kaydı hesap verebilirliği sağlar.
 - **Değişiklikleri Keycloak olaylarından izlemek:** aktör hep core'un service account'u görünür, süre 30 gün.
+
+## Ek: rol sınıfları ve site editörlüğü (2026-10-12)
+
+Kaan sordu: liderler alt ekip açıp lider atadıkça ana sitenin tamamını düzenleyen kişi sayısı artar mı; alt ekip liderlerine `cms:access` verilmesin mi? Hub'daki güvenlik incelemesinin (2026-10-12) cevabı: kendiliğinden artmaz, hiçbir betik ya da core işlemi yeni bir gruba client rolü eşlemez. Ama `cms:access` karar 10'un listesinde yoktu. Bir admin bir alt ekibin Leader grubuna `cms:access` eşlerse grup devredilebilir kalıyordu; üst ekibin Leader'ı oraya istediği etkin hesabı ekleyip site geneli yazma verebiliyordu. ADR-0056'daki "bütün takımların Leader grupları" ifadesi ve Keycloak runbook'u adminleri tam bu eşlemeye yönlendiriyordu. Karar 10'un liste yöntemi bir rolü böyle kaçırdı; yeni roller de aynı yoldan kaçabilirdi.
+
+Karar (Yusuf, 2026-10-12: "sektör nasılsa öyle", Microsoft Entra modeli; site editörlüğü Kaan'ın önerisi):
+
+- **Roller iki sınıftır (karar 10'un yerine).**
+  - **Yönetici rolleri** Entra'nın directory role'lerinin karşılığıdır. Bunlardan birini taşıyan grubun ve onu atasında taşıyan her grubun üyeliğini yalnız Privileged değiştirir (Entra'nın role-assignable grupları).
+  - **Uygulama rolleri** verdiği yetki kişinin kendisiyle ya da üyesi olduğu ekiplerle sınırlı rollerdir. Lider bunları devredebilir: rolü taşıyan grubun üyeliğini değiştirebilir.
+  - **Sınıflandırılmamış her rol yönetici rolü sayılır** (fail-closed). Yeni bir rol, biri onu uygulama rolü listesine alana kadar korunur. core böyle bir rolü gördüğünde loglar ve sayar (yalnız rol adı, kişi yok).
+  - Sınıf **(client, rol) çiftiyle** tanımlanır, yalnız rol adıyla değil: aynı ad başka bir client'ta başka bir roldür.
+  - Composite bir uygulama rolü, ancak içindeki her rol de uygulama rolüyse devredilir.
+  - **Realm rolleri her zaman korunur** (karar 10'daki gibi, fail-closed). Production ölçümü (2026-10-12 22:42) Java döneminden kalan realm rollerinin gruplarda durduğunu gösterdi: `/UYELER`'de `USER`, her en üst takımda takımın adında bir rol (`WEBLAB`) ve Leader gruplarında `<EKİP>_LEADER`. Bu yüzden devir bugün `/UYELER` altında hiçbir yerde çalışmaz. **Eski realm rolleri rol temizliği F3 ile kalkar** (hub `.scratch/rol-temizligi`): önce gruplardan, sonra kişilerden kaldırılırlar, sonra tanımları silinir. `_LEADER`'ın composite'indeki Forms koltuğu, en üst takımların Leader gruplarına client rolü (`skyforms:access`) olarak taşınır. O zamana kadar `/UYELER`'deki `USER` devri kapalı tutar; **devrin açılış ön koşulu F3'tür**. Realm rolleri için ad ya da konum istisnası tanımlanmaz (Yusuf, 2026-10-12: "her şeyi sana bıraktım, Microsoft gibi"; orkestratör kararı, aynı gün): F3'ten sonra ölü kod olurdu, ayrıca core realm rollerinin composite'lerini okuyamadığı için içlerine eklenen bir yönetici rolü görünmez kalırdı.
+  - İlk uygulama rolleri: core'da `certificate:issue`, `certificate:revoke`, `certificate:template:manage`, `certificate:binding:manage` (yalnız kişinin ekiplerinin etkinlikleri); core'da `url:create`, `url:get`, `url:update`, `url:delete`, `url:access` (yalnız kendi kısa linkleri); Forms'ta `skyforms:access` (koltuk) ile `skyforms:form:manage`, `skyforms:response:manage` ve `skyforms:feedback:manage` (yalnız ekran açar; forms-backend her formu iş birlikçiye ya da yönetici rolü `skyforms:*`'a göre karar verir); `broker`'da `read-token` (kişinin kendi kimlik sağlayıcı token'ı); SkyMail'de `skymail:access` ve `skymail:templates:read`; her Site client'ında `content:read`. Planlı `news:read` geldiğinde listeye girer. Liste core'da ve core'un `docs/team-delegation.md` belgesinde durur; değişikliğini Yusuf onaylar.
+  - Bilinen yönetici rollerinden bazıları: core'un Privileged izin rolleri, `audit:read`, `users:read`; her client'ın `client:admin`'i; `realm-management`'ın her rolü; herhangi bir client'taki `content:write` ve `cms:access` (Site client'ları, yönetim paneli `admin`, SkyApp); Forms'ta `skyforms:*`; SkyMail'de şablon yazma, listeler, gönderim, onay ve sistem postaları; Place'te `place:admin` ve `place:moderator`.
+- **Site editörlüğü yönetici rolüdür.** Herhangi bir client'taki `content:write`'ı (inscribed'ın site geneli yazması) ya da `cms:access`'i taşıyan grubun ve onun altındaki her grubun üyeliğini yalnız Privileged değiştirir. `cms:access` kendi adıyla da yönetici rolüdür; böylece koruma Keycloak'ın composite yanıtına bağlı kalmaz. `content:read` tek başına okumadır, uygulama rolüdür.
+- **`cms:access` yalnız en üst takımların Leader gruplarına verilir.** Ana sitede, arge'de ve etkinlik sitelerinde editörlük Privileged gruplarda ve en üst takımların (`/UYELER/<alan>/<ekip>`) `LIDERLER`/`KOORDINATORLER` gruplarındadır. Alt ekiplerin Leader gruplarına ve takım ya da alan gruplarının kendisine verilmez. Bu kural, inscribed'a koleksiyon ve kayıt bazında yazma gelene kadar geçerlidir (Fatih, F2-yazma). O gelince alt ekip liderlerinin kendi Teams kaydını yazması ayrıca kararlaştırılır.
+- **Araçlar kurala uyar.** `e-skylab-keycloak`'taki `config/site-editor-grants.sh --team` alt ekip yolunu reddeder. Runbook "her `…/LIDERLER`" yerine "yalnız en üst takımlar" der.
+
+Sonuçlar:
+
+- En üst takımın Leader grubundaki `cms:access` devri değiştirmez. O grubu zaten yalnız Privileged değiştirir (karar 4). Alt ekipler o grubun altında değil, kardeşidir; yönetimleri devredilmeye devam eder.
+- Bir takım ya da alan grubuna yönetici rolü, sınıflandırılmamış bir rol ya da bir realm rolü eşlenirse o ağacın tamamı devirden çıkar ve yalnız Privileged'ca yönetilir. Bu bilinçlidir: Keycloak'ta rol aşağı doğru miras alınır. Rolü ayrı bir yaprak gruba taşımak ekibi devre geri getirir.
+- Alt ekip liderleri site editörü değildir. Bugün alt ekibin Teams kaydını yalnız `client:admin` sahipleri (ADMIN, YK) yazabilir. `teams` koleksiyonunun kuralı kaydı yalnız takımın kendi Leader grubuyla eşleştirir; üst takımın lideri alt ekibin kaydına yazamaz. Üst takım liderinin yazabilmesi koleksiyon kuralının değişmesini ister.
+- Devir açılmadan önce, karar 6'daki production ağaç raporu en üst takımlar dışındaki her Leader grubunun ve her takım ya da alan grubunun client rol eşlemelerini sınıflarıyla (yönetici, uygulama, sınıflandırılmamış) ve realm rol eşlemelerini, bu realm rollerinin composite'leriyle birlikte listeler (core realm composite'lerini okuyamaz, rapor okur). Realm rolü eşlemesi F3'ten sonra sıfır olmalıdır. Her satırı Yusuf görür; liste temiz olmadan devir açılmaz.
+
+Endüstri uygulamasıyla karşılaştırma:
+
+- **Uyan:** iki sınıf Entra'nınkiyle aynıdır. Entra'da dizin rolü yalnız role-assignable gruba verilir ve bu grubun üyeliğini genel grup yazma izni değiştiremez; uygulama rolleri sıradan gruplara verilir ve grup sahibi üye ekleyerek dağıtabilir. Okta'da admin rolü taşıyan grubu yalnız süper admin yönetir. Google Workspace'te admin rolü yalnız güvenlik grubuna atanır. Site editörlüğü ve `client:admin` yönetici sınıfındadır.
+- **Sapma 1, miras:** Keycloak'ta roller alt gruplara geçer, Entra'nın uygulama rolleri iç içe gruplara geçmez. Bu yüzden ata denetimi var: atasında yönetici rolü bulunan grup da korunur.
+- **Sapma 2, sınıflandırılmamış rol:** Entra'da sınıf rolün türünden gelir. Bizde rolün türü yok, sınıf bir listeden gelir; listede olmayan rol yönetici rolü sayılır. Realm rollerini sınıflamıyoruz, hepsi korur; kulübün eski realm rolleri rol temizliği F3 ile kalkar.
+- **Sapma 3, geniş tanım:** liderler alt ekip açıp alt ekibe lider atayabildiği için (Entra sahibi alt grup açamaz) korunan grup tanımı Entra'dakinden geniştir.
+- **Sapma 4, site editörlüğü:** `cms:access` ve `content:write` uygulama rolleridir; Entra'da sıradan gruplarla dağıtılabilirdi. Biz onları yönetici sınıfına alıyoruz, yani Entra'dan daha sıkıyız. Gerekçe: inscribed'da yazma site genelidir ve kaynak başına yetki yoktur; rol fiilen site yöneticisidir.

@@ -225,8 +225,8 @@ Whoever may manage a team through core: its Leaders, the Leaders of any ancestor
 _Avoid_: Keycloak fine-grained admin permissions as the delegation path; a person's own token on the Keycloak Admin REST API; deciding from a token path that may be stale
 
 **Protected group**:
-A group that carries, directly or through an ancestor, one of core's Privileged permission roles, `audit:read`, a client's `client:admin`, or a Keycloak management role. Only Privileged people change its membership or role mappings; Team managers cannot (Entra's role-assignable groups).
-_Avoid_: delegating membership of a group that grants privilege
+A group that carries, directly or through an ancestor, any realm role or any client role that is not an app role (ADR-0065 addendum of 2026-10-12; the Java era's realm roles on groups, such as `USER` on `/UYELER`, leave in the role cleanup's F3, and delegation opens after it). Roles are classed by their (client, role) pair: app roles (bound to the holder or the holder's Teams, such as the team-bound certificate roles, one's own short links, the Forms seat, `content:read`) may be handed out by a Leader; every other client role is an admin role, a role nobody has classified included. Admin roles include core's Privileged permission roles, `audit:read`, `users:read`, a client's `client:admin`, a Keycloak management role, and `content:write` or `cms:access` on any client (site-wide write). Only Privileged people change its membership or role mappings; Team managers cannot (Entra's role-assignable groups).
+_Avoid_: delegating membership of a group that grants privilege; classing a role by its name alone; treating an unclassified role as delegable
 
 **Team audit record**:
 Core's record of every team and group change, including refused writes: who, when, what, old and new value. If it cannot be written, the change is not made. It stores only the actor's id; name and e-mail are resolved on read, and never after Account erasure. Kept 3 years. Read with core's `audit:read` role, given to the ADMIN and YK roots (ADR-0065).
@@ -301,12 +301,12 @@ A User who may edit one site in the CMS, that is, who holds `cms:access` on that
 _Avoid_: a `site-editorleri` (per-site editor) group tree; granting an event site to every Leader group or to every member of its organization team; granting `cms:access` to a single person; turning on Full scope to learn which sites a person edits; a SkyApp tenant, a server that writes for SkyApp, or granting SkyApp's CMS roles to a Group
 
 **cms:access**:
-A client role on a Site client meaning this User is a CMS editor of that site: it bundles `content:read` and `content:write`, and the site shows its editor only to holders of it. It is granted only to Groups (Privileged and Leader groups; which ones per site is in ADR-0056, and for an event site the Site editor rule), never to single people. Write access is site-wide, so it covers every page of that site but no other site; which Teams items a Leader may change still follows Group membership.
-_Avoid_: treating cms:access as superuser of all content; treating it as retired by the inscribed cutover (ADR-0056); granting it to a single person, to all members, or as a default role
+A client role on a Site client meaning this User is a CMS editor of that site: it bundles `content:read` and `content:write`, and the site shows its editor only to holders of it. It is granted only to Groups (Privileged and the Leader groups of top teams, `/UYELER/<area>/<team>`; which ones per site is in ADR-0056, and for an event site the Site editor rule), never to single people or to a Sub-team's Leader group (ADR-0065 addendum of 2026-10-12). Write access is site-wide, so it covers every page of that site but no other site; which Teams items a Leader may change still follows Group membership.
+_Avoid_: treating cms:access as superuser of all content; treating it as retired by the inscribed cutover (ADR-0056); granting it to a single person, to all members, to a Sub-team's Leader group, or as a default role
 
 **client:admin**:
-A client role on a Site client for CMS tenant administration: creating a team and fixing any team's Teams item, for example after its Leader leaves. It can also change that site's CMS tenant settings, so only the `ADMIN` group holds it until the CMS separates tenant settings from content administration.
-_Avoid_: giving it to Leaders or to YK; treating it as the editor role (that is `cms:access`)
+A client role on a Site client for CMS tenant administration: creating a team and fixing any team's Teams item, for example after its Leader leaves or for a Sub-team (whose Leaders are no Site editors). It can also change that site's CMS tenant settings, so only the `ADMIN` and `YK` roots hold it (Yusuf, 2026-10-12), never DK, which reads and does not write. It is an admin role: a group that holds it is a Protected group.
+_Avoid_: giving it to Leaders or to DK; treating it as the editor role (that is `cms:access`)
 
 ### Event operations
 
