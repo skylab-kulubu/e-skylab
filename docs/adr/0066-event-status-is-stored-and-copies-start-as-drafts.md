@@ -109,12 +109,13 @@ Yusuf "Açık" listesini ve uygulama hazırlığında çıkan soruları tek tek 
 
 Karar (Yusuf, 2026-10-19):
 
-1. **İptal bildirimi, farklı:** iptal ekranında "Bilet sahiplerine bildir" kutusu var. İşaretlenirse core, iptal açıklamasını taşıyan bir SkyMail sistem şablonuyla bilet sahiplerine otomatik posta gönderir. İşaretlenmezse posta gitmez; yönetici mevcut "Katılımcılara mail" akışıyla elle duyurur. Gönderim kuyrukludur (core'daki mevcut kuyruk ve işçi deseni): satır kişi verisi taşımaz, alıcılar gönderim anında okunur, iptal isteğini bekletmez ve düşürmez.
+1. **İptal bildirimi, farklı:** iptal ekranında "Bilet sahiplerine bildir" kutusu var ve varsayılan olarak işaretli gelir. İşaretlenirse core, iptal açıklamasını taşıyan bir SkyMail sistem şablonuyla bilet sahiplerine otomatik posta gönderir. İşaretlenmezse posta gitmez; yönetici mevcut "Katılımcılara mail" akışıyla elle duyurur. Gönderim kuyrukludur (core'daki mevcut kuyruk ve işçi deseni): satır kişi verisi taşımaz, alıcılar gönderim anında okunur, iptal isteğini bekletmez ve düşürmez.
 2. **İptal her zaman geri alınabilir, farklı:** iptal yalnız bir durumdur. Düzenleyen iptali geri alınca etkinlik yayına döner; bitmiş etkinlik de geri alınabilir. Bu yüzden iptal hiçbir şeyi silmez ya da kalıcı kapatmaz:
    - Bilet, başvuru, giriş, kapı görevlisi ve yarışmacı satırları olduğu gibi kalır.
    - Kuyrukta bekleyen sertifika işleri kapatılmaz, bekletilir; geri alınınca devam eder.
    - Etkinlikle birlikte iptal edilen yarışmaların önceki durumu saklanır; geri alınınca yalnız onlar önceki durumuna döner.
    - Henüz gönderilmemiş iptal postası geri almada düşer.
+   - Otomatik iptal postası gitmişse geri alma ekranında "Katılımcılara tekrar bildir" seçeneği vardır ve varsayılan olarak işaretli gelir. İşaretliyse aynı kuyruk ve alıcı kuralıyla etkinliğin yeniden yayında olduğunu söyleyen ikinci bir SkyMail sistem şablonu gönderilir; yalnız iptal postasını almış kişilere gider.
 3. **İptalde kayıt formu:** panel "SkyForms'ta formu kapat" bağlantısı verir. Otomatik kapatma yok, Forms'a yeni uç gerekmez.
 4. **Başka ekibe kopya, farklı:** kopyalayan, etkinlik oluşturabildiği başka bir ekibi hedef seçebilir. Kaynak ekipte etkinliği düzenleme ve hedef ekipte oluşturma hakkı birlikte şarttır; yalnız okuyabilen başka ekibe kopyalayamaz. Hedef ekibin kurallarına takılan parça (kapak, şablon bağlaması, kapı görevlisi, yarışmalar) atlanır ve yanıt bunu söyler.
 5. **Kayıt formu:** kopya formsuz başlar; kopya sayfası tek tıkla kaynağın formundan yeni form açar. Forms'ta sunucu tarafı çoğaltma ucu istenmez.
