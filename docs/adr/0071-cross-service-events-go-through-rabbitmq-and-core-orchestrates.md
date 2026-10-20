@@ -70,7 +70,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 - **ADR-0008:** Keycloak olayı kimlik verisi taşımaz. Yalnız core-backend #270'in periyodik turunu uyandırır, veri yine Keycloak'tan okunur. Kimlik eşitlemesi RabbitMQ'ya dayanmaz.
 - **ADR-0069:** Forms'un cevap bildirimi (davet kodu dahil) ve "form kapandı" haberi olayla gelir: `forms.response.created` (gizli alanlar) ve `forms.form.updated`.
 - **ADR-0066 eki karar 10** karar 15 ve 16 ile değişir: 409 adımı düşer, kapalı başvuruya gelen cevap `submittedAt`'e göre ayrılır. ADR-0066'ya 2026-10-21 eki yazıldı, CONTEXT Registration closure buna göre düzeltildi.
-- **ADR-0070 (#51):** "Broker yoktur" cümlesi bu ADR'la yanlış olur. Doğrusu: bildirim isteği bir komuttur, `Idempotency-Key`'li HTTP ile gider; broker yalnız olaylar içindir. #51 önce birleşirse bu ADR'a ek yazılır, sonra birleşirse cümle #51'de düzeltilir.
+- **ADR-0070:** bildirim isteği bir komuttur, `Idempotency-Key`'li HTTP ile gider; broker yalnız olaylar içindir. ADR-0070'teki eski "Broker yoktur" cümlesi buna göre düzeltildi.
 - **Forms:**
   - Cevap bildirimi giden kutusu genelleşir ve RabbitMQ'ya yayımlar: `forms.response.created`, `forms.response.status_changed`, `forms.form.updated`.
   - Genel "gizli alan" gelir (davet kodu bunlardan biri), karar 5'teki biçim kuralıyla.
