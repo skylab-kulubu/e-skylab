@@ -34,7 +34,11 @@ _Avoid_: Account center or an outbox consumer as the orchestrator; deleting the 
 
 **Erasure command**:
 Core's instruction to one service to erase one person's data for one deletion request. It names the request and the person and carries the person's e-mail addresses only for the length of the call, never in the outbox, logs or storage. Repeating it returns the first result. The service decides, within the Deletion lifecycle rules, what it deletes and what it keeps under Silinmiş kullanıcı.
-_Avoid_: event, message or webhook (there is no broker); a service pulling deletions from core; sending only an opaque id to a service that keys data by e-mail; storing the addresses to retry later
+_Avoid_: event, message or webhook (an erasure waits for each service's result, so it is a command over HTTP even though a broker exists, ADR-0071); a service pulling deletions from core; sending only an opaque id to a service that keys data by e-mail; storing the addresses to retry later
+
+**Integration event** (Olay):
+A fact one service publishes after it happened ("a response was created", "a form closed"), through RabbitMQ, on its own exchange, without knowing who consumes it. It carries a CloudEvents envelope with ids and the fields a consumer needs to decide, never e-mail, name, phone, IP or free text; a consumer that needs more reads the publisher's API. It leaves the publisher through a transactional outbox, and the consumer drops repeats by event id. Core is the orchestrator: other services publish events and answer commands, they do not call core's domain endpoints. See ADR-0071.
+_Avoid_: calling a request that waits for a result an event (Erasure command, mail send); putting contact data in the message; a service declaring its own exchanges or queues; moving a service's internal job queue (SkyMail `mail_queue`) to RabbitMQ
 
 **Silinmiş kullanıcı**:
 The one shared stand-in that replaces an erased person wherever a service keeps a record that must name an actor (who sent, approved, edited, archived). Everyone erased becomes the same placeholder, so it links nothing and cannot be signed in as.
