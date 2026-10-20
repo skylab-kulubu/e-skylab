@@ -51,3 +51,7 @@ cms-backend, whose erase endpoint followed this decision, was retired; the CMS i
 - **The `ArchivedBy` columns cms-backend left behind** hold archivers' subjects that inscribed neither reads nor writes. They are cleared once for everyone, not per erasure.
 
 Considered and not chosen: core writing the inscribed database directly through a column-scoped database role. It needed no work from the owner, but it is shared-database integration and breaks "each service erases its own data". Putting the subject in the endpoint path was also rejected, since paths reach access logs.
+
+## Addendum: a broker exists again (2026-10-20)
+
+ADR-0071 brings RabbitMQ back for cross-service events, so the "None runs in production" premise of the rejected **message broker** option no longer holds once ADR-0071's broker runs in production. The decision stands: an erasure is a command that waits for every service's confirmation and carries the addresses only for the length of the call, so it stays an idempotent HTTP call from core. Events must not carry the addresses either (ADR-0071, decision 5).
