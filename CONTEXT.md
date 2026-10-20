@@ -127,8 +127,8 @@ An Event's applying closed by hand or by a deadline, separately from Event statu
 _Avoid_: using Event status or `active` to close applying; treating a closed Event as unpublished; judging a Forms response by its approval time; answering Forms with a closure status code (`409 registration_closed`)
 
 **Event copy**:
-A new Draft Event made from another Event in one transaction (ADR-0066). Structure comes over: details, cover, capacity, Attendance rule, an Event-scoped certificate template binding when the caller may bind it, EventDays and Oturum rows, with all dates shifted by the gap between the chosen new start and the source start. People and history never come over: Tickets, Check-ins, Certificates, competitors, mail lists, gallery and files. Door staff come only when the caller may assign them and asks. Competitions and their Stages come only when asked, as Drafts, without Entrants, submissions, adjustments or results. The copy may go to another Owner team the caller may create Events in, when the caller may also edit the source Event. Form slots start empty, because a Form has one current Short link and its responses write Tickets to every Event that names it; a new Form is made from the old one in Skyforms instead.
-_Avoid_: copying a Form slot onto the copy; copying Tickets or Check-ins; publishing a copy directly; copying into another team on read rights alone
+A new Draft Event made from another Event in one transaction (ADR-0066). Structure comes over: details, cover, capacity, Attendance rule, an Event-scoped certificate template binding when the caller may bind it, EventDays and Oturum rows, with all dates shifted by the gap between the chosen new start and the source start. People and history never come over: Tickets, Check-ins, Certificates, competitors, mail lists, gallery and files. Door staff come only when the caller may assign them and asks. Competitions and their Stages come only when asked, as Drafts, without Entrants, submissions, adjustments or results. The copy may go to another Owner team the caller may create Events in, when the caller may also edit the source Event. Form slots start empty, because a Form has one current Short link and its responses write Tickets to every Event that names it; a new Form is made from the old one in Skyforms instead. The same goes for Feedback forms; the Feedback mode comes over (ADR-0069).
+_Avoid_: copying a Form slot or a Feedback form onto the copy; copying Tickets or Check-ins; publishing a copy directly; copying into another team on read rights alone
 
 **Event QR**:
 A shared event **poster** QR the **attendee** scans to join (`dahil olmak`). If they have no Ticket, that scan is Walk-in. Staff does **not** scan the poster; it has no person id and is not a door credential. Oturum QR is the same family (attendee scans a shared code) but marks Check-in for that talk, not join.
@@ -283,12 +283,12 @@ A CMS item (title, summary, body, hero, tags) of one of two kinds, news (haber) 
 _Avoid_: Announcement as a core-API entity, `/api/announcements` on super-skylab; audience as a display hint filtered by the reader; a writer that sends back only the fields it knows (the update replaces the whole item)
 
 **News send** (Haber gönderimi):
-Mailing one published News item through SkyMail, started from SkyMail's send screen (the panel and the site link to it). It stores a snapshot of the item; later edits change only the web. Core resolves the audience: Members of the chosen teams and their sub-teams plus their Team followers, cut down to the item's audience, minus people whose Announcement preference is off, disabled or unverified accounts, and accounts without an address. Mail goes only to the Primary e-mail. YK, DK and ADMIN send directly; others submit it for Mail onayı. Every mail carries a one-click opt-out for its own category.
+Mailing one published News item through SkyMail, started from SkyMail's send screen (the panel and the site link to it). It stores a snapshot of the item; later edits change only the web. Core resolves the audience: Members of the chosen teams and their sub-teams plus their Team followers, cut down to the item's audience, minus people whose Communication preference is off, disabled or unverified accounts, and accounts without an address. Mail goes only to the Primary e-mail. YK, DK and ADMIN send directly; others submit it for Mail onayı. Every mail carries a one-click opt-out for its own category.
 _Avoid_: SkyMail resolving the audience from its own Keycloak group lookup; e-mailing automatically on publish; sending a restricted item to a Team follower; tracking opens
 
-**Announcement preference** (Duyuru tercihi):
-A Member's choice of which News mail to receive (ADR-0067). A category is a source, club-wide or one team, times a kind, news or announcement, plus one master switch. Club-wide and the Member's own teams are on by default under legitimate interest (ADR-0062); following another team is off by default. A setting on a parent team covers its sub-teams, and the most specific setting wins. Teams are kept by Keycloak group id, so renaming or moving a team keeps the choice. Kept in core, edited in Account center or through the signed one-click link in each mail, which turns off only that mail's category. Transactional mail (login codes, tickets, certificates) ignores it. Account erasure deletes it.
-_Avoid_: treating it as Contact consent; one club-wide switch only; storing it in Keycloak attributes or SkyMail; an opt-out link that silences every category
+**Communication preference** (İletişim tercihi):
+A Member's choice of which optional Notifications to receive on which Channel (ADR-0067, ADR-0070). A category is a source, club-wide or one team, times a kind, news or announcement, plus one master switch; each row also names its Channel, and each Channel has its own master switch. The settings screen shows each category only with the Channels that make sense for it, not a full category × Channel grid. Club-wide and the Member's own teams are on by default under legitimate interest (ADR-0062); following another team is off by default. A setting on a parent team covers its sub-teams, and the most specific setting wins. Teams are kept by Keycloak group id, so renaming or moving a team keeps the choice. Kept in core (`communication_preferences`), edited in Account center or through the signed one-click link in each mail, which turns off only that mail's category on that Channel. Required Notifications (login codes, account security, tickets, certificates, Mail onayı) ignore it, and so does the Inbox: an Inbox item is written whatever the preference says. Account erasure deletes it.
+_Avoid_: Announcement preference (the old name, from before it carried a Channel); treating it as Contact consent; one club-wide switch only; storing it in Keycloak attributes or SkyMail; an opt-out link that silences every category or every Channel; letting the preference hide Inbox items
 
 **Team follow** (Ekip takibi):
 A Member's own choice to receive the News mail of a visible team they are not in. Off by default. A follower receives only items open to everyone or to all Members, never team-restricted items.
@@ -321,8 +321,20 @@ A person's door identity for one Event. Member apply writes a REGISTERED Ticket;
 _Avoid_: treating a skyforms response as the door identity; treating Ticket as the Event poster QR; treating Ticket as only an email row
 
 **Form slot**:
-A named form attachment on an Event (apply, contest, …). One Event may have several. A slot is an external URL or a Skyforms Event form; the public attach handle is a Short link (`formUrl` on the Event).
-_Avoid_: a single unnamed formUrl as the only product model forever; Typeform as a slot; parsing a Form id out of the URL string; dumping a logged-in User onto this link
+A named form attachment on an Event (apply, contest, …). One Event may have several. A slot is an external URL or a Skyforms Event form; the public attach handle is a Short link (`formUrl` on the Event). An accepted response to a slot's Form writes a Ticket to every Event that names it. A Feedback form is not a Form slot and writes no Ticket (ADR-0069).
+_Avoid_: a single unnamed formUrl as the only product model forever; Typeform as a slot; parsing a Form id out of the URL string; dumping a logged-in User onto this link; attaching a feedback form as an extra slot
+
+**Feedback form** (Geri bildirim formu):
+A Form bound to an Event, or optionally to one Oturum, to ask attendees what they thought (ADR-0069). It is its own field, not a Form slot: its responses write no Ticket, and core answers Forms with 2xx either way. One Form sits in one place only: an Event's apply or extra slot, an Event's Feedback form, or an Oturum's Feedback form; anything else is 409. The Event manages its Form link like an apply Form's. It is mailed to the Ticket holders with a Check-in (guests included): the Event's to those with a Check-in on any of its Oturum, an Oturum's to those with a Check-in on it, 2 hours after the target ends unless the organizer turns that off or sends now. Anyone with the link may answer; answers stay tied to the person. An Event copy does not copy it; a new Form is made from the old one instead.
+_Avoid_: a feedback form writing Tickets; mailing it to every Ticket holder rather than the checked-in; calling feedback anonymous; copying a Feedback form onto an Event copy
+
+**Feedback mode** (Geri bildirim kipi):
+How an Event asks about its Oturum (ADR-0069): `event` (default; one Event Feedback form), `per_session` (each Oturum may have its own Feedback form, mailed to its checked-in attendees; the Event's stays optional) or `event_with_sessions` (one Event Feedback form that asks about each Oturum inside it, built in Forms). Outside `per_session` the Oturum forms are kept but not mailed. A person gets at most one feedback mail a day, listing that EventDay's forms. An Event copy copies the mode, not the forms.
+_Avoid_: a mail per Oturum; storing in core how the Form asks about the Oturum; deleting Oturum forms when the mode changes
+
+**Feedback invite** (Geri bildirim daveti):
+The row core keeps for each Ticket and target (Event or Oturum) it mailed a Feedback form to, with a random personal code (ADR-0069). The mail links straight to the Form with the code, never through a Short link. A Forms response marks the invite answered by its code, else by the logged-in User; a guest is matched by the code only. Unanswered invites get one reminder 3 days later with the same link; closing the Form, cancelling the target or removing the form cancels it for good. The row goes 90 days after the first mail, leaving counts.
+_Avoid_: a personal code in a Short link; hashing the code so the reminder cannot resend it; a second reminder; reminding after the Form closed
 
 **Event form**:
 A skyforms Form bound to an Event. Creating one bounces the operator into skyforms (Gecekodu draft as a Group extra, when it exists) and returns to the same Event page. Forms stay skyforms; this is not a second forms product.
@@ -392,8 +404,36 @@ _Avoid_: EventType; an implicit total per Owner team; counting unpublished resul
 People assigned to one Competition. Staff manage it like organizers, except publishing results and assigning staff. A Judge (jüri üyesi) is assigned to a Competition, Stage or category, sees only what is assigned to them, cannot score their own Entrant, and does not see others' scores before publication.
 _Avoid_: making every Owner-team Member a manager; deriving judges from team membership
 
+**Notification** (Bildirim):
+One "what happened, to whom" request a service such as core sends to the communication service (SkyMail, ADR-0070): a Notification type, its recipients by Keycloak `sub`, the variables, and an `Idempotency-Key`. The sender says what and to whom; SkyMail picks the Channels, the time and the wording. For optional types the sender also passes the Channels each person allows, from their Communication preference.
+_Avoid_: the sender choosing the Channel; a Notification addressed by e-mail address when the person is known; using `/v1/mail_tasks/single` for new notifications
+
+**Notification type** (Bildirim türü):
+The stable key of a kind of Notification (`event.cancelled`), the widening of the Template key: its category, whether it is required (ignores the Communication preference), its default Channels, its lane (system mail never waits behind bulk sends), and one content variant per Channel. The e-mail variant is a Mail template; the Inbox, push and SMS variants are short plain-text templates.
+_Avoid_: a separate template per Channel with its own key; renaming a key in place
+
+**Channel** (Kanal):
+One way a Notification reaches a person: `email`, `inbox` (in-app), `push` or `sms`. Each has its own sender and error rules inside SkyMail. Web push and WhatsApp are not Channels.
+_Avoid_: medium; transport; treating the Inbox as a kind of push
+
+**Delivery** (Teslim):
+One send of one Notification to one person on one Channel; the widening of today's SkyMail queue row (`mail_queue`, which keeps its name and gains `channel` and `recipient_sub`). It carries the tries, the lease and the result.
+_Avoid_: one row for all Channels of a person; message (for the row)
+
+**Contact point** (İletişim adresi):
+Where a Channel reaches a person: the Primary e-mail for `email`, a Device registration for `push`, a phone the person verified with a code for `sms`. The Inbox needs none; the `sub` is enough. A person without a Contact point for a Channel is skipped on it and counted.
+_Avoid_: an admin-typed phone as an SMS address; an e-mail address other than the Primary e-mail
+
+**Device registration** (Cihaz kaydı):
+One app install's push token, kept in SkyMail and written by the app with the person's own token on every launch, removed at sign-out, when the push provider says it is gone, or after 270 days unseen. Account erasure deletes it.
+_Avoid_: keeping push tokens in core; a push topic instead of the person's devices
+
+**Inbox item** (Kutu öğesi):
+One entry in a person's in-app "Bildirimlerim", written by the `inbox` Channel from the Notification type's Inbox variant: a short title, a summary and an in-app link, not a copy of the ticket, certificate or News it points to. Seen, read and archived are kept on the server and shared by the person's devices. It is written whatever the Communication preference says, but only for types whose default Channels include `inbox`. Only its owner may read or mark it; others are told it does not exist. Kept 90 days, or less when its source ends earlier; Account erasure deletes it.
+_Avoid_: notification feed (for the stored row); copying the source record's body into the item; letting the preference drop an Inbox item; keeping Inbox items with no end date
+
 **Mail template**:
-A SkyMail message definition — a subject, an HTML body and a plain-text body — rendered for each recipient with the variables of that send. Archived, never deleted.
+A SkyMail message definition — a subject, an HTML body and a plain-text body — rendered for each recipient with the variables of that send. Archived, never deleted. It is the e-mail variant of the Notification type with the same key (ADR-0070).
 _Avoid_: "template" on its own where a Certificate template or a Skyforms draft template could be meant; e-mail theme; treating the React Email file as the template rather than one way of writing it
 
 **System template**:
@@ -401,7 +441,7 @@ A Mail template another service sends by its Template key: core's welcome and ce
 _Avoid_: locked template; read-only template; treating "system" as "not editable in SkyMail"
 
 **Template key**:
-The stable, readable handle a service addresses a Mail template by (`core.welcome`, `keycloak.verify-email`). A System template always has one; its UUID is never the contract.
+The stable, readable handle a service addresses a Mail template by (`core.welcome`, `keycloak.verify-email`). A System template always has one; its UUID is never the contract. The same key names the Notification type the template is the e-mail variant of.
 _Avoid_: a template id as the integration contract; renaming a key in place
 
 **Authoring mode**:
