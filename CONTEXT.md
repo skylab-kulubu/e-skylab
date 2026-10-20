@@ -283,12 +283,12 @@ A CMS item (title, summary, body, hero, tags) of one of two kinds, news (haber) 
 _Avoid_: Announcement as a core-API entity, `/api/announcements` on super-skylab; audience as a display hint filtered by the reader; a writer that sends back only the fields it knows (the update replaces the whole item)
 
 **News send** (Haber gönderimi):
-Mailing one published News item through SkyMail, started from SkyMail's send screen (the panel and the site link to it). It stores a snapshot of the item; later edits change only the web. Core resolves the audience: Members of the chosen teams and their sub-teams plus their Team followers, cut down to the item's audience, minus people whose Announcement preference is off, disabled or unverified accounts, and accounts without an address. Mail goes only to the Primary e-mail. YK, DK and ADMIN send directly; others submit it for Mail onayı. Every mail carries a one-click opt-out for its own category.
+Mailing one published News item through SkyMail, started from SkyMail's send screen (the panel and the site link to it). It stores a snapshot of the item; later edits change only the web. Core resolves the audience: Members of the chosen teams and their sub-teams plus their Team followers, cut down to the item's audience, minus people whose Communication preference is off, disabled or unverified accounts, and accounts without an address. Mail goes only to the Primary e-mail. YK, DK and ADMIN send directly; others submit it for Mail onayı. Every mail carries a one-click opt-out for its own category.
 _Avoid_: SkyMail resolving the audience from its own Keycloak group lookup; e-mailing automatically on publish; sending a restricted item to a Team follower; tracking opens
 
-**Announcement preference** (Duyuru tercihi):
-A Member's choice of which News mail to receive (ADR-0067). A category is a source, club-wide or one team, times a kind, news or announcement, plus one master switch. Club-wide and the Member's own teams are on by default under legitimate interest (ADR-0062); following another team is off by default. A setting on a parent team covers its sub-teams, and the most specific setting wins. Teams are kept by Keycloak group id, so renaming or moving a team keeps the choice. Kept in core, edited in Account center or through the signed one-click link in each mail, which turns off only that mail's category. Transactional mail (login codes, tickets, certificates) ignores it. Account erasure deletes it.
-_Avoid_: treating it as Contact consent; one club-wide switch only; storing it in Keycloak attributes or SkyMail; an opt-out link that silences every category
+**Communication preference** (İletişim tercihi):
+A Member's choice of which optional Notifications to receive on which Channel (ADR-0067, ADR-0070). A category is a source, club-wide or one team, times a kind, news or announcement, plus one master switch; each row also names its Channel, and each Channel has its own master switch. The settings screen shows each category only with the Channels that make sense for it, not a full category × Channel grid. Club-wide and the Member's own teams are on by default under legitimate interest (ADR-0062); following another team is off by default. A setting on a parent team covers its sub-teams, and the most specific setting wins. Teams are kept by Keycloak group id, so renaming or moving a team keeps the choice. Kept in core (`communication_preferences`), edited in Account center or through the signed one-click link in each mail, which turns off only that mail's category on that Channel. Required Notifications (login codes, account security, tickets, certificates, Mail onayı) ignore it, and so does the Inbox: an Inbox item is written whatever the preference says. Account erasure deletes it.
+_Avoid_: Announcement preference (the old name, from before it carried a Channel); treating it as Contact consent; one club-wide switch only; storing it in Keycloak attributes or SkyMail; an opt-out link that silences every category or every Channel; letting the preference hide Inbox items
 
 **Team follow** (Ekip takibi):
 A Member's own choice to receive the News mail of a visible team they are not in. Off by default. A follower receives only items open to everyone or to all Members, never team-restricted items.
@@ -404,8 +404,36 @@ _Avoid_: EventType; an implicit total per Owner team; counting unpublished resul
 People assigned to one Competition. Staff manage it like organizers, except publishing results and assigning staff. A Judge (jüri üyesi) is assigned to a Competition, Stage or category, sees only what is assigned to them, cannot score their own Entrant, and does not see others' scores before publication.
 _Avoid_: making every Owner-team Member a manager; deriving judges from team membership
 
+**Notification** (Bildirim):
+One "what happened, to whom" request a service such as core sends to the communication service (SkyMail, ADR-0070): a Notification type, its recipients by Keycloak `sub`, the variables, and an `Idempotency-Key`. The sender says what and to whom; SkyMail picks the Channels, the time and the wording. For optional types the sender also passes the Channels each person allows, from their Communication preference.
+_Avoid_: the sender choosing the Channel; a Notification addressed by e-mail address when the person is known; using `/v1/mail_tasks/single` for new notifications
+
+**Notification type** (Bildirim türü):
+The stable key of a kind of Notification (`event.cancelled`), the widening of the Template key: its category, whether it is required (ignores the Communication preference), its default Channels, its lane (system mail never waits behind bulk sends), and one content variant per Channel. The e-mail variant is a Mail template; the Inbox, push and SMS variants are short plain-text templates.
+_Avoid_: a separate template per Channel with its own key; renaming a key in place
+
+**Channel** (Kanal):
+One way a Notification reaches a person: `email`, `inbox` (in-app), `push` or `sms`. Each has its own sender and error rules inside SkyMail. Web push and WhatsApp are not Channels.
+_Avoid_: medium; transport; treating the Inbox as a kind of push
+
+**Delivery** (Teslim):
+One send of one Notification to one person on one Channel; the widening of today's SkyMail queue row (`mail_queue`, which keeps its name and gains `channel` and `recipient_sub`). It carries the tries, the lease and the result.
+_Avoid_: one row for all Channels of a person; message (for the row)
+
+**Contact point** (İletişim adresi):
+Where a Channel reaches a person: the Primary e-mail for `email`, a Device registration for `push`, a phone the person verified with a code for `sms`. The Inbox needs none; the `sub` is enough. A person without a Contact point for a Channel is skipped on it and counted.
+_Avoid_: an admin-typed phone as an SMS address; an e-mail address other than the Primary e-mail
+
+**Device registration** (Cihaz kaydı):
+One app install's push token, kept in SkyMail and written by the app with the person's own token on every launch, removed at sign-out, when the push provider says it is gone, or after 270 days unseen. Account erasure deletes it.
+_Avoid_: keeping push tokens in core; a push topic instead of the person's devices
+
+**Inbox item** (Kutu öğesi):
+One entry in a person's in-app "Bildirimlerim", written by the `inbox` Channel from the Notification type's Inbox variant: a short title, a summary and an in-app link, not a copy of the ticket, certificate or News it points to. Seen, read and archived are kept on the server and shared by the person's devices. It is written whatever the Communication preference says, but only for types whose default Channels include `inbox`. Only its owner may read or mark it; others are told it does not exist. Kept 90 days, or less when its source ends earlier; Account erasure deletes it.
+_Avoid_: notification feed (for the stored row); copying the source record's body into the item; letting the preference drop an Inbox item; keeping Inbox items with no end date
+
 **Mail template**:
-A SkyMail message definition — a subject, an HTML body and a plain-text body — rendered for each recipient with the variables of that send. Archived, never deleted.
+A SkyMail message definition — a subject, an HTML body and a plain-text body — rendered for each recipient with the variables of that send. Archived, never deleted. It is the e-mail variant of the Notification type with the same key (ADR-0070).
 _Avoid_: "template" on its own where a Certificate template or a Skyforms draft template could be meant; e-mail theme; treating the React Email file as the template rather than one way of writing it
 
 **System template**:
@@ -413,7 +441,7 @@ A Mail template another service sends by its Template key: core's welcome and ce
 _Avoid_: locked template; read-only template; treating "system" as "not editable in SkyMail"
 
 **Template key**:
-The stable, readable handle a service addresses a Mail template by (`core.welcome`, `keycloak.verify-email`). A System template always has one; its UUID is never the contract.
+The stable, readable handle a service addresses a Mail template by (`core.welcome`, `keycloak.verify-email`). A System template always has one; its UUID is never the contract. The same key names the Notification type the template is the e-mail variant of.
 _Avoid_: a template id as the integration contract; renaming a key in place
 
 **Authoring mode**:
