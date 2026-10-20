@@ -54,4 +54,4 @@ Considered and not chosen: core writing the inscribed database directly through 
 
 ## Addendum: a broker exists again (2026-10-20)
 
-ADR-0071 brings RabbitMQ back for cross-service events, so the "None runs in production" premise of the rejected **message broker** option no longer holds. The decision stands: an erasure is a command that waits for every service's confirmation and carries the addresses only for the length of the call, so it stays an idempotent HTTP call from core. Events must not carry the addresses either (ADR-0071, decision 5).
+ADR-0071 brings RabbitMQ back for cross-service events, so the "None runs in production" premise of the rejected **message broker** option no longer holds once ADR-0071's broker runs in production. The decision stands: an erasure is a command that waits for every service's confirmation and carries the addresses only for the length of the call, so it stays an idempotent HTTP call from core. Events must not carry the addresses either (ADR-0071, decision 5).
