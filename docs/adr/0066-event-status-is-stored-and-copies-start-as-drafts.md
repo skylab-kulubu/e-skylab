@@ -138,3 +138,24 @@ Endüstri karşılaştırması:
 - **Uyan:** iptalde otomatik e-posta seçeneği (Luma gönderir; Bevy ve Eventbrite organizatöre bırakır; biz organizatöre seçtiriyoruz). Yayın durumundan ayrı başvuru kapanışı ve son başvuru tarihi (Eventbrite, Luma, Meetup). Kopyada neyin geleceğini seçme (Swapcard'ın seçmeli kopyası).
 - **Sapma 1:** iptal her zaman geri alınabilir. İptal hiçbir veriyi silmediği için geri dönüş tutarlıdır.
 - **Sapma 2:** kapalı başvuruya gelen form cevabı, form tarafında zaten kabul edildikten sonra reddedilir; gönderene gösterimi Forms'a bağlıdır. Sorular ayrı bir üründe (Skyforms) olduğu için.
+
+## Ek (2026-10-21): kapalı başvuruda Forms cevabı gönderilme anına göre ayrılır; 409 adımı düşer
+
+2026-10-19 ekinin karar 10'u kapalı başvuruya gelen her Forms cevabını reddediyordu. Forms tanırsa core'un 409 `registration_closed` yanıtına geçmesini de öneriyordu. İki sorun çıktı. Kapanıştan önce gönderilip kapanıştan sonra onaylanan cevabın bileti sessizce kayboluyordu. 409 adımı da Forms'un core'un yanıt kodunu bilmesi demekti, bu Fatih'in ilkesine (ADR-0071) aykırı. Ayrıca Fatih'e forms-backend#37'de karar 10'dan farklı bir şey söylenmişti ("kapanıştan sonra da bilet yazılır").
+
+Karar (Yusuf, 2026-10-21), karar 10'un Forms cevabıyla ilgili kısmının yerine:
+
+1. **409 `registration_closed` adımı düşer.** Forms core'a sormaz ve core'un yanıt kodunu tanımaz. Cevabı olay olarak yayımlar (`forms.response.created`, `forms.response.status_changed`; ADR-0071), karar core'undur. Geçiş dönemindeki HTTP raporunda core her durumda 2xx döner.
+2. **Kapalı başvuruya gelen Forms cevabı `submittedAt`'e göre ayrılır.** `submittedAt`, Forms'un cevabı ilk aldığı an (UTC, RFC 3339, sonu `Z`); onay anı değil.
+   - Cevap başvuru kapanmadan **önce** gönderilmişse bilet yazılır, onayı kapanıştan sonra gelse bile.
+   - Kapanıştan **sonra** gönderilmişse bilet yazılmaz. Cevap Forms'ta kalır; düzenleyen kişiyi panelden elle ekleyebilir (panelden ekleme kapalı başvuruda da açık).
+   - Kapanış anı: son tarih ile elle kapatma anından önce olanı. Başvuru yeniden açılıp kapandıysa son kapanış alınır. Arada kapalı kalmış bir aralıkta gönderilen cevap bu yüzden bilet alabilir; kabul.
+   - `submittedAt` yoksa ya da ayrıştırılamıyorsa bilet yazılır. Bugünkü HTTP raporu bu alanı taşımıyor; Fatih'e forms-backend#37'de böyle söylendi.
+3. Değişmeyenler: iptal edilen etkinliğe Forms cevabı bilet yazmaz (karar 2026-10-19). Başvuru kapalıyken kendi kendine kayıt reddedilir. Bitmiş etkinlik kuralına bu ek dokunmaz.
+
+Sonuçlar:
+
+- **core:** karar verirken başvurunun son kapanış anını bilmesi gerekir. Elle kapatmada kapatma anı saklanır.
+- **Forms:** değişiklik gerekmez. `submittedAt` olayın alanıdır (ADR-0071). forms-backend#37 kapanır.
+- **CONTEXT.md:** Registration closure, Forms cevabını gönderilme anına göre ayırır.
+- **Sapma 2 değişir:** kapanıştan sonra gönderilen form cevabı Forms'ta kabul edilmiş görünür ama bilet yazmaz. Gönderene gösterimi Forms'a bağlıdır. Kapanıştan önce gönderilen cevap artık reddedilmez.

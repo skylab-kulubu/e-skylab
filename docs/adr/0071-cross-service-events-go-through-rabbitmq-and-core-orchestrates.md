@@ -11,7 +11,7 @@ Bugün servisler arasında tek kalıp, OAuth client credentials'lı HTTP. Forms 
 
 RabbitMQ Java döneminde vardı (`super-skylab-rabbitmq`). Tek tüketicisi Java'nın kullanıcı eşitlemesiydi. Go core'a geçişte eşitleme JIT'e döndü (ADR-0008), broker cutover'da durduruldu. Keycloak imajında `keycloak-to-rabbitmq` sağlayıcısı (exchange `keycloak.events`) kaldı. ADR-0045 ve ADR-0051 broker'ı "production'da yok, tüketicisi yok" gerekçesiyle reddetti. Eski kurulumun sorunları: elle compose, yönetim arayüzü herkese açık bir alan adında, varsayılan parola git'te, olaylarda IP ve e-posta.
 
-Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratördür. Karar 9 orkestratörün, 2026-10-20. Karar 4 ve 5'teki iki seçim öneridir, bkz. Açık):
+Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratördür. Karar 9 orkestratörün, 2026-10-20. Karar 10–16 Yusuf'un, 2026-10-21: ilk sürümdeki açık sorular kapandı, her biri önerilen seçenekle):
 
 1. **Servisler arası olaylar RabbitMQ'dan geçer.** Olay "şu oldu" der ve cevap beklemez. Yayıncı tüketiciyi bilmez. Her yayıncının kendi topic exchange'i var (`forms.events`, `keycloak.events`; sonra `core.events`, `skymail.events`). Routing key olay türüdür (`forms.response.created`).
 2. **Komutlar HTTP kalır.** Sonucunu bekleyen istekler olay değildir: Erasure command (ADR-0051), posta ve bildirim gönderimi (ADR-0045, ADR-0070), Forms'ta Okuyucu kaldırma. core bunları çağırmaya devam eder.
@@ -19,9 +19,9 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
    - Kural alan servisleri içindir: Forms, SkyMail, inscribed. Bunlar core'un alan uçlarını, rollerini ve yanıt kodlarını bilmez.
    - core'un istemcileri kuralın dışındadır: ön yüzler ve BFF'ler (Account center, admin paneli, sky-app, siteler) ile etkinlik uygulamaları (Place, Guessr).
    - Ortak platform hizmetleri istisnadır: kullanıcı okuma, media, kısa link, hesap erişim kapısı.
-   - core'un sahip olduğu iki ortak kayıt açık istisnadır, bkz. Açık: Davet onayı yazımı (ADR-0062) ve kitle okuma (ADR-0067, ADR-0070).
+   - core'un sahip olduğu iki ortak kayıt istisnadır (karar 13 ve 14): Davet onayı yazımı (ADR-0062) ve kitle okuma (ADR-0067, ADR-0070).
 4. **Kurulum.**
-   - Her ortamda (production, sandbox) ayrı, tek düğüm RabbitMQ 4.x (öneri, bkz. Açık).
+   - Her ortamda (production, sandbox) ayrı, tek düğüm RabbitMQ 4.x (karar 10).
    - Dokploy uygulaması, digest'li imaj, kalıcı volume, bellek sınırı.
    - Ağ: ortama ait `sky-lab-<ortam>-events` (`internal`; rotator, topoloji ve izleme yan konteyneri için `attachable`), ADR-0061'in ağ tablosuna bir satır. Dışarı port ve Traefik rotası yok. Yönetim arayüzü yalnız SSH tüneliyle.
    - Kuyruklar tek düğümde de quorum: teslim sınırı ve at-least-once dead-letter için.
@@ -30,7 +30,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 5. **Zarf ve kişisel veri.**
    - Zarf CloudEvents 1.0, JSON yapılı mod (`application/cloudevents+json`): `specversion` (`1.0`), `id`, `source`, `type`, `time`, `datacontenttype`, `dataschema` (şema sürümü) ve `data`. Mesaj kalıcıdır (`delivery-mode 2`).
    - `id`, yayıncının giden kutusu satırının kimliğidir ve yeniden yayımda değişmez. Tüketicinin tekrar elemesi buna dayanır.
-   - Mesajda yalnız kimlikler (ör. Keycloak `sub`; takma adlı kişisel veridir) ve tüketicinin karar vermesi için gereken alanlar var. E-posta, ad, telefon, IP ve serbest metin yoktur. Gereken tüketici yayıncının API'sinden okur (misafirin iletişim bilgisi için öneri, bkz. Açık). Kuyruk ve DLQ kopyalarına silme isteği ulaşamaz.
+   - Mesajda yalnız kimlikler (ör. Keycloak `sub`; takma adlı kişisel veridir) ve tüketicinin karar vermesi için gereken alanlar var. E-posta, ad, telefon, IP ve serbest metin yoktur. Gereken tüketici yayıncının API'sinden okur (misafirin iletişim bilgisi için karar 11). Kuyruk ve DLQ kopyalarına silme isteği ulaşamaz.
    - **Gizli alan değerleri kısa koddur:** olaya yalnız `[A-Za-z0-9_-]{1,100}` biçimine uyan değer girer. Uymayan değer (e-posta, ad, boşluklu metin) olaya konmaz, cevapta kalır. Forms bunu biçim süzgeciyle ya da formda alan başına "olayda gider" işaretiyle uygular; hangisi olduğu Fatih'in seçimi, biçim kuralı ikisinde de geçerli.
    - Olay o anki durumu ve bir `version` taşır. Sıra garanti değildir.
 6. **Güvenilirlik.**
@@ -52,13 +52,24 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
    - Fork, IP'yi, `sessionId`'yi, `details`'i ve admin temsilini yayımlamayacak ve yalnız seçilen olay türlerini gönderecek şekilde değişir.
    - Realm dinleyicisini reconciler yönetir.
 9. **Servis içi iş kuyrukları Postgres'te kalır** (orkestratör, 2026-10-20). SkyMail'in `mail_queue`'su ve core'un işçileri RabbitMQ'ya taşınmaz. RabbitMQ yalnız servisler arası olay dağıtımı içindir.
+10. **Ortam başına ayrı örnek** (Yusuf, 2026-10-21). Production ve sandbox'ın kendi RabbitMQ'su var, tek örnekte iki vhost yok. ADR-0061'in ortam ayrımına uyar. RabbitMQ'nun bellek ve disk alarmı düğümün bütün yayıncılarını durdurduğu için bir ortam ötekini durdurmaz.
+11. **Misafirin adı ve e-postası olayda yok** (Yusuf, 2026-10-21). core misafir biletini yazarken bunları Forms'un tek cevap iç ucundan okur: ince olay, "claim check" kalıbı. Kişisel veri olay akışına, kuyruk ve DLQ kopyalarına girmez.
+12. **Eski `super-skylab-rabbitmq` hemen silinir** (Yusuf, 2026-10-21). Yeni sandbox beklenmez, kurulum temiz yapılır. Silme salt okur envanterden (kimlik ve volume adı) sonra, konteyner ve volume adıyla yapılır. Genel `prune` yok.
+13. **Davet onayı yazımı istisna kalır** (Yusuf, 2026-10-21). Forms, Place ve Guessr rızayı core'un kaydına `POST /v1/consents` ile eşzamanlı yazar (ADR-0062). core rıza merkezidir. Rızanın ispat yükü merkezde olduğu için yazım eşzamanlıdır. Rızadan doğan olayları gerekirse merkez yayımlar.
+14. **Kitle okuma istisna kalır** (Yusuf, 2026-10-21). SkyMail kitleyi ve kişi başına izinli kanalları gönderim anında core'dan okur (ADR-0067, ADR-0070). Kopya tutulmaz, liste her zaman günceldir.
+15. **ADR-0066 eki karar 10'daki 409 `registration_closed` adımı düşer** (Yusuf, 2026-10-21). Forms core'a sormaz ve core'un yanıt kodunu tanımaz. Cevap olayını yayımlar, karar core'undur.
+16. **Kapalı başvuruya gelen Forms cevabı `submittedAt`'e göre ayrılır** (Yusuf, 2026-10-21).
+    - Cevap kapanıştan **önce** gönderilmişse bilet yazılır, onayı kapanıştan sonra gelse bile.
+    - Kapanıştan **sonra** gönderilmişse bilet yazılmaz. Cevap Forms'ta kalır, düzenleyen kişiyi panelden elle ekleyebilir.
+    - `submittedAt` yoksa ya da ayrıştırılamıyorsa bilet yazılır. Bu durum geçiş dönemindeki HTTP raporu için; Fatih'e forms-backend#37'de böyle söylendi.
+    - Ayrıntı ADR-0066'nın 2026-10-21 ekinde.
 
 ## Consequences
 
 - **ADR-0051'in "message broker" reddinin dayanağı**, ADR-0071'in broker'ı production'da çalışmaya başlayınca geçerliliğini yitirir. Kararın kendisi değişmez: silme bir komuttur, her servisin onayını bekler, adresleri yalnız çağrı süresince taşır. Bu yüzden HTTP kalır. Aynısı ADR-0045'in RabbitMQ'lu posta reddi için geçerli: posta gönderimi bir komut olarak SkyMail'e HTTP ile gider.
 - **ADR-0008:** Keycloak olayı kimlik verisi taşımaz. Yalnız core-backend #270'in periyodik turunu uyandırır, veri yine Keycloak'tan okunur. Kimlik eşitlemesi RabbitMQ'ya dayanmaz.
 - **ADR-0069:** Forms'un cevap bildirimi (davet kodu dahil) ve "form kapandı" haberi olayla gelir: `forms.response.created` (gizli alanlar) ve `forms.form.updated`.
-- **ADR-0066 eki karar 10:** "Forms kalıcı reddi tanırsa 409 `registration_closed`" adımı karar 3 ile çelişiyor. Kapalı başvuruya gelen Forms cevabının bilet yazıp yazmayacağı da main ile forms-backend#37'deki yorum arasında tutarsız. İkisi de açık, bkz. Açık.
+- **ADR-0066 eki karar 10** karar 15 ve 16 ile değişir: 409 adımı düşer, kapalı başvuruya gelen cevap `submittedAt`'e göre ayrılır. ADR-0066'ya 2026-10-21 eki yazıldı, CONTEXT Registration closure buna göre düzeltildi.
 - **ADR-0070 (#51):** "Broker yoktur" cümlesi bu ADR'la yanlış olur. Doğrusu: bildirim isteği bir komuttur, `Idempotency-Key`'li HTTP ile gider; broker yalnız olaylar içindir. #51 önce birleşirse bu ADR'a ek yazılır, sonra birleşirse cümle #51'de düzeltilir.
 - **Forms:**
   - Cevap bildirimi giden kutusu genelleşir ve RabbitMQ'ya yayımlar: `forms.response.created`, `forms.response.status_changed`, `forms.form.updated`.
@@ -73,26 +84,14 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
   - Ortam başına kurulum wizard'ı ve topoloji dosyası.
   - Rotatorda `rabbitmq` sınıfı.
   - İzleme zamanlayıcısı: DLQ ve `unrouted` > 0, kuyruk derinliği ya da yaşı, tüketicisiz kuyruk, kaynak alarmı. Uyarılar rotatorun uyarı yolundan gider.
-  - Eski `super-skylab-rabbitmq` yeniden kullanılmaz (silme zamanı için bkz. Açık).
+  - Eski `super-skylab-rabbitmq` yeniden kullanılmaz, salt okur envanterden sonra adıyla silinir (karar 12).
 - **Keycloak:** sağlayıcı süzgeci. `KK_TO_RMQ_*` ortam referansları. `eventsListeners` reconciler'a girer, bugünkü "dinleyiciler elle kalır" testi değişir.
 - **Forms issue'ları:**
   - #38'in "form kapanınca haber" maddesi `forms.form.updated`'e, davet kodu gizli alana döner.
   - #36 HTTP komutu olarak kalır ama YK'yı bilmeyen bir adla.
   - forms-frontend#34, `purpose=feedback` yerine panelden Skyforms'a form açılışındaki Forms'un kendi seçeneklerini kullanır.
-  - #37'nin kapanışı Açık'taki iki soruya bağlı.
+  - #37 kapanır: Forms core'un yanıt kodlarına bakmaz, 409 önerisi geri çekilir, Forms'ta değişiklik gerekmez (karar 15).
 - **Yeni durumlu servis.** Volume kaybında topoloji dosyadan, kullanıcılar OpenBao'dan yeniden kurulur. Aradaki olayları giden kutuları ve günlük çekme kapatır.
-
-## Açık
-
-Yusuf'a sorulacak; cevap gelene kadar önerisi olanlarda öneri uygulanır, önerisi olmayanlar karar bekler. Kapanınca bu ADR'a ek yazılır.
-
-- **Ortam başına örnek:** öneri, production ve sandbox için iki ayrı örnek. ADR-0061'in ortam ayrımına uyar ve RabbitMQ'nun bellek/disk alarmı düğümün bütün yayıncılarını durdurduğu için bir ortam ötekini durdurmaz. Seçenek: tek örnek, iki vhost (yaklaşık 200 MiB daha az bellek).
-- **Misafirin adı ve e-postası:** öneri, olayda yok. core misafir biletini yazarken Forms'un tek cevap iç ucundan okur. Seçenek: `forms.response.created` misafirin iletişim bilgisini taşır (Fatih'e bir uç daha az, ama adres 14 güne kadar DLQ kopyasında kalır ve karar 5'e istisna gerekir).
-- **Eski `super-skylab-rabbitmq` konteyneri ve volume'u (duruyorsa):** öneri, yeni sandbox kurulumu çalışınca adıyla silinir. İçinde IP'li eski Keycloak olayları ve git'teki parolayla açılan bir yönetici var. Seçenek: production kurulumuna kadar tutulur.
-- **Davet onayı yazımı (ADR-0062):** Forms, Place ve Guessr core'un rıza kaydına yazıyor (`POST /v1/consents`). Ortak kayıt istisnası olarak mı kalır, yoksa olaya mı döner? Fatih'e de sorulur. Karar yok.
-- **Kitle okuma (ADR-0067, ADR-0070):** SkyMail kitleyi ve kişi başına izinli kanalları core'un servis hesabına açık ucundan okuyor. Ortak kayıt istisnası olarak mı kalır? Karar yok.
-- **409 `registration_closed` adımı (ADR-0066 eki karar 10):** core'un Forms tanıyınca kalıcı ret yanıtına geçmesi Forms'un core'un yanıt kodunu bilmesi demek. Olay modelinde bu adım düşer mi? Karar yok.
-- **Kapalı başvuruya gelen Forms cevabı bilet yazar mı:** ADR-0066 eki karar 10 ve CONTEXT Registration closure "reddedilir, bilet yazılmaz" diyor. Yusuf'un forms-backend#37'deki 2026-10-20 yorumu ise "kapanıştan sonra da bilet yazacak; ileride `submittedAt` ile yalnız kapanıştan sonra gönderilenler reddedilir" diyor. Hangisi geçerli? Karar yok. Cevaba göre ADR-0066'ya ek ve CONTEXT Registration closure düzeltilir.
 
 ## Endüstri uygulamasıyla karşılaştırma
 
@@ -104,6 +103,9 @@ Yusuf'a sorulacak; cevap gelene kadar önerisi olanlarda öneri uygulanır, öne
 - Transactional outbox ve idempotent consumer kalıpları (microservices.io).
 - Microsoft'un .NET mikroservis rehberindeki ayrım: integration event yayımlanır ve cevap beklemez, sonucu beklenen istek ayrı tutulur.
 - Entra'nın kullanıcı eşitlemesi periyodiktir, olay onu hızlandırır (core-backend #270 aynı modeli izler).
+- İnce olay ve "claim check": kişisel veri olayda değil, tüketici kaynaktan okur (karar 11).
+- Rıza merkezi: rıza merkeze eşzamanlı yazılır, çünkü ispat yükü merkezdedir; olayları merkez yayımlar (karar 13).
+- Microsoft Customer Insights Journeys: kitle gönderim anında okunur, kopya tutulmaz (karar 14).
 - Azure Service Bus topic ve subscription, `MaxDeliveryCount` ve dead-letter alt kuyruğu bizim exchange, kuyruk, `delivery-limit` ve DLQ'muzla aynı kalıp. Event Grid CloudEvents 1.0'ı doğrudan kullanır.
 
 **Sapmalar (hepsi):**
@@ -119,6 +121,7 @@ Yusuf'a sorulacak; cevap gelene kadar önerisi olanlarda öneri uygulanır, öne
 10. **Komutlar broker'dan geçmez.** Microsoft rehberi zamansal bağımlılığı azaltmak için asenkron komut mesajlarını da önerir. Bizde komutun sonucu bekleniyor, silme komutundaki adres kalıcı bir kopyaya (kuyruk, DLQ) yazılmamalı (ADR-0051).
 11. **Şema kaydı ve AsyncAPI kataloğu yok.** Sözleşme bu ADR'da, SPEC'te ve kodda. Makinece okunur katalog sonraki adım.
 12. **Tek broker örneği tek arıza noktası.** Kesintide yayın giden kutusunda bekler, tüketiciler yeniden bağlanır, Keycloak olayları kaybolur ve eşitleme turu yakalar.
+13. **İki alan servisi çağrısı core'a gider** (karar 13 ve 14): Forms'un rıza yazımı ve SkyMail'in kitle okuması. Saf olay mimarisinde ikisi de olayla yapılırdı (rıza olayı, kitlenin olayla beslenen kopyası). Rızada ispat yükü, kitlede güncellik için eşzamanlı çağrı seçildi.
 
 ## Considered Options
 
@@ -130,3 +133,8 @@ Yusuf'a sorulacak; cevap gelene kadar önerisi olanlarda öneri uygulanır, öne
 - **SkyMail'in iş kuyruğunu da RabbitMQ'ya taşımak:** kira, bütçe, alıcı durumu ve rapor SQL'de ve aynı işlemde. Servis içi iş kuyruğu için yerleşik kalıp Postgres kuyruklarıdır (River, Oban, GoodJob; `SKIP LOCKED`).
 - **Kafka ya da NATS JetStream:** tek sunucuda daha ağır ya da ekipte deneyimi yok. Keycloak sağlayıcısı RabbitMQ için hazır.
 - **MassTransit'i platform standardı yapmak:** v9 ticari lisanslı. Kütüphane seçimi servis sahibine bırakıldı.
+- **Misafirin iletişim bilgisini olayda taşımak:** Fatih'e bir uç daha az. Ama adres 14 güne kadar DLQ kopyasında kalır ve silme isteği oraya ulaşamaz.
+- **Eski konteyneri sandbox kurulana kadar tutmak:** geri dönülecek bir şey yok, içinde IP'li eski olaylar ve git'teki parolayla açılan bir yönetici var.
+- **Rızayı ve kitleyi olaya çevirmek:** rıza olayının kaybı ya da gecikmesi ispatı zayıflatır. Kitlenin SkyMail'de kopyası tercihi ve ekip ağacını iki yerde tutar.
+- **Kapalı başvuruda her Forms cevabını reddetmek (ADR-0066 eki karar 10'un ilk hâli):** kapanıştan önce gönderilip sonra onaylanan cevabın bileti sessizce kaybolurdu.
+- **Kapalı başvuruda her Forms cevabına bilet yazmak:** kapanış Forms'tan gelenler için anlamını yitirirdi.
