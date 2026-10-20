@@ -127,8 +127,8 @@ An Event's applying closed by hand or by a deadline, separately from Event statu
 _Avoid_: using Event status or `active` to close applying; treating a closed Event as unpublished
 
 **Event copy**:
-A new Draft Event made from another Event in one transaction (ADR-0066). Structure comes over: details, cover, capacity, Attendance rule, an Event-scoped certificate template binding when the caller may bind it, EventDays and Oturum rows, with all dates shifted by the gap between the chosen new start and the source start. People and history never come over: Tickets, Check-ins, Certificates, competitors, mail lists, gallery and files. Door staff come only when the caller may assign them and asks. Competitions and their Stages come only when asked, as Drafts, without Entrants, submissions, adjustments or results. The copy may go to another Owner team the caller may create Events in, when the caller may also edit the source Event. Form slots start empty, because a Form has one current Short link and its responses write Tickets to every Event that names it; a new Form is made from the old one in Skyforms instead.
-_Avoid_: copying a Form slot onto the copy; copying Tickets or Check-ins; publishing a copy directly; copying into another team on read rights alone
+A new Draft Event made from another Event in one transaction (ADR-0066). Structure comes over: details, cover, capacity, Attendance rule, an Event-scoped certificate template binding when the caller may bind it, EventDays and Oturum rows, with all dates shifted by the gap between the chosen new start and the source start. People and history never come over: Tickets, Check-ins, Certificates, competitors, mail lists, gallery and files. Door staff come only when the caller may assign them and asks. Competitions and their Stages come only when asked, as Drafts, without Entrants, submissions, adjustments or results. The copy may go to another Owner team the caller may create Events in, when the caller may also edit the source Event. Form slots start empty, because a Form has one current Short link and its responses write Tickets to every Event that names it; a new Form is made from the old one in Skyforms instead. The same goes for Feedback forms; the Feedback mode comes over (ADR-0069).
+_Avoid_: copying a Form slot or a Feedback form onto the copy; copying Tickets or Check-ins; publishing a copy directly; copying into another team on read rights alone
 
 **Event QR**:
 A shared event **poster** QR the **attendee** scans to join (`dahil olmak`). If they have no Ticket, that scan is Walk-in. Staff does **not** scan the poster; it has no person id and is not a door credential. Oturum QR is the same family (attendee scans a shared code) but marks Check-in for that talk, not join.
@@ -321,8 +321,20 @@ A person's door identity for one Event. Member apply writes a REGISTERED Ticket;
 _Avoid_: treating a skyforms response as the door identity; treating Ticket as the Event poster QR; treating Ticket as only an email row
 
 **Form slot**:
-A named form attachment on an Event (apply, contest, …). One Event may have several. A slot is an external URL or a Skyforms Event form; the public attach handle is a Short link (`formUrl` on the Event).
-_Avoid_: a single unnamed formUrl as the only product model forever; Typeform as a slot; parsing a Form id out of the URL string; dumping a logged-in User onto this link
+A named form attachment on an Event (apply, contest, …). One Event may have several. A slot is an external URL or a Skyforms Event form; the public attach handle is a Short link (`formUrl` on the Event). An accepted response to a slot's Form writes a Ticket to every Event that names it. A Feedback form is not a Form slot and writes no Ticket (ADR-0069).
+_Avoid_: a single unnamed formUrl as the only product model forever; Typeform as a slot; parsing a Form id out of the URL string; dumping a logged-in User onto this link; attaching a feedback form as an extra slot
+
+**Feedback form** (Geri bildirim formu):
+A Form bound to an Event, or optionally to one Oturum, to ask attendees what they thought (ADR-0069). It is its own field, not a Form slot: its responses write no Ticket, and core answers Forms with 2xx either way. One Form sits in one place only: an Event's apply or extra slot, an Event's Feedback form, or an Oturum's Feedback form; anything else is 409. The Event manages its Form link like an apply Form's. It is mailed to the Ticket holders with a Check-in (guests included): the Event's to those with a Check-in on any of its Oturum, an Oturum's to those with a Check-in on it, 2 hours after the target ends unless the organizer turns that off or sends now. Anyone with the link may answer; answers stay tied to the person. An Event copy does not copy it; a new Form is made from the old one instead.
+_Avoid_: a feedback form writing Tickets; mailing it to every Ticket holder rather than the checked-in; calling feedback anonymous; copying a Feedback form onto an Event copy
+
+**Feedback mode** (Geri bildirim kipi):
+How an Event asks about its Oturum (ADR-0069): `event` (default; one Event Feedback form), `per_session` (each Oturum may have its own Feedback form, mailed to its checked-in attendees; the Event's stays optional) or `event_with_sessions` (one Event Feedback form that asks about each Oturum inside it, built in Forms). Outside `per_session` the Oturum forms are kept but not mailed. A person gets at most one feedback mail a day, listing that EventDay's forms. An Event copy copies the mode, not the forms.
+_Avoid_: a mail per Oturum; storing in core how the Form asks about the Oturum; deleting Oturum forms when the mode changes
+
+**Feedback invite** (Geri bildirim daveti):
+The row core keeps for each Ticket and target (Event or Oturum) it mailed a Feedback form to, with a random personal code (ADR-0069). The mail links straight to the Form with the code, never through a Short link. A Forms response marks the invite answered by its code, else by the logged-in User; a guest is matched by the code only. Unanswered invites get one reminder 3 days later with the same link; closing the Form, cancelling the target or removing the form cancels it for good. The row goes 90 days after the first mail, leaving counts.
+_Avoid_: a personal code in a Short link; hashing the code so the reminder cannot resend it; a second reminder; reminding after the Form closed
 
 **Event form**:
 A skyforms Form bound to an Event. Creating one bounces the operator into skyforms (Gecekodu draft as a Group extra, when it exists) and returns to the same Event page. Forms stay skyforms; this is not a second forms product.
