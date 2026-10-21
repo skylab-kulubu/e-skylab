@@ -23,7 +23,7 @@ Yusuf'un kararı (2026-10-21): abonelikten çıkış "sektörde tam olarak nası
   - SES'in hesap düzeyindeki listesi yalnız kalıcı ret ve şikâyet tutar. Çıkışlar SES'te contact list'te, konu başınadır.
   - Hesabı olmayan adresin çıkışını ESP'nin barındırdığı tek tık uç kaydeder.
 
-Karar (karar 1–9). İlke ve S1–S3 cevapları Yusuf'undur (2026-10-21); öteki ayrıntılar bu kaydın ve orkestratörün kararıdır. **Karar 10 bir öneridir, Yusuf'un onayını bekler** (aşağıda):
+Karar (2026-10-21). İlke, S1–S3 cevapları ve karar 10 Yusuf'undur; öteki ayrıntılar bu kaydın ve orkestratörün kararıdır:
 
 1. **İki katman, iki kayıt, iki anlam.**
    - Kimliği olan kişinin tercihi core'dadır. ADR-0067 ve ADR-0070 değişmez.
@@ -32,7 +32,7 @@ Karar (karar 1–9). İlke ve S1–S3 cevapları Yusuf'undur (2026-10-21); ötek
    - ADR-0067'nin reddettiği "tercihi SkyMail'de tutmak" seçeneği aynen reddedilmiş kalır.
 2. **Her posta bir gönderim akışındadır; akışı gönderimin amacı belirler.** Akışı kuyruk önceliği belirlemez.
    - **`islem` akışı:** `hesap@` ve `bilgi@` kutuları. Giriş kodu, doğrulama, Mail onayı, sertifika, bilet ve Forms'un yanıtla tetiklenen postaları bu akıştadır. Tercihe ve çıkış kaydına bakmaz, çıkış başlığı taşımaz, takip edilmez. Kalıcı ret bastırması bugünkü gibi uygulanır, hesap postası muafiyetiyle.
-   - **`duyuru` akışı:** `duyuru@` kutusu. Her posta bir **kategori** taşır: core'un kategorilerinden biri, yani kulüp geneli ya da bir ekip, duyuru ya da haber. Posta tercihe ve çıkış kaydına uyar. RFC 8058 tek tık başlıklarını ve gövdede görünür bir çıkış bağlantısı taşır.
+   - **`duyuru` akışı:** duyuru kutusu, `skylab@duyuru.yildizskylab.com` (karar 10). Her posta bir **kategori** taşır: core'un kategorilerinden biri, yani kulüp geneli ya da bir ekip, duyuru ya da haber. Posta tercihe ve çıkış kaydına uyar. RFC 8058 tek tık başlıklarını ve gövdede görünür bir çıkış bağlantısı taşır.
    - **Ticari akış yoktur** (karar 9).
    - **Operatör postasının amacı:**
      - Liste ve Keycloak grubu gönderimi her zaman duyurudur.
@@ -96,15 +96,17 @@ Karar (karar 1–9). İlke ve S1–S3 cevapları Yusuf'undur (2026-10-21); ötek
    - Duyuru postası Member'a meşru menfaatle gider (ADR-0062). KVKK md. 11'de GDPR'ın doğrudan pazarlamaya itirazı gibi genel bir itiraz hakkı yoktur. Tek tık çıkış meşru menfaat dengesinin önlemidir.
    - Çıkış kaydının amacı adrese yeniden göndermemektir (md. 5/2-f). Kayıt şu durumlardan biri olana kadar tutulur: kişi yeniden abone olur, panel kişinin isteğiyle kaydı geri alır, ya da hesap silinir.
    - Hesap silme kişinin adreslerindeki kayıtları da siler. ADR-0051 karar 4 silmeden sonrası için daraltılmış haliyle geçerlidir (ADR-0051 eki).
-10. **Öneri, Yusuf'un onayını bekliyor: duyuru akışı ayrı bir alt alan adından çıkar** (DKIM alanı ayrımı).
-    - **Bu öneri Yusuf'un kararını tersine çevirir.** Yusuf 2026-10-20'de "tek alt alan `bildirim.yildizskylab.com`, `duyuru.` yok" kararını vermişti (hub SPEC skymail-bounce-isleme §0, "Kesin gönderen düzeni").
-    - Öneriyi getiren, inceleme ve orkestratördür (2026-10-21), gerekçe "sektörün birebir aynısı" ölçütüdür. Yusuf onaylamadıkça 2026-10-20 kararı geçerlidir, ve bu madde sapma 6'ya "DKIM alanı da ayrılmıyor" diye eklenir.
-    - Postmark her gönderim akışı için ayrı bir alt alan önerir; Yahoo toplu postayı IP'yle ya da DKIM alanıyla ayırmayı önerir.
-    - IP ayrımı Exchange Online'da yapılamaz (Microsoft'un ortak havuzu), DKIM alanı ayrımı yapılabilir.
-    - `islem` akışı `bildirim.yildizskylab.com`'da kalır. `duyuru` kutusu kendi alt alanına taşınır: kendi MX, SPF ve DKIM kaydı olur; DMARC ana alandan devralınır.
-    - Ad ve iş ayrı bir bilette yazılır.
-    - Yeni alt alanın itibarı sıfırdan başlar, bu yüzden ısınma planı onunla yeniden başlar.
-    - Onaylanırsa duyuru akışının production'da açılması bu taşımayı bekler.
+10. **Duyuru akışı kendi alt alan adından çıkar: `duyuru.yildizskylab.com`** (Yusuf, 2026-10-21).
+    - **Önceki kararın yerine geçer.** Yusuf'un 2026-10-20 tarihli "tek alt alan `bildirim.yildizskylab.com`, `duyuru.` yok" kararı (hub SPEC skymail-bounce-isleme §0, "Kesin gönderen düzeni") bu kararla değişir.
+    - **Kutu.** Yeni kutu açılmaz. Var olan duyuru kutusunun (`duyuru@bildirim.yildizskylab.com`) birincil adresi `skylab@duyuru.yildizskylab.com` olur, eski adres takma ad olarak kalır. Gönderen adı "SKY LAB Duyurular" değişmez.
+    - **İşlem akışı.** `hesap@` ve `bilgi@` `bildirim.`'de kalır.
+    - **Gerekçe (Yusuf).** İtibar alan adı başına tutulur; toplu postaya gelen şikâyet giriş kodlarının itibarına geçmemeli. `bildirim.` henüz bir günlük olduğu için taşımanın en ucuz zamanı şimdi.
+    - **Sektör.** Postmark her gönderim akışı için ayrı bir alt alan önerir ve alt alanların kendi itibarını kurduğunu yazar. Yahoo toplu postayı IP'yle ya da DKIM alanıyla ayırmayı önerir.
+    - **IP ayrımı** Exchange Online'da yapılamaz (Microsoft'un ortak havuzu, sapma 6); DKIM alanı ayrımı yapılır.
+    - **Ad.** `haber.` adı reddedildi: Yusuf'a göre her duyuru bir haber değildir.
+    - **DNS.** Alt alanın kendi MX, SPF ve DKIM kaydı olur; DMARC ana alandan devralınır.
+    - **Isınma.** Yeni alt alanın itibarı sıfırdan başlar, bu yüzden ısınma planı onunla yeniden başlar.
+    - **Açılış.** Duyuru akışının production'da açılması bu taşımayı bekler.
 
 Nasıl:
 
@@ -144,7 +146,7 @@ Nasıl:
   - Künyede "Abonelikten çık".
 - **Keycloak.** `skymail` istemcisine yeni rol: `skymail:unsubscribes:reactivate`, bir gruba verilir. Henüz kodlanmamış `skymail:suppressions:manage` ile aynı reconcile değişikliğinde girer.
 - **Ops.**
-  - Karar 10 onaylanırsa duyuru alt alanı: DNS, Exchange'de kabul edilen alan adı, kutu adresi, gönderen adı.
+  - Duyuru alt alanı (karar 10): DNS, M365'te kabul edilen alan adı, duyuru kutusunun adres değişikliği, Dokploy'da `SKYMAIL_FROM_DUYURU`, ısınma.
   - SkyMail çıkış anahtarı OpenBao'ya bir wizard ile girer; wizard yeni anahtar sürümü de ekler. Dokploy'da yalnız referans tutulur.
   - Kenarın erişim logu `/api/skymail/u/` yolunu tutmamalıdır.
 - **Metinler.** KVKK Aydınlatma Metni'ne "abonelikten çıkış kaydı" girer: amacı, dayanağı ve süresi. Duyuru akışının production'da açılması bu metnin yayımlanmasını bekler.
@@ -162,7 +164,6 @@ Nasıl:
 ## Açık
 
 - **DKIM kapsamı** (skymail-bounce-isleme 11, S2). Exchange Online, MIME `sendMail`'deki iki başlığı DKIM imzasının `h=` listesine alıyor mu? Belgelerde yazmıyor; ilk başlıklı postada okunacak. Almıyorsa Gmail tek tık düğmesini göstermeyebilir; o zaman ayrı bir gönderen ya da relay kararı gerekir.
-- **Duyuru alt alanı** (karar 10). Önce kararın kendisi Yusuf'ta: 2026-10-20'deki "tek alt alan" kararını değiştiriyor. Onaylanırsa ad da Yusuf'ta; öneri ve gerekçesi biletinde.
 - **Kimliği olmayan adresin silme başvurusu.** Böyle bir kişi bilgi@'ya KVKK md. 11/e başvurusu yaparsa yol, karar 7'deki yetkili geri almadır; gerekçeye "silme başvurusu" yazılır. Ama kayıt silinince çıkış da kalkar. Adresin listelerden de silinmesi ve yeniden eklenmemesi elle yapılır. Bu, ADR-0051'in kabul ettiği sınırın aynısıdır.
 - **Şikâyet geri bildirimi.** Yahoo CFL kulübün DKIM alanıyla kurulabilir mi? Ayrı bir takip bileti açıldı.
 
@@ -219,7 +220,7 @@ Nasıl:
     - HubSpot ve Mailchimp gönderene izin vermez, kişi kendisi geri döner.
     - Karar 7.
 13. **Kalıcı ret bütün akışlarda bastırır.** SES'in hesap düzeyindeki suppression list'i (`BOUNCE`) böyle çalışır. Bu kural mevcuttur, bu kayıtla değişmez.
-14. **Duyuru akışı ayrı alt alan adından çıkar (öneri, onay bekliyor).** Postmark akış başına alt alan önerir; Yahoo DKIM alanıyla ayırmayı önerir. Karar 10.
+14. **Duyuru akışı ayrı alt alan adından çıkar.** Postmark akış başına alt alan önerir; Yahoo DKIM alanıyla ayırmayı önerir. Karar 10.
 15. **Bağlantı uzun ömürlüdür.**
     - RFC 8058 bir süre koymaz.
     - CAN-SPAM bağlantının gönderimden sonra en az 30 gün çalışmasını ister.
@@ -250,7 +251,7 @@ Nasıl:
    - Postmark toplu postayı "aynı içerik birçok alıcıya, alıcının bir eylemiyle tetiklenmeden" diye tanımlar ve işlem trafiğini ayırmayı önerir. Bu tanıma göre operatörün Forms yanıtlayanlarına yazdığı posta toplu postadır.
    - Neden (Yusuf, 2026-10-21): başvurunun kendisi hakkındaki operatör postası (yer değişikliği, sonuç) alıcı açısından işlem postasıdır. Google da postanın türüne alıcının karar verdiğini söylüyor. İstisna dar ve beyana bağlı; liste ve grup bu yoldan gidemez.
 5. **(b) Bağlantı süresizdir.** Dynamics çıkış bağlantılarını altı ayda geçersiz kılıyor. Postmark, SendGrid, SES, HubSpot ve Mailchimp bir süre belgelemiyor; core'un bağlantısı da süresiz.
-6. **(a) Akışlar IP'yle ayrılmıyor.** Google, birden çok IP kullanılıyorsa her tür için ayrı IP önerir; Yahoo IP'yle ya da DKIM alanıyla ayırmayı önerir. Exchange Online'ın IP'leri Microsoft'un ortak havuzudur. DKIM alanı ayrımı öneridir (karar 10); onaylanmazsa bu sapma DKIM alanını da kapsar.
+6. **(a) Akışlar IP'yle ayrılmıyor.** Google, birden çok IP kullanılıyorsa her tür için ayrı IP önerir; Yahoo IP'yle ya da DKIM alanıyla ayırmayı önerir. Exchange Online'ın IP'leri Microsoft'un ortak havuzudur. DKIM alanı ayrılır (karar 10), yani Yahoo'nun önerisinin DKIM yarısı uygulanır.
 7. **(a) Toplu posta Exchange Online'dan çıkıyor.**
    - **Microsoft ne diyor** (Exchange Online sınırları):
      - İleti hızı sınırının dipnotu genel ve "ticari" ile sınırlı değil: "Exchange Online isn't suited to accommodate bulk-mailing scenarios".
@@ -289,7 +290,9 @@ Nasıl:
 - **core hükmünü 48 saate kadar kullanmak** (ilk taslak) ya da **5 dakikalık bir eşikle yeniden sormak** (ikinci taslak). 48 saat dış sınırdır, hedef değildir. İncelenen her sağlayıcı gönderim anında uyguluyor. Tur başına tek toplu istek zaten ucuz olduğu için eşik gerekmiyor. İkisi de ADR-0071 karar 14'ün "liste her zaman günceldir" kuralıyla gerilimdeydi.
 - **Çıkış kaydını `mail_suppressions`'a sütun olarak eklemek.** Eski imaj nedene bakmadan bütün satırları okur. İmaj geri alınırsa çıkmış adrese Forms onayı da dahil bütün postalar dururdu.
 - **Anahtarı hiç döndürmemek.** Bir sızıntıda ya bütün eski bağlantılar bozulurdu (Google'ın kuralı, CAN-SPAM'in 30 günü) ya da anahtar sızık kalırdı.
-- **Duyuruyu `bildirim.`'de bırakıp ayrımı bir tetiğe bağlamak** (giriş kodları spama düşerse). Bu, Yusuf'un 2026-10-20 kararıdır ve karar 10 onaylanmazsa geçerli kalır. Önerinin gerekçesi şu: tetik zararı ancak oluştuktan sonra ölçer, ayrım ise düşük maliyetli (bir kabul edilen alan adı ve DNS kayıtları).
+- **Duyuruyu `bildirim.`'de bırakıp ayrımı bir tetiğe bağlamak** (giriş kodları spama düşerse). Bu, Yusuf'un 2026-10-20 kararıydı; 2026-10-21'de karar 10 ile değişti. Tetik zararı ancak oluştuktan sonra ölçer; ayrım ise düşük maliyetli ve `bildirim.` henüz bir günlük.
+- **Alt alan adı olarak `haber.`.** Reddedildi: her duyuru bir haber değil (Yusuf, 2026-10-21).
+- **Duyuru için yeni bir kutu açmak.** Gerekmez. Exchange'de bir kutunun birden çok adresi olur (proxy addresses): birincil adres değişir, eski adres ikincil kalır. Eski adrese gelen yanıtlar ve NDR'ler aynı kutuya düşer; uygulama yetkisi (etikete bağlı kapsam) ve posta akışı kuralı kutuyla birlikte kalır.
 - **Başlığı yalnız core bağlantısı olan postaya koymak** (skymail-backend #93'ün bugünkü sınırı). Operatör postaları çıkışsız kalırdı; bu Gmail ve Yahoo'nun toplu gönderici kuralına uymaz.
 - **core yanıt vermezse yine göndermek** (fail open). Bu, onurlandırılmamış bir çıkış olurdu. Takipte (core `tracking:resolve`) core yanıt vermezse kimse takip edilmez ve posta yine gider; orada güvenli yön budur. Çıkışta güvenli yön göndermemektir.
 - **Varsayılanı da engel saymak** (Dynamics'in restrictive modeli). Listeye konan ve üyesi olmadığı ekibin kategorisindeki herkes atlanırdı; operatörün seçtiği kitle sessizce boşalırdı.
