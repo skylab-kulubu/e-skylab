@@ -60,4 +60,4 @@ ADR-0071 brings RabbitMQ back for cross-service events, so the "None runs in pro
 
 SkyMail now keeps address-level records while an account exists. One is a permanent failure (bounce), on every stream. The other is the unsubscribe of an address core does not know, on the broadcast stream only (ADR-0072). Neither is a Communication preference, which stays in core.
 
-Decision 4 stands as written, because it is about what survives an erasure. The erase command's addresses remove every such record in SkyMail's erase step, so nothing derived from the address survives, and a manual mailing list can take the address again. The rejected **suppression hash** stays rejected.
+Decision 4 is narrowed. It no longer says that SkyMail keeps no suppression list. It says only that no such list survives an erasure: the erase command's addresses remove every one of these records in SkyMail's erase step, so nothing derived from the address survives, and a manual mailing list can take the address again. The rejected **suppression hash** stays rejected.
