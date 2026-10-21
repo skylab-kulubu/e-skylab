@@ -23,7 +23,7 @@ Yusuf'un kararı (2026-10-21): abonelikten çıkış "sektörde tam olarak nası
   - SES'in hesap düzeyindeki listesi yalnız kalıcı ret ve şikâyet tutar. Çıkışlar SES'te contact list'te, konu başınadır.
   - Hesabı olmayan adresin çıkışını ESP'nin barındırdığı tek tık uç kaydeder.
 
-Karar (Yusuf, 2026-10-21; ilke, ve "Açık"ta duran soruların cevapları aynı gün):
+Karar (karar 1–9). İlke ve S1–S3 cevapları Yusuf'undur (2026-10-21); öteki ayrıntılar bu kaydın ve orkestratörün kararıdır. **Karar 10 bir öneridir, Yusuf'un onayını bekler** (aşağıda):
 
 1. **İki katman, iki kayıt, iki anlam.**
    - Kimliği olan kişinin tercihi core'dadır. ADR-0067 ve ADR-0070 değişmez.
@@ -41,9 +41,12 @@ Karar (Yusuf, 2026-10-21; ilke, ve "Açık"ta duran soruların cevapları aynı 
      - Kategoriyi gönderen seçer. Keycloak grubu bir ekipse o ekibin kategorisi önerilir.
 3. **Kimliği olan alıcıya core gönderim anında karar verir.**
    - **Kontrol noktası.** Duyuru akışına giren her alıcı, kuyruğa yazılmadan önce core'a sorulur. Kontrol noktası SkyMail'in kuyruğa alma katmanıdır, yani alıcı hangi ekrandan gelirse gelsin aynı yerden geçer.
-   - **Göndermeden önce yeniden sorulur.** Dağıtıcı, hükmü 5 dakikadan eski satırları göndermeden önce core'a toplu olarak yeniden sorar. core yanıt vermezse satır bekler, gönderilmez. Hiçbir satır 48 saatten eski bir hükümle gitmez.
-     - 48 saat bir üst sınırdır: Google'ın önerisi ve Yahoo'nun şartı.
-     - 5 dakikanın gerekçesi: Dynamics her postayı göndermeden hemen önce denetler. Biz aynı sonucu her posta için ayrı soru yerine toplu soruyla alıyoruz. 5 dakika, core'un kendi önbellekleriyle aynı mertebededir (ekip ağacı 60 saniye, takip için kullanılan üye listesi 30 saniye). Toplu şerit dakikada yaklaşık 17 posta gönderdiği için bu, bir gönderim başına dağıtım turunda en çok bir core sorusu demektir.
+   - **Her dağıtım turunda, göndermeden hemen önce yeniden sorulur.**
+     - Dağıtıcı, bir turda göndereceği kimlikli duyuru satırlarının hepsini core'a tek bir toplu istekle yeniden sorar. Eşik yoktur.
+     - core yanıt vermezse satırlar bekler, gönderilmez.
+     - Dynamics her postayı göndermeden hemen önce denetler; biz aynı denetimi tur başına tek istekle yapıyoruz. Toplu şerit dakikada yaklaşık 17 posta gönderdiği için bu, dakikada birkaç küçük istek demektir.
+     - Kuyruğa alırken sorulan soru da durur: bağlantıyı ve erken atlamayı o verir.
+     - Google'ın 48 saatlik önerisi ve Yahoo'nun 2 günlük şartı dış sınırdır. Bu kuralla hükmün yaşı bir dağıtım turunu geçmez.
    - **Eşleme.** Alıcı bir hesabın doğrulanmış adresiyse ya da `sub`'ı biliniyorsa core iki şey döner: posta gidebilir mi, ve kişiye ve kategoriye özel imzalı çıkış bağlantısı.
      - Doğrulanmış adres şunlardan biri olabilir (ADR-0044): birincil adres (`emailVerified`); YTÜ bağlantısı olan hesabın okul adresi; `personalEmailVerifiedAt` damgalı kişisel adres. Bu, Keycloak giriş formunun kabul ettiği tanımlayıcıların kuralıyla aynıdır.
      - İki hesaba birden uyan bir adrese posta gitmez.
@@ -93,13 +96,15 @@ Karar (Yusuf, 2026-10-21; ilke, ve "Açık"ta duran soruların cevapları aynı 
    - Duyuru postası Member'a meşru menfaatle gider (ADR-0062). KVKK md. 11'de GDPR'ın doğrudan pazarlamaya itirazı gibi genel bir itiraz hakkı yoktur. Tek tık çıkış meşru menfaat dengesinin önlemidir.
    - Çıkış kaydının amacı adrese yeniden göndermemektir (md. 5/2-f). Kayıt şu durumlardan biri olana kadar tutulur: kişi yeniden abone olur, panel kişinin isteğiyle kaydı geri alır, ya da hesap silinir.
    - Hesap silme kişinin adreslerindeki kayıtları da siler. ADR-0051 karar 4 silmeden sonrası için daraltılmış haliyle geçerlidir (ADR-0051 eki).
-10. **Duyuru akışı ayrı bir alt alan adından çıkar** (DKIM alanı ayrımı).
+10. **Öneri, Yusuf'un onayını bekliyor: duyuru akışı ayrı bir alt alan adından çıkar** (DKIM alanı ayrımı).
+    - **Bu öneri Yusuf'un kararını tersine çevirir.** Yusuf 2026-10-20'de "tek alt alan `bildirim.yildizskylab.com`, `duyuru.` yok" kararını vermişti (hub SPEC skymail-bounce-isleme §0, "Kesin gönderen düzeni").
+    - Öneriyi getiren, inceleme ve orkestratördür (2026-10-21), gerekçe "sektörün birebir aynısı" ölçütüdür. Yusuf onaylamadıkça 2026-10-20 kararı geçerlidir, ve bu madde sapma 6'ya "DKIM alanı da ayrılmıyor" diye eklenir.
     - Postmark her gönderim akışı için ayrı bir alt alan önerir; Yahoo toplu postayı IP'yle ya da DKIM alanıyla ayırmayı önerir.
     - IP ayrımı Exchange Online'da yapılamaz (Microsoft'un ortak havuzu), DKIM alanı ayrımı yapılabilir.
     - `islem` akışı `bildirim.yildizskylab.com`'da kalır. `duyuru` kutusu kendi alt alanına taşınır: kendi MX, SPF ve DKIM kaydı olur; DMARC ana alandan devralınır.
     - Ad ve iş ayrı bir bilette yazılır.
     - Yeni alt alanın itibarı sıfırdan başlar, bu yüzden ısınma planı onunla yeniden başlar.
-    - Duyuru akışının production'da açılması bu taşımayı bekler.
+    - Onaylanırsa duyuru akışının production'da açılması bu taşımayı bekler.
 
 Nasıl:
 
@@ -115,7 +120,7 @@ Nasıl:
   - **Çıkış kaydı.** Ayrı bir tabloda durur; `mail_suppressions`'a sütun eklenmez. Eski imaj yeni tabloyu bilmez, böylece imaj geri alındığında işlem postası durmaz. Panel iki tabloyu tek liste olarak gösterir.
   - **Tek tık ucu.** SkyMail'in herkese açık yolundadır (`/api/skymail/u/{belirteç}`) ve takip uçlarının (`/t/`) kurallarına uyar: IP saklanmaz, belirteç ve yol loglanmaz.
   - **Satırın bağlantısı.** Satırın `list_unsubscribe_url`'i (skymail-backend #93) ya core'un bağlantısıdır ya SkyMail'inki. Gövdede `.UnsubscribeUrl` olarak durur. Şablon bağlantıyı kullanmıyorsa SkyMail künyeye standart bir çıkış satırı ekler (Postmark gibi).
-  - **Bağlantıyı zaten taşıyan satır.** Haber gönderimi (ADR-0067) ve core'un toplu Bildirim'i (ADR-0070) bağlantıyı aynı istekte core'dan alır, bu yüzden kuyruğa alırken yeniden sorulmaz. Dağıtıcıdaki 5 dakikalık yeniden sorgu ve çıkış kaydı onlara da uygulanır.
+  - **Bağlantıyı zaten taşıyan satır.** Haber gönderimi (ADR-0067) ve core'un toplu Bildirim'i (ADR-0070) bağlantıyı aynı istekte core'dan alır, bu yüzden kuyruğa alırken yeniden sorulmaz. Dağıtıcının her turdaki yeniden sorgusu ve çıkış kaydı onlara da uygulanır.
   - **Açılış.** Bayrak varsayılan kapalıdır. Açıkken anahtar ve core adresi zorunludur, eksikse açılış durur.
 - **Rapor.** Atlananlar nedenleriyle sayılır: kişinin core'daki çıkışı, adresin SkyMail'deki çıkış kaydı, devre dışı hesap, iki hesaba uyan adres. Atlanan alıcı gönderimi "Başarısız" yapmaz. Adres hiçbir loga yazılmaz.
 
@@ -125,7 +130,7 @@ Nasıl:
 - **core.** Yeni iç uç, adres dizini önbelleği ve belgesi (`docs/news-audience.md`, `docs/communication-preferences.md`). Tercih kaydı, belirteci ve tek tık ucu değişmez.
 - **SkyMail (skymail-backend).** Şunlar eklenir:
   - gönderim amacı ve kategori;
-  - tek kontrol noktası ve dağıtıcıda 5 dakikalık yeniden sorgu;
+  - tek kontrol noktası ve dağıtıcıda her turda yeniden sorgu;
   - çıkış kaydı tablosu ve herkese açık uç;
   - anahtar halkası;
   - panelin yetkili ve gerekçeli geri alması;
@@ -139,7 +144,7 @@ Nasıl:
   - Künyede "Abonelikten çık".
 - **Keycloak.** `skymail` istemcisine yeni rol: `skymail:unsubscribes:reactivate`, bir gruba verilir. Henüz kodlanmamış `skymail:suppressions:manage` ile aynı reconcile değişikliğinde girer.
 - **Ops.**
-  - Duyuru alt alanı: DNS, Exchange'de kabul edilen alan adı, kutu adresi, gönderen adı.
+  - Karar 10 onaylanırsa duyuru alt alanı: DNS, Exchange'de kabul edilen alan adı, kutu adresi, gönderen adı.
   - SkyMail çıkış anahtarı OpenBao'ya bir wizard ile girer; wizard yeni anahtar sürümü de ekler. Dokploy'da yalnız referans tutulur.
   - Kenarın erişim logu `/api/skymail/u/` yolunu tutmamalıdır.
 - **Metinler.** KVKK Aydınlatma Metni'ne "abonelikten çıkış kaydı" girer: amacı, dayanağı ve süresi. Duyuru akışının production'da açılması bu metnin yayımlanmasını bekler.
@@ -147,7 +152,7 @@ Nasıl:
 - **ADR-0067 ve ADR-0051'e tarihli ek** yazılır: çıkış kaydı tercih değildir; ADR-0051 karar 4 silmeden sonrası için daraltılır.
 - **core'un çıkış anahtarı** bugün "hiç döndürülmez" kuralında (`COMMUNICATION_PREFERENCE_KEY`). Aynı anahtar halkasına geçmesi ayrı bir iştir.
 - **Bilinen sınırlar.**
-  - Hesap silinince çıkış kaydı da silinir, adres elle bir listeye yeniden girebilir (sapma 10).
+  - Hesap silinince çıkış kaydı da silinir, adres elle bir listeye yeniden girebilir (sapma 9).
   - core kapalıyken operatörün duyuru postası gitmez.
   - SkyMail imajı geri alınırsa çıkış kaydı o süre uygulanmaz. Bu yüzden geri alma önce bayrakla yapılır.
 - **CONTEXT.md'de değişenler:**
@@ -157,7 +162,7 @@ Nasıl:
 ## Açık
 
 - **DKIM kapsamı** (skymail-bounce-isleme 11, S2). Exchange Online, MIME `sendMail`'deki iki başlığı DKIM imzasının `h=` listesine alıyor mu? Belgelerde yazmıyor; ilk başlıklı postada okunacak. Almıyorsa Gmail tek tık düğmesini göstermeyebilir; o zaman ayrı bir gönderen ya da relay kararı gerekir.
-- **Alt alan adı** (karar 10). Ad Yusuf'un onayında; öneri ve gerekçesi biletinde.
+- **Duyuru alt alanı** (karar 10). Önce kararın kendisi Yusuf'ta: 2026-10-20'deki "tek alt alan" kararını değiştiriyor. Onaylanırsa ad da Yusuf'ta; öneri ve gerekçesi biletinde.
 - **Kimliği olmayan adresin silme başvurusu.** Böyle bir kişi bilgi@'ya KVKK md. 11/e başvurusu yaparsa yol, karar 7'deki yetkili geri almadır; gerekçeye "silme başvurusu" yazılır. Ama kayıt silinince çıkış da kalkar. Adresin listelerden de silinmesi ve yeniden eklenmemesi elle yapılır. Bu, ADR-0051'in kabul ettiği sınırın aynısıdır.
 - **Şikâyet geri bildirimi.** Yahoo CFL kulübün DKIM alanıyla kurulabilir mi? Ayrı bir takip bileti açıldı.
 
@@ -167,7 +172,7 @@ Nasıl:
 
 1. **Kimliğe bağlı merkezi tercih; göndermeden önce denetim.**
    - Dynamics Customer Insights – Journeys gönderimden hemen önce amaç, konu ve rıza kaydını uygular. Kişi bir segmente yanlışlıkla girmiş olsa da çıkmış kişiye posta gitmez.
-   - Bizde core hükmü göndermeden önce en çok 5 dakika eskidir (sapma 9), SkyMail kaydı göndermeden hemen önce okunur.
+   - Bizde core hükmü her dağıtım turunda göndermeden hemen önce toplu olarak yeniden sorulur, SkyMail kaydı da göndermeden hemen önce okunur.
    - HubSpot'ta subscription type, SES'te contact list ve topic, Mailchimp'te audience aynı işi görür.
    - Karar 3 ve 5.
 2. **Her toplu postanın bir konusu var; tek tık yalnız o konudan çıkarır.**
@@ -206,7 +211,7 @@ Nasıl:
     - Postmark bağlantıyı her broadcast postasına kendisi ekler.
     - SES bağlantıyı yer tutucuyla ekler.
 11. **Çıkış süresi.**
-    - SkyMail kaydı göndermeden hemen önce uygulanır; core'daki çıkış en geç 5 dakikada uygulanır.
+    - SkyMail kaydı da core'daki çıkış da göndermeden hemen önce, bir sonraki dağıtım turunda uygulanır. Tek istisna yeni doğrulanmış bir adresin kişiye eşlenmesidir (sapma 1).
     - Dış sınırlar: Google 48 saat önerir, Yahoo 2 gün şart koşar, 6563 yönetmeliği 3 iş günü, CAN-SPAM 10 iş günü.
 12. **Gönderen, kişinin çıkışını yalnız kişi isteyince ya da bir hata olunca geri alır.**
     - Postmark: "only reactivate email addresses when asked to do so, or when mistakes happen". SES contact tercihini API'yle değiştirtir. SendGrid global ve group çıkışlarını panelden kaldırtır. Dynamics rıza kaydını düzenletir ve denetim geçmişi tutar.
@@ -214,11 +219,11 @@ Nasıl:
     - HubSpot ve Mailchimp gönderene izin vermez, kişi kendisi geri döner.
     - Karar 7.
 13. **Kalıcı ret bütün akışlarda bastırır.** SES'in hesap düzeyindeki suppression list'i (`BOUNCE`) böyle çalışır. Bu kural mevcuttur, bu kayıtla değişmez.
-14. **Duyuru akışı ayrı alt alan adından çıkar.** Postmark akış başına alt alan önerir; Yahoo DKIM alanıyla ayırmayı önerir. Karar 10.
+14. **Duyuru akışı ayrı alt alan adından çıkar (öneri, onay bekliyor).** Postmark akış başına alt alan önerir; Yahoo DKIM alanıyla ayırmayı önerir. Karar 10.
 15. **Bağlantı uzun ömürlüdür.**
     - RFC 8058 bir süre koymaz.
     - CAN-SPAM bağlantının gönderimden sonra en az 30 gün çalışmasını ister.
-    - Google uzun süre çalışmayan çıkış bağlantısını kural ihlali sayar.
+    - Google: çıkış bağlantısı uzun süre çalışmazsa postalar tek tık şartını karşılamamış sayılır. Spam işaretlenmezler, ama gönderen teslim sorunlarında Google'dan destek alamaz. Google bir süre belirtmiyor.
     - Anahtar halkası, anahtar değişse de bağlantıyı açık tutar.
     - Karar 4.
 
@@ -229,11 +234,15 @@ Nasıl:
    - Bizde kişinin iki adresi var (ADR-0044) ve tercih ADR-0067'den gelir. Çıkış iki adrese de uyar, bu yüzden daha sıkıdır.
    - Bunun bir sonucu daha var: iki hesaba uyan bir adrese posta gitmez. Adres anahtarlı ürünlerde böyle bir durum yoktur.
    - Kimliği olmayan adreste SkyMail'in kaydı adrese bağlıdır, yani sektörle aynıdır.
+   - **Adres → kişi eşlemesi.** Kişiye bağlı tercih bir eşleme ister. Adres anahtarlı ürünlerde böyle bir adım yoktur. core bu eşlemeyi doğrulanmış adreslerin bir dizininden yapar. Dizin en çok 5 dakika, yenileme başarısızsa en çok 15 dakika eskidir.
+     - O pencerede yeni doğrulanmış bir adres hesapsız sayılır. Kişi core'da önceden çıkmışsa ve bu adres bir operatör listesindeyse, posta gider. Kişi postadaki SkyMail bağlantısıyla çıkabilir.
+     - Keycloak'ta devre dışı bırakma da en çok aynı süre içinde etkili olur.
+     - Bu düşük riskli bir gecikmedir. Kişinin var olan adreslerindeki çıkışı ve silinmesi gecikmez: tercih ve silinme her soruda tazedir.
 2. **(b) Kimliği olmayan adreste çıkış akış genelidir, konu bazında değil.**
    - Postmark'la birebir aynıdır.
    - SES, SendGrid ve Dynamics çıkışı konu ya da group başına tutar, hesabı olmayan adres için de.
    - Neden: adres × kategori kaydı SkyMail'de ikinci bir tercih ve kalıtımın bir kopyası olurdu. ADR-0067 bunu reddediyor, karar 1 de "çıkış kaydı tercih değildir" diyor.
-3. **(b) Kimliği olan kişinin tercihini operatör değiştiremez.**
+3. **(b) Kimliği olan kişinin tercihini operatör değiştiremez.** Kimliği olmayan adreste ise panel, Postmark ve SES gibi, kişi isteyince geri alabilir (karar 7). İki katman ayrı olduğu için iki model de tutarlıdır.
    - Dynamics rıza kaydını kullanıcıya düzenletir. HubSpot kişinin kendi çıkışını kullanıcıya geçersiz kılmaz.
    - Bizde tercih ekranı Hesap Merkezi'ndedir (ADR-0067) ve core'da operatör yolu yoktur.
 4. **(b) İşlem amacı yalnız iki hedefte ve beyanla seçilir.**
@@ -241,19 +250,29 @@ Nasıl:
    - Postmark toplu postayı "aynı içerik birçok alıcıya, alıcının bir eylemiyle tetiklenmeden" diye tanımlar ve işlem trafiğini ayırmayı önerir. Bu tanıma göre operatörün Forms yanıtlayanlarına yazdığı posta toplu postadır.
    - Neden (Yusuf, 2026-10-21): başvurunun kendisi hakkındaki operatör postası (yer değişikliği, sonuç) alıcı açısından işlem postasıdır. Google da postanın türüne alıcının karar verdiğini söylüyor. İstisna dar ve beyana bağlı; liste ve grup bu yoldan gidemez.
 5. **(b) Bağlantı süresizdir.** Dynamics çıkış bağlantılarını altı ayda geçersiz kılıyor. Postmark, SendGrid, SES, HubSpot ve Mailchimp bir süre belgelemiyor; core'un bağlantısı da süresiz.
-6. **(a) Akışlar IP'yle ayrılmıyor.** Google, birden çok IP kullanılıyorsa her tür için ayrı IP önerir; Yahoo IP'yle ya da DKIM alanıyla ayırmayı önerir. Exchange Online'ın IP'leri Microsoft'un ortak havuzudur. DKIM alanı ayrımı yapılır (karar 10).
+6. **(a) Akışlar IP'yle ayrılmıyor.** Google, birden çok IP kullanılıyorsa her tür için ayrı IP önerir; Yahoo IP'yle ya da DKIM alanıyla ayırmayı önerir. Exchange Online'ın IP'leri Microsoft'un ortak havuzudur. DKIM alanı ayrımı öneridir (karar 10); onaylanmazsa bu sapma DKIM alanını da kapsar.
 7. **(a) Toplu posta Exchange Online'dan çıkıyor.**
-   - Microsoft, toplu ticari postayı (ör. bülten) üçüncü taraf sağlayıcılarla göndermeyi öneriyor; Exchange sınırlarını aşan dış gönderim için de Azure Communication Services'i öneriyor.
-   - Bizim duyurumuz ticari değil ve hacmi Exchange'in kutu sınırları içinde.
-   - ADR-0067 ("Gönderen hesap": hacim büyürse ayrı sağlayıcı) ve ADR-0070 (Azure Communication Services 2028-09-30'da emekliye ayrılıyor) bu kararı verdi.
+   - **Microsoft ne diyor** (Exchange Online sınırları):
+     - İleti hızı sınırının dipnotu genel ve "ticari" ile sınırlı değil: "Exchange Online isn't suited to accommodate bulk-mailing scenarios".
+     - Toplu ticari posta (ör. bülten) için üçüncü taraf sağlayıcı öneriliyor.
+     - Sınırları aşan dış gönderim için Azure Communication Services öneriliyor.
+   - **Sınırlar:**
+     - Kutu başına dakikada 30 ileti ve 24 saatte 10.000 alıcı.
+     - Kiracı geneli TERRL (Tenant External Recipient Rate Limit): kiracının 24 saatlik kayan pencerede gönderebileceği en çok dış alıcı. Kabul edilen alan adı olmayan her adres dış alıcıdır. Sınır lisans sayısına bağlıdır, grup üyeleri tek tek sayılır.
+     - Bizim kiracıda TERRL 10.000 (ölçüm 2026-10-20). İnsan kutularıyla ortaktır. SkyMail'in günlük bütçesi 9.000, toplu şeridin payı 6.300.
+   - **Dayanak (a):** ADR-0070'in reddettiği seçenekler.
+     - Self-host Novu (seçenek C): tek sunucuya sığmıyor.
+     - SaaS (seçenek D: Knock, Courier, SuprSend, OneSignal): üye verisini yurt dışındaki bir işleyene taşıyor (KVKK md. 9).
+     - Azure Communication Services: 2028-09-30'da emekliye ayrılıyor.
+     - Bu yüzden kendi motorumuz Exchange Online kutularından gönderiyor. Duyuru ticari değil ve hacim bu sınırların altında tutuluyor.
+     - Tetik: hacim TERRL'ye yaklaşırsa ya da Microsoft kısarsa, gönderim sağlayıcısı kararı yeniden açılır.
 8. **(a) Kimliği olan kişinin çıkışı gönderim sisteminin listesine yazılmaz.**
    - SendGrid'de uygulama kendi kayıtlarını API'yle group listesine ekleyebiliyor. Bizde kontrol noktası her gönderimde core'a soruyor (ADR-0071 karar 14).
    - Sonuç: core kapalıyken duyuru postası gitmez. Dynamics ve HubSpot'ta da rıza ve gönderim aynı üründedir; rıza deposu yanıt vermezse gönderim de durur.
-9. **(b) core hükmü göndermeden önce en çok 5 dakika eskidir.** Dynamics her postayı göndermeden hemen önce denetler. Biz her posta için ayrı soru yerine 5 dakikalık bir toplu soru seçtik (karar 3). Bu süre, core'un kendi önbellekleriyle aynı mertebededir.
-10. **(a) Hesap silinince çıkış hatırlanmaz.**
+9. **(a) Hesap silinince çıkış hatırlanmaz.**
     - Dynamics ve HubSpot'ta kişi silinse de çıkış adreste kalır. Bizde adres elle bir listeye yeniden girebilir.
     - Neden: ADR-0051 karar 4 ve orada reddedilen "adresin özetini tutmak".
-11. **(a) Şikâyet (FBL) bastırması yok.**
+10. **(a) Şikâyet (FBL) bastırması yok.**
     - Postmark `SpamComplaint`, SES `COMPLAINT`, SendGrid spam report ile bastırır.
     - Gmail alıcı başına şikâyet bildirmiyor; Exchange Online kiracıya şikâyet geri bildirimi iletmiyor.
     - Yahoo CFL DKIM alanına göre kaydoluyor; kulübün alanıyla kurulması takip biletinde.
@@ -267,10 +286,10 @@ Nasıl:
 - **Kimliği olmayan adresin çıkışını core'un Davet onayı kaydına yazmak.** Davet onayı bir onay kaydıdır ve varsayılanı kapalıdır. Rızası olmayan adres için "geri alınan rıza" anlamsızdır. core'un adres anahtarlı ikinci bir "gönderme" kaydı tutması gerekirdi.
 - **Kimliği olmayan adreste konu başına çıkış** (SendGrid group, SES topic). Sapma 2'ye bakın.
 - **Panelin çıkışı hiç geri alamaması** (HubSpot, Mailchimp). Bu ilk öneriydi. Yusuf Postmark ve SES modelini seçti: yetkili, uyarılı ve gerekçeli geri alma.
-- **core hükmünü 48 saate kadar kullanmak.** 48 saat dış sınırdır, hedef değildir. ADR-0071 karar 14'ün "liste her zaman günceldir" kuralıyla da gerilimdeydi.
+- **core hükmünü 48 saate kadar kullanmak** (ilk taslak) ya da **5 dakikalık bir eşikle yeniden sormak** (ikinci taslak). 48 saat dış sınırdır, hedef değildir. İncelenen her sağlayıcı gönderim anında uyguluyor. Tur başına tek toplu istek zaten ucuz olduğu için eşik gerekmiyor. İkisi de ADR-0071 karar 14'ün "liste her zaman günceldir" kuralıyla gerilimdeydi.
 - **Çıkış kaydını `mail_suppressions`'a sütun olarak eklemek.** Eski imaj nedene bakmadan bütün satırları okur. İmaj geri alınırsa çıkmış adrese Forms onayı da dahil bütün postalar dururdu.
 - **Anahtarı hiç döndürmemek.** Bir sızıntıda ya bütün eski bağlantılar bozulurdu (Google'ın kuralı, CAN-SPAM'in 30 günü) ya da anahtar sızık kalırdı.
-- **Duyuruyu `bildirim.`'de bırakıp ayrımı bir tetiğe bağlamak** (giriş kodları spama düşerse). Tetik zararı ancak oluştuktan sonra ölçer. Ayrım düşük maliyetli: bir kabul edilen alan adı ve DNS kayıtları.
+- **Duyuruyu `bildirim.`'de bırakıp ayrımı bir tetiğe bağlamak** (giriş kodları spama düşerse). Bu, Yusuf'un 2026-10-20 kararıdır ve karar 10 onaylanmazsa geçerli kalır. Önerinin gerekçesi şu: tetik zararı ancak oluştuktan sonra ölçer, ayrım ise düşük maliyetli (bir kabul edilen alan adı ve DNS kayıtları).
 - **Başlığı yalnız core bağlantısı olan postaya koymak** (skymail-backend #93'ün bugünkü sınırı). Operatör postaları çıkışsız kalırdı; bu Gmail ve Yahoo'nun toplu gönderici kuralına uymaz.
 - **core yanıt vermezse yine göndermek** (fail open). Bu, onurlandırılmamış bir çıkış olurdu. Takipte (core `tracking:resolve`) core yanıt vermezse kimse takip edilmez ve posta yine gider; orada güvenli yön budur. Çıkışta güvenli yön göndermemektir.
 - **Varsayılanı da engel saymak** (Dynamics'in restrictive modeli). Listeye konan ve üyesi olmadığı ekibin kategorisindeki herkes atlanırdı; operatörün seçtiği kitle sessizce boşalırdı.
