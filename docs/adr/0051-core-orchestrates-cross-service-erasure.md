@@ -55,3 +55,9 @@ Considered and not chosen: core writing the inscribed database directly through 
 ## Addendum: a broker exists again (2026-10-20)
 
 ADR-0071 brings RabbitMQ back for cross-service events, so the "None runs in production" premise of the rejected **message broker** option no longer holds once ADR-0071's broker runs in production. The decision stands: an erasure is a command that waits for every service's confirmation and carries the addresses only for the length of the call, so it stays an idempotent HTTP call from core. Events must not carry the addresses either (ADR-0071, decision 5).
+
+## Addendum: address records while the account lives (2026-10-21)
+
+SkyMail now keeps address-level records while an account exists. One is a permanent failure (bounce), on every stream. The other is the unsubscribe of an address core does not know, on the broadcast stream only (ADR-0072). Neither is a Communication preference, which stays in core.
+
+Decision 4 stands as written, because it is about what survives an erasure. The erase command's addresses remove every such record in SkyMail's erase step, so nothing derived from the address survives, and a manual mailing list can take the address again. The rejected **suppression hash** stays rejected.
