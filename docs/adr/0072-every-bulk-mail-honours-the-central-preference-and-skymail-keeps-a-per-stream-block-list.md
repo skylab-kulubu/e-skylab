@@ -31,13 +31,13 @@ Karar (2026-10-21). İlke, S1–S3 cevapları ve karar 10 Yusuf'undur; öteki ay
    - **Çıkış kaydı tercih değildir.** Kategori, ekip, kanal ya da varsayılan taşımaz. Yalnız "bu adrese duyuru akışından posta gitmez" der.
    - ADR-0067'nin reddettiği "tercihi SkyMail'de tutmak" seçeneği aynen reddedilmiş kalır.
 2. **Her posta bir gönderim akışındadır; akışı gönderimin amacı belirler.** Akışı kuyruk önceliği belirlemez.
-   - **`islem` akışı:** `hesap@` ve `bilgi@` kutuları. Giriş kodu, doğrulama, Mail onayı, sertifika, bilet ve Forms'un yanıtla tetiklenen postaları bu akıştadır. Tercihe ve çıkış kaydına bakmaz, çıkış başlığı taşımaz, takip edilmez. Kalıcı ret bastırması bugünkü gibi uygulanır, hesap postası muafiyetiyle.
+   - **`islem` akışı:** `hesap@` ve `bilgi@` kutuları. Giriş kodu, doğrulama, Mail onayı, sertifika, bilet ve Forms'un yanıtla tetiklenen postaları bu akıştadır. İşlem postası abonelik tercihine takılmaz ve çıkış başlığı taşımaz. Takip akışa bağlı değildir: bütün postalar takiplidir (Yusuf, 2026-10-21); SkyMail'de `SKYMAIL_TRACKING_SYSTEM` ve `SKYMAIL_TRACKING_OPERATOR` bayraklarıyla, gizli bağlantı istisnasıyla. Takip kararı ayrı bir ADR ile yazılacak. Kalıcı ret bastırması bugünkü gibi uygulanır, hesap postası muafiyetiyle.
    - **`duyuru` akışı:** duyuru kutusu, `skylab@duyuru.yildizskylab.com` (karar 10). Her posta bir **kategori** taşır: core'un kategorilerinden biri, yani kulüp geneli ya da bir ekip, duyuru ya da haber. Posta tercihe ve çıkış kaydına uyar. RFC 8058 tek tık başlıklarını ve gövdede görünür bir çıkış bağlantısı taşır.
    - **Ticari akış yoktur** (karar 9).
    - **Operatör postasının amacı:**
      - Liste ve Keycloak grubu gönderimi her zaman duyurudur.
      - Kişilere tek tek gönderimde ve Forms yanıtlayanlarına gönderimde gönderen "işlem" amacını seçebilir. Bunun için "bu posta alıcının kendi başvurusu ya da işlemi hakkındadır" beyanı gerekir (Yusuf, 2026-10-21). Seçmezse posta duyurudur.
-     - Takip isteyen posta duyurudur.
+     - Takip amacı belirlemez: işlem amaçlı operatör postası da öteki operatör postaları gibi takiplidir (orkestratör, 2026-10-23).
      - Kategoriyi gönderen seçer. Keycloak grubu bir ekipse o ekibin kategorisi önerilir.
 3. **Kimliği olan alıcıya core gönderim anında karar verir.**
    - **Kontrol noktası.** Duyuru akışına giren her alıcı, kuyruğa yazılmadan önce core'a sorulur. Kontrol noktası SkyMail'in kuyruğa alma katmanıdır, yani alıcı hangi ekrandan gelirse gelsin aynı yerden geçer.
