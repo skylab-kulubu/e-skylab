@@ -312,3 +312,14 @@ Nasıl:
 - Microsoft Outlook.com: [yüksek hacimli göndericiler](https://techcommunity.microsoft.com/blog/outlook/strengthening-email-ecosystem-outlook%E2%80%99s-new-requirements-for-high%E2%80%90volume-senders/4399730) (gövde okunamadı; ikincil özetlere göre SPF, DKIM ve DMARC zorunlu, görünür çıkış bağlantısı öneri)
 - FTC: [CAN-SPAM uyum rehberi](https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business) (işlem ya da ilişki iletisinin tanımı, 10 iş günü, bağlantının en az 30 gün çalışması)
 - Ticari İletişim ve Ticari Elektronik İletiler Hakkında Yönetmelik md. 9 (ret bildirimi, üç iş günü; [RG 04.01.2020, 30998](https://www.turmob.org.tr/arsiv/mbs/resmigazete/30998-30998-1.pdf) değişikliği)
+
+## Ek (2026-10-24): karar 9, sponsor teşekkürü ve tanıtım izni (ADR-0062 eki)
+
+Karar 9'un ilk iki maddesi ("sponsor tanıtımı, ücretli bilet, şirket iş ilanı ya da çekiliş içermez" ve "ticari içerik gönderilmez") şu kuralla değişir (avukat cevabı 13, Yusuf 2026-10-23; KVKK Aydınlatma Metni s6 §5.10). Karar 9'un öteki maddeleri değişmez.
+
+- **Asıl amaç belirler.** Asıl amacı bilgilendirme olan duyurudaki kısa sponsor teşekkürü ya da sponsor logosu tanıtım sayılmaz. Bu posta duyuru akışından, tercihe göre bütün alıcılara gider.
+- **Tanıtım yalnız izin verene gider.** Asıl amacı tanıtım olan içerik (indirim kodu, şirket iş ilanı, satış, çekiliş) yalnız tanıtım izni veren kişiye gider. Ayrı bir ticari akış açılmaz: tanıtım postası duyuru akışından çıkar. Kitle, karar 3'ün süzgecinden geçen alıcılar ile core'daki tanıtım izni listesinin gönderim anındaki kesişimidir. core yanıt vermezse tanıtım postası gönderilmez. Postadaki çıkış bağlantısı tanıtım iznini kapatır.
+- **Tanıtım izni kişi başına tek bir izindir** ve işaretsiz kutuyla alınır (ADR-0062 eki).
+- **Beyan değişir.** Gönderen artık "ticari içerik yok" değil, "postanın asıl amacı tanıtım değil" beyan eder. Kısa teşekkür ve logo bu beyana engel değildir.
+- **İYS.** Kulüp İYS'ye kayıtlı bir hizmet sağlayıcı değildir. Tanıtım içeriği yalnız kulübün kendi tanıtım iznine dayanarak gider.
+- **Açık:** karar 9'daki "ücretli bilet" örneği s6 §5.10'un listesinde yok. Kulübün kendi ücretli etkinliğinin duyurusu asıl amaç ölçüsüne göre değerlendirilir; ayrı bir kural gerekiyorsa Yusuf karar verir.
