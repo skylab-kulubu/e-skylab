@@ -127,3 +127,12 @@ Karar (Yusuf, 2026-10-03): her veri kategorisi **hukuken savunulabilecek en uzun
 - Hesabı olmayan adresin silme başvurusunda (KVKK md. 11/e, md. 7) çıkış kaydının silinmesi ve ardından adresin yeniden duyuru alabilmesi (ADR-0072 Açık).
 - YTÜ SKS'ye bildirilen katılımcı listesinin alanları.
 - SkyForms yanıtlarının süre kuralı (Fatih).
+
+## Ek (2026-10-24, ikinci): tanıtım izni kutusu yalnız iletişim tercihlerinde
+
+Yusuf ve Fatih (2026-10-24): kulüp şu an tanıtım içeriği göndermiyor. Bu yüzden önceki ekteki "Kutu üç yerde görünür" cümlesi daralır. Tanıtım izni kutusu yalnız Hesap Merkezi iletişim tercihlerinde çıkar. Kayıttan sonraki ilk Hesap Merkezi ekranında ve SkyForms formlarında kutu yoktur.
+
+- Önceki ekin şu kısımları bu yüzden boşa düşer: ilk ekranda ve formlarda kutunun gizlenmesi, formda boş bırakılan kutu, girişsiz verilen iznin çift onayı ve hesapsız kişinin e-posta adresine bağlı izni. İzni yalnız hesabı olan kişi verir.
+- Değişmeyenler: kişi başına tek izin, işaretsiz ve varsayılan kapalı kutu, üç geri alma yolu (iletişim tercihleri, tanıtım postasındaki çıkış bağlantısı, info@yildizskylab.com), izin kaydının geri almadan sonra 3 yıl saklanması ve hesap silinince silinmesi.
+- Duyuru rızası (Davet onayı, `davet-v2`) ve onun formdaki kutusu aynen kalır.
+- Kutuyu yeniden ilk ekrana ya da formlara koymak yeni bir karar ister.
