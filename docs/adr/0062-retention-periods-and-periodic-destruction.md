@@ -87,7 +87,7 @@ Karar (Yusuf, 2026-10-03): her veri kategorisi **hukuken savunulabilecek en uzun
 
 - **Asıl amaç belirler.** Asıl amacı bilgilendirme olan duyurudaki kısa sponsor teşekkürü ya da sponsor logosu ("Etkinliğimiz X'in katkılarıyla düzenlenmektedir.") tanıtım sayılmaz. Bu posta, duyuru tercihine göre bütün alıcılara gider. Davet postası da buna dahildir.
 - **Tanıtım yalnız izin verene gider.** Asıl amacı bir mal ya da hizmetin tanıtımı olan içerik (indirim kodu, şirket iş ilanı, satış, çekiliş) tanıtımdır. Yalnız tanıtım izni veren kişiye gider.
-- **Tanıtım izni kişi başına tek bir izindir.** Core'da `contact_consents` içinde `promotional` amacıyla tutulur. Kutu işaretsiz gelir, varsayılan kapalıdır ve hizmet şartı yapılmaz. Kutu üç yerde görünür: Hesap Merkezi iletişim tercihleri, kayıttan sonraki ilk Hesap Merkezi ekranı ve SkyForms formları; kayıt formunda görünmez. İzin açıksa kutu gösterilmez. Formda kutuyu boş bırakmak geri alma değildir. Girişsiz verilen izin çift onaylıdır. Hesapsız kişide izin e-posta adresine bağlıdır; aynı adresle hesap açılınca hesabın izni sayılır. Tanıtım postasındaki çıkış bağlantısı izni kapatır. Davet onayındaki 3 yıllık yenileme sorusu bu izinde yoktur.
+- **Tanıtım izni kişi başına tek bir izindir.** Core'da `contact_consents` içinde `promotional` amacıyla tutulur. Kutu işaretsiz gelir, varsayılan kapalıdır ve hizmet şartı yapılmaz. Kutu üç yerde görünür: Hesap Merkezi iletişim tercihleri, kayıttan sonraki ilk Hesap Merkezi ekranı ve SkyForms formları; kayıt formunda görünmez. İzin açıksa ilk Hesap Merkezi ekranında ve formlarda kutu gösterilmez; iletişim tercihlerindeki anahtar her zaman görünür, çünkü izin oradan geri alınır. Formda kutuyu boş bırakmak geri alma değildir. Girişsiz verilen izin çift onaylıdır. Hesapsız kişide izin e-posta adresine bağlıdır; aynı adresle hesap açılınca hesabın izni sayılır. İzin üç yoldan geri alınır: Hesap Merkezi iletişim tercihleri, tanıtım postasındaki çıkış bağlantısı ve info@yildizskylab.com'a yazmak. Hesap silinince izin de silinir (Account erasure rıza kayıtlarını siler). Davet onayındaki 3 yıllık yenileme sorusu bu izinde yoktur.
 - **Beyan kalır.** Duyuruyu gönderen her gönderimde postanın asıl amacının tanıtım olmadığını beyan eder; kısa teşekkür ve logo bu beyana engel değildir. Asıl amacı tanıtım olan posta bu beyanla gönderilemez.
 - **İYS.** Kulüp İleti Yönetim Sistemi'ne kayıtlı bir hizmet sağlayıcı değildir. Tanıtım içeriği bu yüzden yalnız kulübün kendi tanıtım iznine dayanarak gider.
 
@@ -99,11 +99,11 @@ Karar (Yusuf, 2026-10-03): her veri kategorisi **hukuken savunulabilecek en uzun
 | SkyMail: çıkışı geri alma kaydı (kim, zaman, gerekçe, kaydın kaynağı ve ilk tarihi; adres yok) | 3 yıl, sonra silinir; hesap silinince yetkilinin kimliği değiştirilir | meşru menfaat (ispat) |
 | SkyMail: kişi bazında açılma ve tıklama | 90 gün; sonra posta ve bağlantı bazında sayılar kalır: 10 ve daha çok alıcılı gönderimde anonim ve süresiz, 10'dan az alıcılı gönderimde 1 yıl sonra silinir | meşru menfaat |
 | SkyMail: gönderilen posta içeriği (Forms yanıt kopyaları dahil) | 1 yıl | sözleşme, meşru menfaat |
-| Uygulama içi bildirim (kutu öğesi) | 90 gün; hesapla birlikte silinir | (ADR-0070) |
-| Bildirim cihaz kaydı | son görülmeden 270 gün sonra ya da çıkışta | (ADR-0070) |
-| SMS teslim satırı | e-postanın kişiselleştirilmiş gövde süresiyle (1 yıl) | (ADR-0070) |
+| Uygulama içi bildirim (kutu öğesi) | 90 gün; hesapla birlikte silinir | — |
+| Bildirim cihaz kaydı | son görülmeden 270 gün sonra ya da çıkışta | — |
+| SMS teslim satırı | e-postanın kişiselleştirilmiş gövde süresiyle (1 yıl, öneri) | — |
 | Tanıtım izni kaydı (yer, zaman; hesapsız kişide e-posta adresine bağlı) | izin sürdükçe; geri alındıktan sonra 3 yıl, sonra silinir | açık rıza (ispat) |
-| Ters vekil sunucu erişim kaydı (zaman, kaynak IP ve port, hedef, yöntem, maskelenmiş yol, sonuç) | 1 yıl, günlük dosyalarının zaman damgalı bütünlük özetiyle; sonra IP ve port kaldırılır, gün, sayfa ve sonuç sayıları anonim ve süresiz | kanun (5651 md. 5/3) |
+| Ters vekil sunucu erişim kaydı (zaman, kaynak IP ve port, hedef, yöntem, maskelenmiş yol, sonuç) | 1 yıl, günlük dosyalarının zaman damgalı bütünlük özetiyle; sonra IP ve port kaldırılır, gün, sayfa ve sonuç sayıları anonim ve süresiz | kanun (5651 md. 5/3; Yönetmelik md. 3/ş, md. 7/1-c) |
 | Ham konteyner ve sunucu günlükleri (erişim kaydı dışında) | en çok 90 gün (değişmedi; kapsam netleşti) | — |
 | Kart çip numarası | kart kaydı kaldırılınca ya da hesap silinince | sözleşme |
 | YK üyelerinin adı, soyadı ve görevi (site) | görev süresince | meşru menfaat |
@@ -116,9 +116,12 @@ Karar (Yusuf, 2026-10-03): her veri kategorisi **hukuken savunulabilecek en uzun
 | İş ortağı, sponsor, tedarikçi: yalnız yazışma | son yazışmadan 3 yıl | meşru menfaat |
 | SkyForms form yanıtları | kural yok, kendiliğinden silme yok; Fatih'in kuralı gelince değişir | — |
 
-- "Club archive" satırındaki etkinlik fotoğrafları ile "Ham konteyner günlükleri" satırı yukarıdaki satırlarla daralır. Üye olmayan kişinin duyuru rızası Davet onayı satırlarına tabidir; değişmedi.
+- "Club archive" satırındaki etkinlik fotoğrafları ile "Ham konteyner günlükleri" satırı yukarıdaki satırlarla daralır. Üye olmayan kişinin duyuru rızası Davet onayı satırlarına tabidir; süreleri değişmedi (kapsam aşağıda genişler).
+- ADR-0070 satırlarının dayanağı ADR-0070'te yazılı değil; sahibi yazana kadar "—".
 - SkyMail'in çıkış kaydı tercih değildir ve kendiliğinden düşmez. Kişi yeniden abone olunca, panel kişinin isteğiyle ya da bir hatadan sonra gerekçeyle geri alınca, ya da hesap silinince (ADR-0051 eki) silinir. Periyodik imha bu kayda dokunmaz; SkyMail'in silme adımı dokunur. Geri alma kaydı adres tutmaz.
 - Anonim, geri döndürülemez demektir (KVKK md. 3, md. 7 ve Silme Yönetmeliği). IP'nin ya da e-posta adresinin özeti anonim sayılmaz; süre sonunda yalnız toplam sayılar kalır.
+
+**Davet onayının kapsamı genişler** (avukat cevabı 14, KVKK Aydınlatma Metni s6 §5.14, satır 14). Davet onayı artık yalnız gelecek etkinliklere davet değil, kulübün diğer etkinlik ve duyurularına ilişkin postaları da kapsar. Kutu metni "Diğer etkinlik ve duyurulardan haberdar olmak istiyorum." olur (metin sürümü `davet-v2`). Core'daki amaç aynı kalır (`event_invitations`); sürüm vermeyen kayıt `davet-v2`'ye düşer, `davet-v1` kabul edilmeye devam eder. SkyMail bu amacın kitlesini duyurularda da okur. Kişinin kaydolduğu etkinlikle ilgili postalar (bilet, yer ya da saat değişikliği, iptal, geri bildirim formu, sertifika) bu rızaya bağlı değildir; md. 5/2-c ile gider. Kutuyu işaretlemeyen de etkinliğe katılır. Giriş yapılmadan verilen rıza, kişinin adresine giden onay postası onaylanınca geçerli olur; o zamana kadar adrese duyuru gitmez. Yenileme sorusu (3 yıl, 60 gün) ve rıza kaydının 3 yıllık ispat süresi değişmez. Davet onayı ile tanıtım izni ayrı kayıtlardır: biri duyuru ve davet, öteki tanıtım içeriği içindir.
 
 **Açık sorulara eklenenler:**
 - Hesabı olmayan adresin silme başvurusunda (KVKK md. 11/e, md. 7) çıkış kaydının silinmesi ve ardından adresin yeniden duyuru alabilmesi (ADR-0072 Açık).
