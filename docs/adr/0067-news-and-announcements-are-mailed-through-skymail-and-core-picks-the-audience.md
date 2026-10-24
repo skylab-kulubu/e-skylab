@@ -131,3 +131,12 @@ Bu kararın tercih ve çıkış kuralları değişmez. ADR-0072 onları yalnız 
 - **SkyMail'in çıkış kaydı tercih değildir.** ADR-0072 SkyMail'e duyuru akışında adres başına bir çıkış kaydı (Suppression, `unsubscribed` nedeni) verir. Bu kayıt kategori, ekip ya da kanal taşımaz. Yalnız core'un tanımadığı adresin "bu adrese duyuru gönderme" kaydıdır. Kimliği olan kişinin core'daki çıkışı oraya kopyalanmaz.
 - **"Bastırma listesi tutulmaz (ADR-0051)" cümlesi silmeden sonrası içindir.** SkyMail hesap açıkken adres başına kayıt tutar: kalıcı ret ve kimliği olmayan adresin çıkışı. Hesap silinince bu kayıtlar da silinir. ADR-0051 karar 4 buna göre daraltıldı (ADR-0051 eki).
 - **"SkyMail'in kendi Keycloak grup çözümü" reddi haber gönderimi içindir.** Panelin grup gönderimi üyeleri Keycloak'tan çözmeye devam eder. Ama duyuru akışındaki her alıcı gönderim anında core'a sorulur (ADR-0072 karar 3).
+
+## Ek (2026-10-24): sponsor teşekkürü postada olabilir, tanıtım yalnız izin verene gider (ADR-0062 eki)
+
+"Sponsorlu içerik postada" açık sorusunun önerisi ("yok; sponsor yalnız web'de") şu kuralla değişir (avukat cevabı 13, Yusuf 2026-10-23; KVKK Aydınlatma Metni s6 §5.10):
+
+- **Asıl amacı bilgilendirme olan haber ya da duyuru,** kısa bir sponsor teşekkürü ya da sponsor logosu taşıyabilir. Bu tanıtım sayılmaz. Posta, tercih ve ekip aboneliğine göre bütün alıcılara gider.
+- **Asıl amacı tanıtım olan içerik** (indirim kodu, şirket iş ilanı, satış, çekiliş) yalnız tanıtım izni veren kişiye gider. Kitle, bu kararın kitlesi ile core'daki tanıtım izni listesinin kesişimidir.
+- **Tanıtım izni kişi başına tek bir izindir** ve işaretsiz kutuyla alınır (ADR-0062 eki). Ekip ya da kategori başına tanıtım izni yoktur.
+- **Gönderimdeki onay kutusu kalır.** Gönderen, postanın asıl amacının tanıtım olmadığını beyan eder; kısa teşekkür ve logo bu beyana engel değildir. Tanıtım postası bu beyanla gönderilemez.
