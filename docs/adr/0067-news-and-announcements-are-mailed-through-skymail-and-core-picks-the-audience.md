@@ -140,3 +140,7 @@ Bu kararın tercih ve çıkış kuralları değişmez. ADR-0072 onları yalnız 
 - **Asıl amacı tanıtım olan içerik** (indirim kodu, şirket iş ilanı, satış, çekiliş) yalnız tanıtım izni veren kişiye gider. Kitle, bu kararın kitlesi ile core'daki tanıtım izni listesinin kesişimidir.
 - **Tanıtım izni kişi başına tek bir izindir** ve işaretsiz kutuyla alınır (ADR-0062 eki). Ekip ya da kategori başına tanıtım izni yoktur.
 - **Gönderimdeki onay kutusu kalır.** Gönderen, postanın asıl amacının tanıtım olmadığını beyan eder; kısa teşekkür ve logo bu beyana engel değildir. Tanıtım postası bu beyanla gönderilemez.
+
+## Ek (2026-10-25): açılma ve tıklama kişi bazında kaydedilir (ADR-0074)
+
+"Sapmalar 5" ("Açılma izleme yok, açık soruya bağlı") kapanır. SkyMail haber ve duyuru postalarının açılmasını ve tıklanmasını kişi bazında kaydeder; dayanak meşru menfaattir, üye Hesap Merkezi'nden itiraz eder, gizli bağlantılar sayılmaz. Kural, kapsam ve süreler ADR-0074'tedir. Bayraklar kapalı başlar; production açılışı ayrı bir karardır.
