@@ -138,3 +138,11 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 - **Rızayı ve kitleyi olaya çevirmek:** rıza olayının kaybı ya da gecikmesi ispatı zayıflatır. Kitlenin SkyMail'de kopyası tercihi ve ekip ağacını iki yerde tutar.
 - **Kapalı başvuruda her Forms cevabını reddetmek (ADR-0066 eki karar 10'un ilk hâli):** kapanıştan önce gönderilip sonra onaylanan cevabın bileti sessizce kaybolurdu.
 - **Kapalı başvuruda her Forms cevabına bilet yazmak:** kapanış Forms'tan gelenler için anlamını yitirirdi.
+
+## Ek (2026-10-25): Forms'un postaları ve iki yeni olay (ADR-0075)
+
+ADR-0075 karar 3'ü alan servislerinin birbirine de uygular: Forms SkyMail'i, SkyMail Forms'u bilmez. Forms'un postaları core'un bildirim kararına geçtiği için:
+
+- **Olay listesi genişler.** `forms.response.status_changed` `nextFormId`, `returnedQuestionCount` ve `reviewedAt` alanlarını da taşır. İki yeni tür gelir: `forms.workflow_run.reopened` ve `forms.attempt.updated`. Karar 5 aynen geçerlidir: olaylarda yalnız kimlik ve karar alanları vardır.
+- **İç okuma uçları genişler.** Aynı dar rolle uçlar şunları da verir: formun başlığı, yanıtın cevapları, `reviewNote`, `guestCopyEligible`, akış koşusunun yeniden açılma notu, gecikmiş değerlendirmeler ve gönderenin rolüyle yanıtlayanlar (karar 11'deki claim check).
+- **Kitle okuma istisnası (karar 14)** form yanıtlayanlarını da kapsar. SkyMail kitleyi core'dan okur, core yanıtlayanları Forms'tan okur.

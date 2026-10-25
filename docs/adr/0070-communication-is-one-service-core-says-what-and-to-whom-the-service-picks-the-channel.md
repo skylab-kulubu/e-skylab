@@ -91,3 +91,7 @@ Nasıl:
 - **Kutuyu tercihe bağlamak:** kapalı kategori kutuda da görünmezdi; kişi e-postayı kapatınca bilet ya da etkinlik haberini hiçbir yerde göremezdi. Kutu sessizdir, kişiyi rahatsız etmez; push ve e-posta tercihe bakar.
 - **`mail.` adresinde kalıcı olarak kalmak:** sıfır maliyet, ama ürün adı push ve SMS gelince yanıltıcı olur. İlk aşamalar için seçildi (karar 8); geçiş sonraki adım.
 - **Alan adını hemen değiştirmek:** kullanıcıya ikinci kanal görünmeden faydası yok; skylcn-ui geçişi ve konsol işleriyle aynı anda Keycloak, Traefik ve DNS değişikliği riski toplar.
+
+## Ek (2026-10-25): Forms'un postalarını core gönderir (ADR-0075)
+
+Karar 3'teki "Keycloak, Forms ve core'un mevcut çağrıları değişmez" cümlesinin ve Consequences'taki "Keycloak SPI, Forms ve core `/single` ile göndermeye devam eder" cümlesinin Forms kısmı ADR-0075 ile değişir. Forms SkyMail'e göndermez. Forms olay yayımlar, postanın kime ve hangi Bildirim türüyle gideceğine core karar verir. core postayı kendi kuyruğundan gönderir: hesabı olan alıcıya `POST /v1/notifications` ile, misafire `/v1/mail_tasks/single` ile. Karar 2 bu yönü zaten söylüyordu. Keycloak'ın sistem postası SkyMail'e doğrudan gitmeye devam eder (ADR-0045). `forms.*` şablon anahtarları ve değişkenleri aynı kalır; sözleşmelerinin sahibi core olur.
