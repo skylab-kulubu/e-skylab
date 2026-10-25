@@ -136,3 +136,15 @@ Yusuf ve Fatih (2026-10-24): kulüp şu an tanıtım içeriği göndermiyor. Bu 
 - Değişmeyenler: kişi başına tek izin, işaretsiz ve varsayılan kapalı kutu, üç geri alma yolu (iletişim tercihleri, tanıtım postasındaki çıkış bağlantısı, info@yildizskylab.com), izin kaydının geri almadan sonra 3 yıl saklanması ve hesap silinince silinmesi.
 - Duyuru rızası (Davet onayı, `davet-v2`) ve onun formdaki kutusu aynen kalır.
 - Kutuyu yeniden ilk ekrana ya da formlara koymak yeni bir karar ister.
+
+## Ek (2026-10-25): açılma ve tıklama takibinin kayıtları (ADR-0074)
+
+2026-10-24 ekindeki "SkyMail: kişi bazında açılma ve tıklama" satırı ADR-0074'ün süresidir. Tabloya iki satır eklenir:
+
+| Veri | Süre | Dayanak |
+|---|---|---|
+| SkyMail: takip bağlantısı adresleri (gönderimde kaydedilen hedefler) | 1 yıl, sonra adres boşalır ve bağlantı "süresi doldu" der; maskelenen ya da sonradan hassaslaşan gönderimde saklama işinin ilk koşusunda; kişiyi adlandıran adres hesap silmede | meşru menfaat |
+| core: takip tercihi değişikliklerinin kaydı (kişi, yeni ve önceki değer, kaynak, zaman; adres ve IP yok) | 3 yıl, sonra silinir; hesap silinince hemen | meşru menfaat (ispat) |
+
+- Takibe itiraz eden kişinin olayları itirazla silinir; tercih satırı hesapla yaşar.
+- "Açık sorular"daki 10 kişilik anonimlik eşiği SkyMail'in takip toplamları için de geçerlidir.

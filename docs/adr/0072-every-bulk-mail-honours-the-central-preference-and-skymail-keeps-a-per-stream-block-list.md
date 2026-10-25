@@ -323,3 +323,7 @@ Karar 9'un ilk iki maddesi ("sponsor tanıtımı, ücretli bilet, şirket iş il
 - **Beyan değişir.** Gönderen artık "ticari içerik yok" değil, "postanın asıl amacı tanıtım değil" beyan eder. Kısa teşekkür ve logo bu beyana engel değildir.
 - **İYS.** Kulüp İYS'ye kayıtlı bir hizmet sağlayıcı değildir. Tanıtım içeriği yalnız kulübün kendi tanıtım iznine dayanarak gider.
 - **Açık:** karar 9'daki "ücretli bilet" örneği s6 §5.10'un listesinde yok. Kulübün kendi ücretli etkinliğinin duyurusu asıl amaç ölçüsüne göre değerlendirilir; ayrı bir kural gerekiyorsa Yusuf karar verir.
+
+## Ek (2026-10-25): takip kararı (ADR-0074)
+
+Karar 2'nin "Takip kararı ayrı bir ADR ile yazılacak" cümlesindeki ADR, ADR-0074'tür. Takip akışa bağlı değildir: panel postaları `SKYMAIL_TRACKING_OPERATOR`, servislerin postaları `SKYMAIL_TRACKING_SYSTEM` bayrağına bağlıdır; gizli bağlantılar hiçbir postada sayılmaz, hesabı olmayan adres hiç izlenmez.
