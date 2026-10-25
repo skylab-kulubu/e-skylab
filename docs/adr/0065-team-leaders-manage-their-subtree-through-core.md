@@ -151,3 +151,12 @@ Endüstri uygulamasıyla karşılaştırma:
 - **Sapma 2, sınıflandırılmamış rol:** Entra'da sınıf rolün türünden gelir. Bizde rolün türü yok, sınıf bir listeden gelir; listede olmayan rol yönetici rolü sayılır. Realm rollerini sınıflamıyoruz, hepsi korur; kulübün eski realm rolleri rol temizliği F3 ile kalkar.
 - **Sapma 3, geniş tanım:** liderler alt ekip açıp alt ekibe lider atayabildiği için (Entra sahibi alt grup açamaz) korunan grup tanımı Entra'dakinden geniştir.
 - **Sapma 4, site editörlüğü:** `cms:access` ve `content:write` uygulama rolleridir; Entra'da sıradan gruplarla dağıtılabilirdi. Biz onları yönetici sınıfına alıyoruz, yani Entra'dan daha sıkıyız. Gerekçe: inscribed'da yazma site genelidir ve kaynak başına yetki yoktur; rol fiilen site yöneticisidir.
+
+## Ek: ekip ayarları (2026-10-25)
+
+Yusuf (2026-10-25, core-frontend #94 incelemesi B1): ekip üyeleri etkinliklerin yarışmacılarını ekleyip düzenleyebilir, ama bunu ekibin lideri seçer.
+
+- **Ekip ayarı** ekibin kendi grubunun özniteliğidir; core'un `PUT /v1/groups/{id}/settings` ucu yazar. İlki `members_manage_competitors`: `false` iken ekibin etkinliklerinde yarışmacı ekleme, düzenleme ve silme yalnız Leader'larda (karar 2'deki üst ekip Leader'ları dahil) ve Privileged'dadır. Okuma ve kişinin kendini kaydetmesi değişmez.
+- **Liderin yazdığı ilk yetki özniteliğidir.** Karar 8 ekip bilgisini yönetenlere, `public_listing`, `public_leaders` ve `team_door_scan`'i Privileged'a bırakır; o üçü yetkiyi genişletir (üye adını açar, kapı yetkisi verir). Ekip ayarı **yalnız daraltır**: varsayılanı bugünkü kuraldır, lider kendi yetkisinin üstüne çıkamaz, yalnız kendi ekibinin üyelerinin bir yazmasını kapatabilir. Bu yüzden ekibi yöneten (`Manages`: ekibin ya da üst ekibin Leader'ı) yazar; korumalı grupta yalnız Privileged. Sonraki ekip ayarları da bu kurala bağlıdır: yalnız daraltan ayar lidere açılır, genişleten Privileged'da kalır.
+- Değer yoksa, okunamazsa ya da ad tek bir grubun değilse varsayılan geçerlidir (açık). Her değişiklik karar 9'daki denetim kaydına eski ve yeni değerle yazılır.
+- `TEAM_DELEGATION` kapalıyken ayarı yalnız Privileged yazar; açılınca liderler de yazar.
