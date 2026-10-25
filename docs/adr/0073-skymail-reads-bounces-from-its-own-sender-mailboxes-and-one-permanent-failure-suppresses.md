@@ -14,7 +14,7 @@ Bugünkü boşluk:
 
 Kayıt tabloları, ayrıştırıcı ve kuyruğa alırken bastırma 2026-10-20 ve 21'de SkyMail'e girdi (skymail-backend #86, #87, #89; hepsi production'da). Raporu kutudan çeken okuyucu henüz yok (hub bileti skymail-bounce-isleme 04). Bu kayıt okuyucunun ve bugün uygulanan kuralların dayanağıdır.
 
-Gönderen kutuları ADR-0072'de belirlendi: işlem akışı `hesap@` ve `bilgi@` (`bildirim.yildizskylab.com`), duyuru akışı kendi alt alanındaki kutu (karar 10). Kutuların hepsi paylaşılan kutudur; kimse onları okumaz. Kutuya gelen insan postasını bir posta akışı kuralı `info@`'ya yönlendirir; teslim raporları, otomatik yanıtlar ve OOF yönlendirilmez.
+Gönderen kutuları ADR-0072'de belirlendi: işlem akışı `hesap@` ve `bilgi@` (`bildirim.yildizskylab.com`), duyuru akışı kendi alt alanındaki kutu (karar 10). Kutuların hepsi paylaşılan kutudur; kimse onları okumaz. Kutuya gelen insan postası bir posta akışı kuralıyla `info@`'ya yönlendirilecek; teslim raporları, otomatik yanıtlar ve OOF yönlendirilmez. Kural 2026-10-25 itibarıyla Audit kipindedir: henüz yönlendirmez, yalnız eşleşmeleri kaydeder. Enforce'a geçiş hub bileti 02'dedir.
 
 Karar (2026-10-20, Yusuf: K1–K4; ayrıntılar hub SPEC skymail-bounce-isleme ve bu kayıt):
 
@@ -31,7 +31,7 @@ Karar (2026-10-20, Yusuf: K1–K4; ayrıntılar hub SPEC skymail-bounce-isleme v
 3. **Okuyucu kutuyu yoklar.**
    - Her 5 dakikada Graph delta sorgusu (`mailFolders/inbox/messages/delta`); her yeni öğenin MIME'ı (`$value`) bellekte ayrıştırılır. Ham MIME SkyMail'de saklanmaz; yalnız delta bağlantısı saklanır.
    - Aynı anda tek okuyucu koşar (Postgres advisory lock); replika sayısı fark etmez.
-   - Bayrak `SKYMAIL_BOUNCE_READER=off|dry-run|on`, varsayılan `off`. `dry-run` okur ve sayar, hiçbir şey yazmaz. Production'da `on` aydınlatma metninin teslim durumu satırını bekler (hub bileti 07).
+   - Bayrak `SKYMAIL_BOUNCE_READER=off|dry-run|on`, varsayılan `off`. `dry-run` okur ve sayar; ret ve bastırma yazmaz, yalnız kutudaki yerini (delta bağlantısı) ve sayıları tutar. Production'da `on` aydınlatma metninin teslim durumu satırını bekler (hub bileti 07).
 
 4. **Yalnız standart rapor işlenir, ve yalnız SkyMail'in postasına bağlanabiliyorsa.**
    - Üst tür `multipart/report; report-type=delivery-status` (RFC 6522) olmalı. Yalnız `message/delivery-status` bölümü ve geri dönen postanın başlıkları okunur. Konu, insan metni ve HTML hiç okunmaz; Exchange bunları kutunun diline göre yazar.
@@ -73,14 +73,14 @@ Karar (2026-10-20, Yusuf: K1–K4; ayrıntılar hub SPEC skymail-bounce-isleme v
    - `Diagnostic-Code`'dan yalnız kodlar alınır; metin adresi ve sunucu adlarını tekrarladığı için saklanmaz. Günlükler adres ve rapor metni yazmaz.
 
 9. **Uzak sunucudan yalnız başlık ve yalnız ret istenir.**
-   - Sunucu `DSN` ilan ediyorsa SMTP gönderimi `RET=HDRS` ve `NOTIFY=FAILURE` ister (RFC 3461). `NOTIFY=SUCCESS` istenmez; her teslim için kutuya rapor yağardı.
+   - Sunucu `DSN` ilan ediyorsa SMTP gönderimi `RET=HDRS` ve `NOTIFY=FAILURE` ister (RFC 3461). `NOTIFY=SUCCESS` istenmez; her teslim için kutuya rapor yağardı. `NOTIFY=FAILURE` gecikme (`DELAY`) raporunu da istememek demektir; yine de gelen gecikme raporu (NOTIFY'ı yok sayan bir sunucudan) yalnız kaydedilir.
 
 ## Consequences
 
 - **SkyMail (skymail-backend).** Okuyucu (hub bileti 04): bayrak, Graph istemcisi, delta bağlantısının saklandığı tablo, advisory lock, sayaçlar (işlenen, `dsn_degil`, `eslesmedi`, kalıcı, yumuşak, gecikme) ve bounce oranı için okunabilir bir uç. Tablolar, ayrıştırıcı, eşleme, kuyruğa alırken bastırma, muafiyet ve operatör uçları mevcuttur.
 - **Arayüz (skymail-frontend).** Bastırma listesinde bounce satırını onaylı kaldırma, gönderim sayfasında "ulaşmadı" ve "bastırıldı" sayıları, hesap postası işareti, yumuşak ret etiketi (hub bileti 08).
 - **Keycloak.** `skymail` istemcisine `skymail:suppressions:manage`, bir gruba; ADR-0072'nin `skymail:unsubscribes:reactivate` rolüyle aynı reconcile değişikliğinde (hub bileti 06). Rol verilene kadar listeyi kimse okuyamaz ve kaldıramaz.
-- **Ops.** Uygulama kaydı, sertifika, yönetim kapsamı, saklama etiketi ve yönlendirme kuralı bir wizard ile kuruldu (hub biletleri 02 ve 12). Sertifika iki yıllıktır; bitişten önce yenileme aynı wizard'dadır. Okuyucunun açılması sandbox'ta gerçek bir NDR ile eşlemenin doğrulanmasını bekler.
+- **Ops.** Uygulama kaydı, sertifika, yönetim kapsamı ve saklama etiketi bir wizard ile kuruldu (hub biletleri 02 ve 12). Yönlendirme kuralı Audit kipinde kuruldu; posta provası, Graph provası ve Enforce'a geçiş (`--posta-provasi`, `--prova`, `--kural-enforce`) henüz kayıtlı değil (bilet 02). Sertifika iki yıllıktır; bitişten önce yenileme aynı wizard'dadır. Okuyucunun açılması sandbox'ta gerçek bir NDR ile eşlemenin doğrulanmasını bekler.
 - **Metinler.** KVKK Aydınlatma Metni'ne "e-posta teslim durumu" girer: amaç (ulaşmayan adrese yeniden göndermemek, hesap postalarının ulaşmasını korumak), dayanak (meşru menfaat), süreler ve Microsoft'un posta teslim eden veri işleyen olduğu (hub bileti 07).
 - **Saklama.** ADR-0062'ye iki satır eklenecek: "SkyMail: ret kaydı (adressiz) | 1 yıl | meşru menfaat" ve "SkyMail: bastırma kaydı (adres) | kaldırılana ya da hesap silinene kadar | meşru menfaat". ADR-0062 bu kayıtla değişmez.
 - **Bilinen sınırlar.**
