@@ -146,3 +146,28 @@ ADR-0075 karar 3'ü alan servislerinin birbirine de uygular: Forms SkyMail'i, Sk
 - **Olay listesi genişler.** `forms.response.status_changed` `nextFormId`, `returnedQuestionCount` ve `reviewedAt` alanlarını da taşır. İki yeni tür gelir: `forms.workflow_run.reopened` ve `forms.attempt.updated`. Karar 5 aynen geçerlidir: olaylarda yalnız kimlik ve karar alanları vardır.
 - **İç okuma uçları genişler.** Aynı dar rolle uçlar şunları da verir: formun başlığı, yanıtın cevapları, `reviewNote`, `guestCopyEligible`, akış koşusunun yeniden açılma notu, gecikmiş değerlendirmeler ve gönderenin rolüyle yanıtlayanlar (karar 11'deki claim check).
 - **Kitle okuma istisnası (karar 14)** form yanıtlayanlarını da kapsar. SkyMail kitleyi core'dan okur, core yanıtlayanları Forms'tan okur.
+
+## Ek (2026-10-26): Keycloak grup silme olayı, zarfa `traceparent`; SkyMail bastırması olay olmaz
+
+Kararlar (Yusuf, 2026-10-25 ve 2026-10-26). Karar 1–16 aynen geçerlidir. Bu ek yalnız Keycloak'ta seçilen türleri ve zarfı genişletir.
+
+- **Keycloak'ta seçilen türlere grup silme girer (karar 8).**
+  - Sağlayıcı admin olaylarını kaynak başına bir işlem kümesiyle seçer: `USER` için `CREATE`, `UPDATE`, `DELETE` (bugünkü); `GROUP` için yalnız `DELETE`. `GROUP` `CREATE`/`UPDATE` ve `GROUP_MEMBERSHIP` gönderilmez. Bağları olmadığı için `unrouted`'a düşer ve alarm çalardı.
+  - Routing key `KK.EVENT.ADMIN.<realm>.SUCCESS.GROUP.DELETE`. `core.keycloak` kuyruğuna yalnız bu bağ eklenir.
+  - Gövde öteki admin olaylarıyla aynıdır: `id`, `realmId`, `resourceType`, `operationType`, `resourcePath` (`groups/<id>`), `time`. Grup adı ve temsil yoktur.
+  - core olayı yalnız uyandırıcı olarak kullanır (sapma 4). Silinen ekiplerin İletişim tercihi satırlarını temizleyen iş uyanır; veri yine Keycloak'tan okunur, günlük tur kalır.
+  - Kişi silmede (`USER DELETE`) de aynı: core kişiyi Keycloak'tan yeniden okur. Kişi Keycloak'ta yoksa ve hesap silme (ADR-0051) sürmüyorsa tercih satırlarını siler.
+- **Zarfa isteğe bağlı `traceparent` (karar 5).**
+  - CloudEvents Distributed Tracing uzantısıdır, W3C Trace Context biçiminde: `00-<32 hex>-<16 hex>-<2 hex>`. `tracestate` yoktur.
+  - Yayıncı, olayı doğuran HTTP isteğinin izi varsa doldurur; arka plan işinde boş bırakır.
+  - Tüketici değer geçerliyse loglar. Geçersizse ya da yoksa yok sayar; olay bu yüzden reddedilmez.
+  - Kişisel veri değildir. Alan eklemek olduğu için şema sürümü değişmez. Keycloak olayları CloudEvents olmadığı için taşımaz.
+- **SkyMail bastırması olay olmaz.** `skymail.events` bu ekle açılmaz; karar 1'deki "sonra" hâli sürer.
+  - Kişiye gösterim olay değil, SkyMail'in kişi ucudur (ADR-0075 karar 2, ADR-0073 eki 2026-10-26). core bastırma bilgisini hiçbir kararında kullanmaz.
+  - Kişiye kendiliğinden bildirim (kutu, push) istenirse bu bir bildirim kararıdır ve ADR-0075 karar 1'e göre core'a girer. Olay yolu o gün yeniden değerlendirilir.
+- **Saklama değişmez.** Karar 6'daki saklama listesine satır eklenmez: yeni giden kutusu ya da yeni tüketici tablosu yoktur.
+
+**Endüstri uygulamasıyla karşılaştırma (bu ek).**
+- **Uyan:** `traceparent` CloudEvents'in Distributed Tracing uzantısı ve W3C Trace Context'tir.
+- **Sapma 14. `traceparent` var, toplayıcı yok.** OpenTelemetry'de iz bir toplayıcıya gider; bizde yalnız tüketici loguna yazılır. Yayıncı ve tüketici logları zaten olay `id`'siyle bağlanır. Toplayıcı ayrı bir iştir.
+- **Sapma 4'ün devamı.** Keycloak grup silme olayı da giden kutusuz ve confirms'süzdür. Kaçan olayı core'un günlük temizlik turu kapatır.
