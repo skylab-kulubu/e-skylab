@@ -156,7 +156,7 @@ Kararlar (Yusuf, 2026-10-25 ve 2026-10-26). Karar 1–16 aynen geçerlidir. Bu e
   - Routing key `KK.EVENT.ADMIN.<realm>.SUCCESS.GROUP.DELETE`. `core.keycloak` kuyruğuna yalnız bu bağ eklenir.
   - Gövde öteki admin olaylarıyla aynıdır: `id`, `realmId`, `resourceType`, `operationType`, `resourcePath` (`groups/<id>`), `time`. Grup adı ve temsil yoktur.
   - core olayı yalnız uyandırıcı olarak kullanır (sapma 4). Silinen ekiplerin İletişim tercihi satırlarını temizleyen iş uyanır; veri yine Keycloak'tan okunur, günlük tur kalır.
-  - Kişi silmede (`USER DELETE`) de aynı: core kişiyi Keycloak'tan yeniden okur. Kişi Keycloak'ta yoksa ve hesap silme (ADR-0051) sürmüyorsa tercih satırlarını siler.
+  - Kişi silmede (`USER DELETE`; hesap konsolundan `DELETE_ACCOUNT` de) aynı yol izlenir: core kişiyi Keycloak'tan yeniden okur. Kişi Keycloak'ta yoksa ve core'da kişinin hesap silme isteği (ADR-0051) yoksa tercih satırlarını siler.
 - **Zarfa isteğe bağlı `traceparent` (karar 5).**
   - CloudEvents Distributed Tracing uzantısıdır, W3C Trace Context biçiminde: `00-<32 hex>-<16 hex>-<2 hex>`. `tracestate` yoktur.
   - Yayıncı, olayı doğuran HTTP isteğinin izi varsa doldurur; arka plan işinde boş bırakır.
