@@ -336,7 +336,7 @@ Karar 8'in iki yolu ADR-0075 ile değişir; akış sınıfları değişmez.
 - **Form sahibinin toplu gönderimi.** "Forms'un mail-source anlık görüntüsü" yolu kalkar. SkyMail kitleyi core'dan çözer: kitle türü `form_respondents`, gönderim ya da onay anında çözülür. core yanıtlayanları ve gönderenin forma erişimini Forms'un iç ucundan okur.
 - **Amaç ve süzgeç.** Amaç seçimi ve beyan (karar 2) aynen kalır:
   - `islem` beyanlı posta bütün yanıtlayanlara gider.
-  - `duyuru` postasında Member karar 3'ün süzgecinden geçer.
+  - `duyuru` postasında Member karar 3'ün süzgecinden geçer. Varsayılan tek başına engellemez, çünkü yanıtlayan kitleye kendi yanıtıyla girmiştir. Değişen yalnız Member olmayanın dayanağıdır.
   - Member olmayan yanıtlayan duyuru postasını yalnız etkin bir Davet onayıyla alır (ADR-0062). Bu kural için karar 3'teki "listenin hukuki dayanağı gönderenindir" cümlesi bu kitleye uygulanmaz, çünkü kitleyi gönderen değil core çözer.
   - Hesabı olmayan adres ayrıca karar 4'teki çıkış kaydına bakar.
-- **Kontrol noktası** (karar 3 ve 6) bu gönderime de aynen uygulanır.
+- **Kontrol noktası** (karar 3 ve 6) bu gönderime de aynen uygulanır. Bu kitlede tur başına yeniden sorgu Davet onayını da denetler.
