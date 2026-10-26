@@ -132,3 +132,22 @@ Karar (2026-10-20, Yusuf: K1–K4; ayrıntılar hub SPEC skymail-bounce-isleme v
 - Microsoft: [RBAC for Applications](https://learn.microsoft.com/en-us/exchange/permissions-exo/application-rbac), [Graph delta (mesajlar)](https://learn.microsoft.com/en-us/graph/delta-query-messages), [Graph MIME](https://learn.microsoft.com/en-us/graph/outlook-get-mime-message), [sertifika kimliği](https://learn.microsoft.com/en-us/entra/identity-platform/certificate-credentials), [Exchange Online NDR kodları](https://learn.microsoft.com/en-us/troubleshoot/exchange/email-delivery/ndr/non-delivery-reports-in-exchange-online), [outbound spam koruması](https://learn.microsoft.com/en-us/defender-office-365/outbound-spam-protection-about), [kısıtlanan kullanıcılar](https://learn.microsoft.com/en-us/defender-office-365/outbound-spam-restore-restricted-users), [saklama etiketleri](https://learn.microsoft.com/en-us/purview/retention-tags-and-retention-policies)
 - Amazon SES: [account-level suppression list](https://docs.aws.amazon.com/ses/latest/dg/sending-email-suppression-list.html)
 - Postmark: [bounce webhook](https://postmarkapp.com/developer/webhooks/bounce-webhook), [Suppressions API](https://postmarkapp.com/developer/api/suppressions-api)
+
+## Ek (2026-10-26): kişi bastırılmış adresini Hesap Merkezi'nde görür (ADR-0075)
+
+Karar (Yusuf, 2026-10-26). Karar 1–9 aynen geçerlidir.
+
+- **Kişi görür.** Hesap Merkezi'nin e-posta sayfasında, bastırılmış adresin yanında "Bu adrese posta ulaşmıyor." yazar. Genel bakış sayfasında e-posta sayfasına bağlanan tek satırlık bir özet de görünür.
+- **Hesap Merkezi SkyMail'in kişi ucundan okur.**
+  - Uç `GET /v1/me/email-delivery`'dir. Hesap Merkezi onu kişinin kendi token'ıyla çağırır, `/v1/me/inbox`'ı çağırdığı gibi (ADR-0075 karar 2, ADR-0070 karar 7).
+  - Rol yoktur. SkyMail yetki için yalnız token'ın `aud`'una (`skymail`) ve `sub`'ına bakar; servis hesabının token'ı reddedilir (403). Hesap erişim kapısı geçerlidir.
+- **Uç yalnız kişinin kendi satırlarını döner.**
+  - Parametre almaz. Döndüğü bastırma kayıtları ya kişinin `sub`'ına bağlıdır ya da adresi token'daki kişinin kendi adreslerinden biridir (`email`; varsa `school_email`).
+  - `email` yalnız `email_verified` true ise sayılır. Doğrulanmamış bir adresi kendi hesabına yazan biri, o adresin bastırılıp bastırılmadığını öğrenemez.
+  - Başka adres ya da kişi sorgulanamaz.
+  - Yanıtta adres ve ilk görülme zamanı vardır. Kaynak, kod ve kayıt kimliği yoktur.
+  - Hesap Merkezi adresi kişinin birincil, okul ve kişisel adresleriyle sunucuda eşler. Tarayıcıya yalnız adresin türü gider.
+- **Kişi bastırmayı kaldıramaz.** Karar 7 aynen geçerlidir: kaldırma yalnız panelden, `skymail:suppressions:manage` rolüyle yapılır. Hesap Merkezi yalnız gösterir.
+- **Olay, core kaydı ve core ucu yoktur.** core bastırma bilgisini hiçbir kararında kullanmaz, bu yüzden araya girmez (ADR-0075 karar 2). Kişiye kendiliğinden bildirim istenirse yeniden değerlendirilir (ADR-0071 eki 2026-10-26).
+- **Bilinen sınır.** Kişinin `sub`'ı bastırma kaydına yalnız gönderim kişiyi biliyorsa yazılır (karar 8). Keycloak'un giriş kodu ve bugün Forms'un postaları kişisiz gider. Kişisiz bastırılmış bir kişisel adres, token'da karşılığı yoksa görünmez. Birincil adres doğrulanmışsa, okul adresi de token'da varsa, token'dan eşlendiği için görünür.
+- **Aydınlatma.** Consequences'taki "e-posta teslim durumu" satırının amacına, bastırmanın kişiye Hesap Merkezi'nde gösterilmesi de girer (hub bileti skymail-bounce-isleme 07).
