@@ -148,3 +148,13 @@ Yusuf ve Fatih (2026-10-24): kulüp şu an tanıtım içeriği göndermiyor. Bu 
 
 - Takibe itiraz eden kişinin olayları itirazla silinir; tercih satırı hesapla yaşar.
 - "Açık sorular"daki 10 kişilik anonimlik eşiği SkyMail'in takip toplamları için de geçerlidir.
+
+## Ek (2026-10-27): bastırma listesinden kaldırma kaydı 3 yıl (ADR-0073)
+
+Karar (Yusuf, 2026-10-27): ADR-0073'ün kaldırma denetim kaydı, çıkışı geri alma kaydı gibi 3 yıl saklanır. Kayıtta kaldıran görevlinin kimliği olduğu için süresiz tutulamaz; amaç (kimin neyi kaldırdığının ispatı) geri alma kaydınınkiyle aynıdır. Tabloya bir satır eklenir:
+
+| Veri | Süre | Dayanak |
+|---|---|---|
+| SkyMail: bastırma listesinden kaldırma kaydı (kim, zaman, kaldırılan satırın kaynağı, kodu, sayısı ve ilk görülmesi; adres yok) | 3 yıl, sonra silinir; hesap silinince yetkilinin kimliği değiştirilir | meşru menfaat (ispat) |
+
+- SkyMail'in içerik süpürücüsü siler; süre sabittir, ayarı yoktur.
