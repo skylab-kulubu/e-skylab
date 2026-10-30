@@ -11,7 +11,7 @@ Karar (Yusuf, 2026-10-12: GY3, GY4 ve GY8; aynı gece S2 ve S3; konsol listesi 2
 1. **Konsol ne içindir.** Keycloak konsolu kimlik sağlayıcı, client ve token ayarları ile acil durum içindir. Üyelik, grup açma, silme ve adlandırma ve grup rol eşlemesi yalnız panelden, core üzerinden yapılır.
 2. **Kim yazar.** Konsoldan yalnız master'daki konsol yazıcı grubunun üyeleri, kendi ayrı hesaplarıyla yazar (ADR-0076 karar 9). Bugün altı kişidir. GY4'teki "yalnız iki ADMIN" sayısı S2 ile değişti.
 3. **Acil durum nedir.** Panel ya da core çalışmıyor ve bekleyemeyecek bir üyelik ya da rol değişikliği gerekiyor (ör. ele geçirilmiş bir hesabın yetkisini almak); ya da Keycloak'ın kendisi bozuk ya da konsol hesaplarıyla girilemiyor. Sıradan iş acil değildir: panel beklenir.
-4. **Acil hesaplar (S3).** master'da kişiye bağlı olmayan iki hesap, master `admin` rolüyle. İkisi de passkey'le korunur. Parola ve passkey'i taşıyan anahtar mühürlü zarfta saklanır; parolanın bir kopyası sır deposundadır (ADR-0049). Sır deposuna insan girişi Keycloak'a bağlı olduğu için asıl yedek zarftır. Değer elle kopyalanmaz.
+4. **Acil hesaplar (S3).** master'da kişiye bağlı olmayan iki hesap, master `admin` rolüyle. İkisi de passkey'le korunur. Parola ve passkey'i taşıyan anahtar mühürlü zarfta saklanır; asıl yedek zarftır. Değer elle kopyalanmaz.
    - Acil hesabın her girişi ADMIN'e posta olarak gider.
    - Kullanıldığı gün ne yapıldığı ekibe yazılır. İş bitince parola değiştirilir, yeni zarf hazırlanır, açılan zarf imha edilir.
    - **Yılda bir deneme.** Dönem devri haftasında her acil hesapla bir kez girilir, salt okur bakılır, çıkılır; ADMIN'e postanın geldiği doğrulanır. Tarih kulübün iç runbook'una yazılır.
@@ -37,14 +37,15 @@ Kaynaklar:
 - **Tespit gecikmelidir.** Konsoldaki bir değişiklik birkaç dakika sonra kayda ve postaya girer. Bu süre içinde core'un ekip yönetimi kararları güncel Keycloak üyeliğini okur, yani değişiklik hemen etkilidir.
 - **Acil hesap girişi postası** master'ın giriş olaylarından okunur; bu yüzden master realm'de giriş olayları açıktır.
 - **Haftalık ölçüm.** Konsol yazıcı sayısı, master `admin` taşıyan insan sayısı ve e-skylab'da yönetim rolü taşıyan insan ve grup sayısı düzenli ölçülür; kişiler adıyla değil sayıyla raporlanır.
+- **Uygulama durumu (2026-10-30).** Karar 6 uygulanmadı; o gelene kadar karar 7 geçerlidir.
 - **Sunucuda tek kişi.** Keycloak'ın kendisi bozulursa onarım sunucu yöneticisini bekler. Panel ve konsol üzerinden yapılabilen işleri konsol yazıcıları yürütür.
 - Sunucu, kullanıcı adları ve kimlik bilgisinin yeri kulübün iç runbook'undadır; bu public depoya yazılmaz.
 - **CONTEXT.md'de yeni terim:** Console change.
 
 ## Açık
 
-- **Konsol hesabı modeli ile bu politikanın tek ADR olup olmayacağı.** ADR-0076 karar 9 ile bu ADR'ın birleşmesi Yusuf'un kararıdır.
-- **Konsol olaylarının denetim kaydındaki satır biçimi.** Konsoldan gelen kişiye doğrudan rol olayları ve grupsuz satırların şeması, ekip yetki devrindeki ekstra rol kaydı kararıyla birlikte verilir.
+- *Not:* Konsol hesabı modeli ADR-0076 karar 9'dadır; bu ADR onu kullanır.
+- *Not:* **Konsol olaylarının denetim kaydındaki satır biçimi.** Konsoldan gelen kişiye doğrudan rol olayları ve grupsuz satırların şeması, ekip yetki devrindeki ekstra rol kaydı kararıyla birlikte verilir.
 
 ## Endüstri uygulamasıyla karşılaştırma
 

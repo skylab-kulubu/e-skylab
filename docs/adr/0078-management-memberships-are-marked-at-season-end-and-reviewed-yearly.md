@@ -33,16 +33,16 @@ Kaynaklar:
 - **ADR-0065'in "dinamik gruplar, PIM, süreli roller yok" sapması daralır.** Dinamik grup ve PIM yine yok. Yönetim üyeliğinin artık bir bitişi var, ama yalnız işaret ve bildirim üretir; erişimi kaldırmaz.
 - **Süresi dolmuş bir yöneticinin yetkisi, biri ekrandan çıkarana kadar sürer.** Bu bilinçli bir risktir. ADMIN'e giden günlük liste, haftalık özet ve panel işareti onu görünür tutar.
 - **Dönem devri sırası.** Yeni dönem açılıp aktif yapılmadan eklenen yönetim üyeliklerinin bitişi eski dönemin sonudur. Bu yüzden dönem devrinde önce yeni dönem açılır, sonra devir yapılır.
+- **Uygulama durumu (2026-10-30).** Karar 1–5'in core uygulaması açık bir PR'dadır; karar 6 yazılmadı.
 - **Açılış bayrakla.** Günlük iş core'da kapalı bir bayrağın arkasındadır; önce yalnız sayan kuru koşu, sonra uygulama açılır. Uyarı postası SkyMail'de şablonu tohumlanınca gider.
 - **Kişisel veri.** Terim kaydı yalnız kimlik tutar (kişi, grup, dönem); ad ve e-posta okunurken çözülür. Denetim kaydına giren satırlar ADR-0065 karar 9'daki 3 yıllık süreye bağlıdır.
 - **CONTEXT.md'de yeni terimler:** Management membership, Membership term, Season handover, Access review.
 
 ## Açık
 
-- **Bitmiş terimlerin saklama süresi.** Elle çıkarılmış ya da devredilmiş terim kaydı ne kadar tutulur (denetim kaydı gibi 3 yıl mı, daha kısa mı)? ADR-0062'nin saklama tablosuna satır olarak girer. Yusuf karar verecek.
-- **Gözden geçirme özetinin saklama süresi.** İşaretler dönem kapanınca silinir; geriye kalan özet sayının ne kadar tutulacağı yazılmadı.
-- **Alan liderleri.** Alan grubunun kendi `LIDERLER` grubu (alan bir ekip değildir) kapsam dışıdır. Süreli olup olmayacağı Yusuf'a soruldu.
-- **Süresi dolmamış üyeliği "çıkar" ucundan çıkarmak.** core'daki uygulama taslağı bunu reddediyor; o üyelik devirle ya da sıradan üye çıkarmayla kalkar. Böyle kalıp kalmayacağı Yusuf'a soruldu.
+- **Bitmiş terimlerin saklama süresi** (açık soru). Elle çıkarılmış ya da devredilmiş terim kaydı ne kadar tutulur? Öneri: denetim kaydı gibi 3 yıl. ADR-0062'nin saklama tablosuna satır olarak girer.
+- *Not:* Gözden geçirmeden geriye kalan özet yalnız sayıdır, kişisel veri taşımaz.
+- *Not:* Bugün alanların kendi Leader grubu yok; açılırsa bu ADR'a ek yazılır.
 
 ## Endüstri uygulamasıyla karşılaştırma
 

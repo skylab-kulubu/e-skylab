@@ -60,6 +60,8 @@ Kaynaklar:
 - **Spec önerisi, Yusuf'un "her şeyi sana bıraktım" yetkisiyle kabul (2026-10-12):** K3, K4, ayrı master hesabı (S1), acil hesaplar (S3), `/ROLLER` adı (S4), rol yerleşimi (S5), yeniden adlandırma politikası (S6), Forms koltuğu (S7; Forms'un sahibi 2026-10-15'te teyit etti), realm rol istisnasının kalkması, hiyerarşi hükmü.
 - Sektör karşılaştırması hub'daki rol temizliği spec'inde ve grup yönetimi değerlendirmesinde.
 
+**Uygulama durumu (2026-10-30).** `/ROLLER` grupları, en üst ekiplerin Leader gruplarındaki uygulama rolleri, core'un kişiye yeni doğrudan rolü reddetmesi ve realm rollerinin her zaman korunması uygulandı. Master konsol yapılandırması main'de, yayında değil. Konsol hesaplarının göçü, doğrudan rollerin `/ROLLER`'e taşınmasının kalanı, realm rollerinin kaldırılması, eski client'ların silinmesi ve Privileged kök listesinin üçe inmesi sırada.
+
 ## Consequences
 
 - **ADR-0006 tamamlanır ve sıkılaşır.** "Realm roles go away" cümlesi K2 ile uygulanır. "Extra per-user client roles" kalkar (K1). "Keycloak's own console is only for IdP and OAuth2/client/token setup" cümlesi master'daki ayrı hesaplarla ve ADR-0079'daki politikayla uygulanır.
@@ -82,16 +84,15 @@ Kaynaklar:
 
 ## Açık
 
-- **Sertifika yetkisinin ekip içinde devri.** Certificate manager artık bir rol grubu üyeliğidir. Ekip liderinin bu yetkiyi kendi ekibinden birine nasıl vereceği ayrı bir karardır; bu ADR yazmaz.
 - **Başka kullanılan uygulama var mı?** S8'de "başka bir şey" seçeneği işaretlendi, açıklaması yazılmadı. Cevap gelene kadar hiçbir client silinmez; yalnız devre dışı bırakma ve 14 günlük izleme yapılır.
-- **Konsol ADR'ı tek mi, iki mi?** Konsol hesabı modeli burada (karar 9), konsolun kullanım politikası ve acil erişim ADR-0079'da yazıldı. İkisinin tek ADR'da birleşmesi Yusuf'un kararıdır.
+- *Not:* Ekip liderinin sertifika yetkisini (rol grubu üyeliği) kendi ekibinden birine nasıl vereceği ayrı bir karardır; bu ADR yazmaz.
 
 ## Endüstri uygulamasıyla karşılaştırma
 
 **Uyanlar:**
 - **Entra app roles.** Uygulama izinleri client rolleridir; kodun okuduğu değer boşluksuz bir dizedir, görünen ad ayrıdır (N1).
-- **Rolü kişiye değil gruba ata.** Microsoft'un Cloud Adoption Framework'ü bunu önerir. Entra uygulama rolünü kişiye doğrudan atamaya izin verir; biz hiç izin vermiyoruz (K1), yani daha sıkıyız.
-- **Role-assignable gruplar.** Yönetici rolü taşıyan grubu yalnız ayrıcalıklı yönetici değiştirir (Privileged kökler, ADR-0065). Konsol grubunu core ve panel değiştiremez; yalnız master yöneticisi değiştirir. Bu, Entra'da role-assignable grubu yalnız Privileged Role Administrator'ın yönetmesinin karşılığıdır.
+- **Rolü kişiye değil gruba ata.** Microsoft'un Cloud Adoption Framework'ü bunu önerir.
+- **Role-assignable gruplar.** Yönetici rolü taşıyan grubu yalnız ayrıcalıklı yönetici değiştirir (Privileged kökler, ADR-0065). Konsol grubunu core ve panel değiştiremez; yalnız master yöneticisi değiştirir. Bu, Entra'da role-assignable grubu yalnız ayrıcalıklı rol yöneticisinin (ya da grubun atanmış sahibinin) yönetmesinin karşılığıdır.
 - **Ayrı yönetici hesabı.** Microsoft, Global Administrator işleri için ayrı hesap ister; Cloud Adoption Framework ayrıcalıklı yönetimde günlük hesabın kullanılmamasını söyler. Google da süper yöneticiye ayrı bir hesap önerir.
 - **Yöneticiye oltalamaya dayanıklı MFA.** Entra'nın Conditional Access şablonunun karşılığı, konsol girişinde passkey zorunluluğudur.
 - **Acil erişim hesapları kişiye bağlı değildir ve en az ikidir** (ayrıntı ADR-0079).
@@ -110,6 +111,7 @@ Kaynaklar:
 8. **Grup süzgeci yok.** Entra token'a yalnız uygulamaya atanmış grupları koyabilir. Bizde `/ROLLER` yolları her token'ın `groups`'unda görünür.
 9. **Ad ayırıcısı ve önekler.** Graph `.` kullanır, biz `:` kullanıyoruz. Bazı client'larda tarihsel önek var (`skymail:`, `skyforms:`, `place:`); yeniden adlandırılmıyor (karar 10).
 10. **Ad politikası yetki içindir.** Entra'nın adlandırma politikası yalnız Microsoft 365 gruplarında var ve önek ya da sonek ekler. Bizde ad bir yetki anahtarı olduğu için kural daha sıkıdır (ADR-0065 karar 7, N2, N3).
+11. **Kişiye doğrudan uygulama rolü yasak** (K1). Entra uygulama rolünü kişiye doğrudan atamaya izin verir; biz hiç izin vermiyoruz, yani daha sıkıyız.
 
 ## Considered Options
 

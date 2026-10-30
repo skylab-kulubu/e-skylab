@@ -18,7 +18,7 @@ Karar (Yusuf, 2026-10-12: GY5 ve GY9; aynı gün 22:15 alıcı kuralı "UYELER'e
 3. **İçerik.** Kim, neyi, hangi gruba, ne zaman; paneldeki ilgili sayfanın bağlantısı. E-posta adresi yazılmaz. Her alıcı değişiklik başına tek posta alır.
 4. **Varsayılan açık.** Bildirim core'da varsayılan olarak açıktır; şablon anahtarı boş bırakılırsa kapanır.
 5. **Konsoldan yapılan aynı değişiklikler** de, core onları okuduğunda (ADR-0079 karar 6) aynı postayı tetikler.
-6. **YTÜ ile doğrulanmamış hesap** (CONTEXT "Verified YTÜ account") bir Privileged köke ya da altına eklenirken panel **uyarır, engellemez** (GY9). Mezun yöneticilerin YTÜ hesabı olmayabilir.
+6. **YTÜ'ye bağlı olmayan hesap** (CONTEXT "YTÜ-linked"; core'da `ytu_linked`) bir Privileged köke ya da altına eklenirken panel **uyarır, engellemez** (GY9). Mezun yöneticilerin YTÜ hesabı olmayabilir.
    - Grubun Privileged olup olmadığını ve kişinin doğrulanıp doğrulanmadığını panel core'un yanıtından öğrenir; panelde grup adına bakan kural yazılmaz.
    - Aday listesinde işaret yalnız doğrulanmamış kişide ve yalnız hedef Privileged iken çıkar (Kaan, 2026-10-19).
    - Onay sorusu kişinin e-posta adresini gösterir ve adresin o kişiye ait olduğunun kontrol edilmesini ister.
@@ -37,7 +37,7 @@ Bu ADR core'da ve panelde 2026-10'da uygulanmış davranışı kayda geçirir.
 - **Akran görünürlüğü.** YK'ya eklenen kişiyi YK'nın öbür üyeleri de öğrenir; DK'ya ekleneni DK üyeleri (ADR-0077 karar 6).
 - **Posta kuyruğu ayrıdır.** Bilgi postası üyelik postasının kuyruğunu kullanmaz; eski bir core sürümü bu satırları "gruba eklendin" postası olarak göndermesin diye.
 - **Doğrulama kaynağı.** core'un kullanıcı kaydındaki YTÜ bağı okunur; core'da hesabı olmayan kişi doğrulanmamış sayılır.
-- **CONTEXT.md'de değişen:** Privileged ve Verified YTÜ account terimleri bu kuralları anar.
+- **CONTEXT.md'de değişen:** Privileged ve YTÜ-linked terimleri bu kuralları anar.
 
 ## Endüstri uygulamasıyla karşılaştırma
 
@@ -49,13 +49,13 @@ Bu ADR core'da ve panelde 2026-10'da uygulanmış davranışı kayda geçirir.
 **Sapmalar (hepsi):**
 1. **Yönetim grubuna üyelik o kökün öbür üyelerine de bildirilir** (akran görünürlüğü, GY5). PIM yalnız yöneticilere, grup sahiplerine ve atanan kişiye bildirir.
 2. **Varsayılan açık.** Google'ın kuralı varsayılan kapalıdır.
-3. **Doğrulanmamış hesap engellenmez, uyarılır.** İncelenen ürünler dış kişiyi engelliyor ya da ayrı bir hesap türü olarak tutuyor. Bizde ayrı bir hesap türü yok; ayrımı "Verified YTÜ account" taşır. Gerekçe: mezun yöneticilerin YTÜ hesabı olmayabilir.
+3. **Doğrulanmamış hesap engellenmez, uyarılır.** İncelenen ürünler dış kişiyi engelliyor ya da ayrı bir hesap türü olarak tutuyor. Bizde ayrı bir hesap türü yok; ayrımı "YTÜ-linked" taşır. Gerekçe: mezun yöneticilerin YTÜ hesabı olmayabilir.
 
 ## Considered Options
 
 - **Rol eşlemesinde grubun bütün üyelerine posta.** Yusuf reddetti: "UYELER'e mail gitmemeli".
 - **Yönetim grubuna üyelikte yalnız ADMIN'e posta** (PIM gibi). Yusuf akran görünürlüğünü seçti.
-- **Bu kuralları ADR-0077'ye ya da ADR-0079'a katmak** (taslakta önerilmişti). Ayrı tutuldu; birleştirme Yusuf'un kararıdır.
+- **Bu kuralları ADR-0077'ye ya da ADR-0079'a katmak** (taslakta önerilmişti). Ayrı tutuldu, çapraz bağlıdır.
 - **Doğrulanmamış hesabı yönetim grubuna almamak.** Mezun yöneticiler yüzünden reddedildi (GY9).
 
 ## Kaynaklar
