@@ -45,7 +45,7 @@ Karar (Yusuf, 2026-10-12; sektör karşılaştırması hub'daki admin paneli ara
    - Kayıt yazılamazsa değişiklik yapılmaz.
    - Kayıtta kişinin yalnız kimliği durur; ad ve e-posta okunurken çözülür.
    - Kayıt 3 yıl tutulur.
-   - Kaydı core'un `audit:read` rolü olanlar görür; rol ADMIN ve YK köklerine verilir.
+   - Kaydı core'un `audit:read` rolü olanlar görür; rol ADMIN ve YK köklerine verilir. *(Değişti: DK'ya da verilir, bkz. ADR-0077.)*
 10. **Rol taşıyan grup devredilmez.** core'un Privileged izin rollerinden, `audit:read`'den, bir client'ın `client:admin`'inden ya da Keycloak yönetim rollerinden birini doğrudan ya da atasından taşıyan grubun üyeliğini yalnız Privileged değiştirir (Entra'nın role-assignable gruplarının karşılığı). Grup rol eşlemeleri yalnız Privileged'dadır.
    *(2026-10-12: liste yerine rol sınıfları geldi; yönetici rolü taşıyan grup devredilmez, uygulama rolü taşıyan devredilir; bkz. aşağıdaki ek.)*
 
@@ -102,7 +102,7 @@ Kaynaklar:
 5. **Dizin görünürlüğü dar.** Entra'da her üye dizini okur. Bizde Leader yalnız kendi üyelerini ve maskeli bir aday aramasını görür.
 6. **Saklama uzun.** Entra P1/P2 30 gün, GitHub ve Microsoft 365 Standard 180 gün tutar. Biz 3 yıl tutuyoruz; ADR-0062'deki erişim kaydıyla aynı süre.
 7. **Onay yok.** GitHub'da iki tarafın maintainer'ı aynı kişi değilse taşıma istek ve onayla yapılır. Bizde böyle bir istek akışı yok; taşıyan iki tarafı da yönetmelidir.
-8. **Dinamik gruplar, PIM, süreli roller yok.** Keycloak'ta yoklar ve kulüp ölçeğinde gereksizler.
+8. **Dinamik gruplar, PIM, süreli roller yok.** Keycloak'ta yoklar ve kulüp ölçeğinde gereksizler. *(Daraldı: yönetim üyeliklerinin dönem sonunda bir bitişi var, ama yalnız işaret koyar; bkz. ADR-0078.)*
 
 ## Considered Options
 
