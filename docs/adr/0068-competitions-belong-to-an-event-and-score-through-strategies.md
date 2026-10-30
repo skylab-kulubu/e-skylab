@@ -115,7 +115,7 @@ Bugün geçerli olan:
 3. **ADR-0065 karar 8 ile ilişki.** `members_manage_competitors`, Privileged'da kalan öznitelikler (`public_listing`, `public_leaders`, `team_door_scan`) arasında değildir; onlar yetkiyi genişletir, bu yalnız daraltır (ADR-0065'in 2026-10-25 eki).
 4. **2026-10-12'de kabul edilen, henüz uygulanmamış kurallar:**
    - **Kimse kendi yarışmacısına puan yazamaz** (A3): Leader ve Privileged dahil. Bugün yalnız Judge için yazılıydı.
-   - **Yarışma görevlisi** (Competition staff) isteğe bağlıdır ve tek bir yarışma kapsamlıdır. Görevli yarışmayı organizatör gibi yönetir ve sonucu ilan eder (A5); görevli atayamaz, arşivleyemez, seri ayarını değiştiremez.
+   - **Yarışma görevlisi** (Competition staff) isteğe bağlıdır ve tek bir yarışma kapsamlıdır. Görevli yarışmayı organizatör gibi yönetir ve sonucu ilan eder (A5); yeni yarışma açamaz, görevli atayamaz, arşivleyemez, seri ayarını değiştiremez.
    - **Seri ayarı** (dönem tarihleri, toplama kuralı, hazır puanlar) yalnız Leader'da ve üstündedir (A2).
    - **Kulüp genelinde kilit yok** (A7): ayar ekip ekip değişir.
    - Ayar yalnız yarışmaları kapsar, etkinlik açmayı kapsamaz (A6).
