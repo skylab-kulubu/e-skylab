@@ -77,8 +77,8 @@ A Keycloak client that a Web handoff may land on, named by its `client_id` (firs
 _Avoid_: a free-form URL allowlist; storing the list in env vars; giving core or superadmin `manage-clients`
 
 **Verified YTÜ account**:
-A User whose Keycloak identity has a federated link to the YTÜ Microsoft identity provider (alias `OBS`). Its name and School e-mail are locked; an unverified account (for example one opened by Self-registration) may link YTÜ later, from Account center or right after Self-registration, and becomes locked then.
-_Avoid_: inferring verification from `emailVerified` or from the presence of a school-looking address; unlocking the name for support cases outside superadmin
+A User whose Keycloak identity has a federated link to the YTÜ Microsoft identity provider (alias `OBS`). Its name and School e-mail are locked; an unverified account (for example one opened by Self-registration) may link YTÜ later, from Account center or right after Self-registration, and becomes locked then. Adding an unverified account to a Privileged root or below shows a warning in the admin panel but is never refused; whether the warning was confirmed goes into the Team audit record (ADR-0080).
+_Avoid_: inferring verification from `emailVerified` or from the presence of a school-looking address; unlocking the name for support cases outside superadmin; refusing an unverified account a management group
 
 **YTÜ-linked**:
 A User whose university, faculty and department follow the YTÜ Microsoft login. Core alone decides it: the first token (or the one-time backfill of Keycloak attributes) carrying the `university` attribute that the OBS login writes sets `users.ytu_linked`, and a token without the claims (Account center's never has them) does not clear it. From then on every YTÜ login writes the current university and department (program codes and space-less names cleaned, an unknown code left empty), and faculty comes from core's department → faculty table. The three fields are read-only for the person and for admins: core refuses a change with `409 ytu_managed_field`, and Account center shows them with "YTÜ hesabından gelir". Account center reads core's `ytuLinked` and never decides this itself. In practice these are the same people as a Verified YTÜ account, but the decision rests on the attribute core can see, not on the federated link.
@@ -199,12 +199,16 @@ The Group a User is actually in when they appear on a parent roster. Direct memb
 _Avoid_: inherited flag, nested member flag, a second membership record on the parent
 
 **Realm role**:
-A realm-wide Keycloak role. Not used for club membership or core authorization. Leftover names that duplicate Groups (ADMIN, YK, WEBLAB) should not be assigned.
-_Avoid_: realm role as a copy of a Group
+A realm-wide Keycloak role. Only `default-roles-e-skylab` and Keycloak's built-in roles (`offline_access`, `uma_authorization`) remain in the e-skylab realm; no new realm role is created. The Java era's realm roles (ADMIN, YK, DK, USER, team names, `<TEAM>_LEADER`) are taken off Groups and people and then deleted (ADR-0076). Until then core treats every realm role as an admin role.
+_Avoid_: realm role as a copy of a Group; reading a realm role for authorization; a new realm role for an application permission
 
 **Client role**:
-A permission that belongs to one application (for example `core` `url:create`, `skyforms:form:manage`, or `cms:access`). Group → client-role mappings and extra per-user grants are both managed from the SKY LAB admin UI. Keycloak's own console is not used for this.
-_Avoid_: client roles as the way to represent a team; realm roles; `skylapp` client roles after Java is gone
+A permission that belongs to one application (for example `core` `url:create`, `skyforms:form:manage`, or `cms:access`). It is mapped only to Groups, and only in three places: a Privileged root, a top team's Leader group, or a Role group (ADR-0076). People never hold one directly; service accounts do. Mappings are managed from the SKY LAB admin UI, not Keycloak's console. A new role is named `resource:action[:scope]`, lowercase ASCII with hyphens inside words; a client whose roles carry a prefix (`skymail:`, `skyforms:`, `place:`) keeps it, a new client takes none, and no new `*` role is created (a named composite instead).
+_Avoid_: client roles as the way to represent a team; extra per-user roles; mapping a role to `/UYELER`, an area, a team or sub-team Group or a YK office group; realm roles; `skylapp` client roles after Java is gone
+
+**Role group** (Rol grubu):
+A leaf Group under `/ROLLER` named `<APP>-<ROLE>` (for example `/ROLLER/SKYMAIL-MAILS-APPROVE`, `/ROLLER/FORMS-ALL`) that carries exactly one client role of one client. The name is derived mechanically from the role value; the shown name says it in Turkish. It is how one person gets an application permission outside their team position: they are added to the Role group from the admin panel, which writes the Team audit record (ADR-0076). Entra's security group for an app role. A Role group holding an admin role is a Protected group.
+_Avoid_: a per-user role; a Role group with sub-groups or several clients' roles; a team code in its name; a per-person bundle of roles without the app owner's decision
 
 **Resource server**:
 The Keycloak client that stands for one API process. Core's resource server is `core`. A token is for core when `aud` contains `core`. Core reads roles only from `resource_access.core`.
@@ -223,8 +227,12 @@ Granting Member status by placing a User into the right Keycloak groups. No dire
 _Avoid_: promote to LDAP, federation link
 
 **Privileged**:
-Membership in one of six fixed roots or a subgroup under them: `/ADMIN`, `/YK`, `/DK`, `/UYELER/ADMIN`, `/UYELER/YK`, `/UYELER/DK` (ADR-0065). The match is anchored to those paths; a group elsewhere that happens to be named `ADMIN`, `YK` or `DK` is not Privileged. These people can manage club resources regardless of team ownership. The target is still the roles-only mode of ADR-0059.
-_Avoid_: superuser, admin role (unless you mean the `ADMIN` group itself); deciding privilege from a group name anywhere in the path
+Membership in one of six fixed roots or a subgroup under them: `/ADMIN`, `/YK`, `/DK`, `/UYELER/ADMIN`, `/UYELER/YK`, `/UYELER/DK` (ADR-0065); the list is narrowed to the three that exist, `/ADMIN`, `/UYELER/YK` and `/UYELER/DK` (ADR-0076). The match is anchored to those paths; a group elsewhere that happens to be named `ADMIN`, `YK` or `DK` is not Privileged. These people can manage club resources regardless of team ownership; DK's roots are reader roots (Privileged reader, ADR-0077). Adding or removing a person mails ADMIN, the root's members and the person (ADR-0080). The master realm's console groups (`/KONSOL/…`) are Keycloak administration, not Privileged: core neither reads nor changes them. The target is still the roles-only mode of ADR-0059.
+_Avoid_: superuser, admin role (unless you mean the `ADMIN` group itself); deciding privilege from a group name anywhere in the path; treating a console account as Privileged
+
+**Privileged reader**:
+A member of a reader root, by default DK's (ADR-0077). Stays Privileged for everything that names a Privileged Group (Protected group, membership mail, reserved names), but core's Privileged shortcut allows them only reads; every write is refused whatever roles their token carries. Their reads come from `global:read` (Entra's Global Reader) and the Team audit record from `audit:read`; in Forms a read-only `skyforms:read-all`. DK's membership is changed by ADMIN and YK. What is the person's own stays theirs: own short links, own profile, the Team they lead.
+_Avoid_: giving DK a write role in any application; treating `global:read` as `audit:read`; letting DK members change DK
 
 **Team code**:
 A team's Keycloak group name (`WEBLAB`). Owner team, the CMS Teams item key and Forms template matching all use it. New codes are ASCII capitals, digits and hyphens, at most 24 characters, and unique across the whole system regardless of case: realm groups, core records that name a team, and retired codes. A deleted or renamed code is never reused. Reserved names (`ADMIN`, `YK`, `DK`, `UYELER`, `LIDERLER`, `KOORDINATORLER` and codes named in core's rules) are created only by Privileged people at a root or by core's leader-assignment step. A Team manager renames a code only while no core record is bound to it; moving a team keeps its code. The name the site shows is a separate field (ADR-0065).
@@ -239,8 +247,28 @@ A group that carries, directly or through an ancestor, any realm role or any cli
 _Avoid_: delegating membership of a group that grants privilege; classing a role by its name alone; treating an unclassified role as delegable
 
 **Team audit record**:
-Core's record of every team and group change, including refused writes: who, when, what, old and new value. If it cannot be written, the change is not made. It stores only the actor's id; name and e-mail are resolved on read, and never after Account erasure. Kept 3 years. Read with core's `audit:read` role, given to the ADMIN and YK roots (ADR-0065).
+Core's record of every team and group change, including refused writes: who, when, what, old and new value. If it cannot be written, the change is not made. It stores only the actor's id; name and e-mail are resolved on read, and never after Account erasure. Kept 3 years. Read with core's `audit:read` role, given to the ADMIN, YK and DK roots (ADR-0065, ADR-0077). Console changes are added from Keycloak's admin events with the console as their source (ADR-0079).
 _Avoid_: Keycloak admin events as the audit trail (the actor is always core's service account, and they last 30 days); storing names or e-mails in the record
+
+**Console change** (Konsol değişikliği):
+A change of Groups, memberships or role mappings made in Keycloak's admin console instead of the admin panel, recognised by an admin event whose authentication comes from the master realm. Core reads these events every few minutes, writes them to the Team audit record with the console as source and sends the same mails a panel change would; it never undoes them (ADR-0079). The console is for identity-provider, client and token settings and emergencies; console accounts live in the master realm, one per person, and write through `/KONSOL/<REALM>-<RIGHT>` groups (ADR-0076).
+_Avoid_: making membership changes in the console as routine; a person's everyday e-skylab account in the console; Keycloak's 30-day admin events as the only record
+
+**Management membership** (Yönetim üyeliği):
+A direct membership of a Privileged root other than ADMIN or a Group under it (YK, YK's office groups, DK), or of a team's `LIDERLER` or `KOORDINATORLER` group. It has a Membership term; ADMIN's trees and ordinary team membership have none (ADR-0078).
+_Avoid_: putting an end on ordinary membership; counting ADMIN as a management membership
+
+**Membership term** (Üyelik süresi):
+Core's record of when a Management membership ends: the last day of the active Season (Europe/Istanbul), or none when there is no active Season. 14 days and 1 day before, the holder and those over them are warned; at the end core only marks it expired, records it and lists it to ADMIN. Nobody is taken out of a Group by the term; removal is done by hand from the admin panel. Extended or handed over only by someone who may change that Group's membership, never by the holder, and at most to the next Season's end or, with none defined, a year (ADR-0078).
+_Avoid_: removing access automatically when the term ends; counting the term from the day of the add; keeping it in Keycloak
+
+**Season handover** (Dönem devri):
+The yearly change of YK, DK and team Leaders at a Season's end, done from the admin panel's hand over and extend screen. The next Season is created and made active before the handover, so new Management memberships get its end (ADR-0078).
+_Avoid_: handing over by letting terms expire; doing it in Keycloak's console
+
+**Access review** (Erişim gözden geçirme):
+A once-a-year check, during the Season handover window (30 days before the Season ends until it ends), where each Leader marks their team's members, YK the top teams' Leaders and ADMIN the Privileged roots as keep or remove. Removals go through core's audited writer; an unanswered membership stays. The marks are deleted when the window closes (ADR-0078).
+_Avoid_: a campaign engine; removing members nobody reviewed
 
 **Leader**:
 Membership in a team's `LIDERLER` or `KOORDINATORLER` subgroup, matched as a whole path segment. A Leader is a Team manager of that team and everything under it, and a Leader of the team's Events and of its sub-teams' Events (ADR-0065). A team's Leader group is changed only by the parent team's Leader or by Privileged people: nobody makes themselves Leader or removes their own leadership, and a Leader cannot add co-leaders to their own team. Top-level team Leaders are set by Privileged people only.
@@ -271,8 +299,8 @@ An immutable published snapshot of a Certificate template, including its layout 
 _Avoid_: mutating a published version; changing historical PDFs when a template is edited; silently publishing an external-design sync
 
 **Certificate manager**:
-An Owner-team Member explicitly granted one or more certificate-management capabilities in addition to the access Privileged people and that team's Leaders already have. The grant does not extend outside Owner teams that person belongs to; an Event without an Owner team remains Privileged-only.
-_Avoid_: a realm role that represents a team; a grant that unlocks every team's certificates; making every team Member a manager by default
+An Owner-team Member who holds one or more team-bound certificate-management roles in addition to the access Privileged people and that team's Leaders already have. The role comes from a Role group membership, not a per-user grant (ADR-0076). It does not extend outside Owner teams that person belongs to; an Event without an Owner team remains Privileged-only.
+_Avoid_: a realm role that represents a team; a per-user certificate role; a grant that unlocks every team's certificates; making every team Member a manager by default
 
 **Public listing**:
 A Group attribute (`public_listing=true`). Visitors may see that team and its members. Unset means hidden (SKYSEC, YK, ADMIN). Managed on the Group in Keycloak / superadmin, not an app allowlist.
