@@ -53,7 +53,7 @@ Nasıl (spec'ten):
 Yusuf'a soruldu; yarışmanın ilk dilimini bekletmez, cevap gelene kadar spec'in önerisi uygulanır.
 
 - **Event'e bağlılık:** öneri, her yarışma bir Event'e bağlı (yukarıdaki model). Seçenek: bağımsız yarışma, Event isteğe bağlı.
-- **Kim yönetir:** öneri, Event'in Owner team'inin Leader'ları (ADR-0065'le üst ekiplerinkiler de), uygulama geneli `competition:manage` rolü, yarışmaya atanmış Competition staff; Owner team'i olmayan Event'te yalnız Privileged (ADR-0018). Bugünkü "ekibin her üyesi" kuralı daralır; kullanım sıfır olduğu için kimse yetki kaybetmez.
+- ~~**Kim yönetir:** öneri, Event'in Owner team'inin Leader'ları (ADR-0065'le üst ekiplerinkiler de), uygulama geneli `competition:manage` rolü, yarışmaya atanmış Competition staff; Owner team'i olmayan Event'te yalnız Privileged (ADR-0018). Bugünkü "ekibin her üyesi" kuralı daralır; kullanım sıfır olduğu için kimse yetki kaybetmez.~~ *Kapandı (Yusuf, 2026-10-12 ve 2026-10-25); bkz. aşağıdaki ek. Kalan sorular ekin "Açık" alt başlığında.*
 - **Misafir yarışabilir mi:** öneri, evet, GUEST Ticket'la; çevrimiçi gönderimde hesap açarak (ADR-0063).
 - **Public tabloda ad:** öneri, bireyde ad soyad, takımda takım adı ve üyeler; yarışma ayarıyla takma ad; profil fotoğrafı yok. Reşit olmayan katılımcının adının yayımı hukuk sorusudur (veli onayı ya da hiç yayımlamamak).
 - **Yeni saklama süreleri:** öneri, flag ve cevap denemeleri etkinlik + 90 gün, gönderim dosyaları etkinlik + 1 yıl (kazananınki arşiv), jüri yorumları etkinlik + 1 yıl. ADR-0062'ye ek olarak yazılır.
@@ -92,3 +92,56 @@ Yusuf'a soruldu; yarışmanın ilk dilimini bekletmez, cevap gelene kadar spec'i
 - **Judge0:** yarışma katmanı yok; ayrıcalıklı servisler ve ana makinede cgroup v1 ister; 2024'te kritik sandbox kaçışları yayımlandı.
 - **Bütün CTF'leri CTFd'de bırakmak ya da hepsini bize taşımak:** büyük CTF'in altyapısı SKY-SEC'te hazır; küçük CTF için ayrı bir CTFd kurmak gereksiz yük. Yusuf ikisini birden seçti (karar 4).
 - **Sonuç ilanını sürümsüz, canlı tutmak (CTFd gibi):** sertifika ve arşiv belli bir sonuca bağlanamaz; düzeltme sessizce olur.
+
+## Ek: yarışmaları kim yönetir; ilk ekip ayarı yarışmacıları kapsar (2026-10-12, 2026-10-25)
+
+"Açık" bölümündeki "Kim yönetir" sorusu iki kararla kapandı.
+
+**Yusuf, 2026-10-12:** "Microsoft tarzı olmalı, panelden yönetebilmeliyiz. Bazen AGC lideri + koordinatörler, bazen AGC'nin tüm üyeleri." Yani kimin yöneteceği ekip başına, panelden bir ayarla seçilir. Aynı gün ayarın ayrıntısındaki yedi soru (A1–A7) önerildiği gibi kabul edildi.
+
+**Yusuf, 2026-10-25** (admin paneli incelemesi): ekip üyeleri etkinliklerin yarışmacılarını ekleyip düzenleyebilir, ama bunu ekibin lideri seçer. Bu ayar ADR-0065'in 2026-10-25 ekinde yazıldı ve core'da uygulandı.
+
+Bugün geçerli olan:
+
+1. **Organizatör.** Yarışmayı açmak, düzenlemek, durumunu değiştirmek, yarışmacı (Entrant) eklemek, puan yazmak, sonucu ilan etmek ve arşivlemek Event'in Owner team'inin Leader'larının (ADR-0065'le üst ekiplerinkiler de), `competition:manage` rolünün ve Privileged'ın işidir. Owner team'i olmayan Event'te yalnız Privileged yönetir (ADR-0018). Ekip üyeliği tek başına yarışmayı yönetmez. Bu, "Açık"taki önerinin ve 2026-10-12 kararındaki varsayılanın ("liderler ve koordinatörler") aynısıdır.
+2. **İlk ekip ayarı: `members_manage_competitors`.** Ekibin kendi grubunun özniteliğidir.
+   - Ekibin üyelerinin, ekibin etkinliklerinde eski yarışmacı kaydını (Competitor) ekleyip düzenleyip silip silemeyeceğini söyler.
+   - Varsayılan açıktır, yani ayardan önceki kural: üyeler yazar. `false` olunca yazma yalnız ekibin Leader'larında, üst ekiplerin Leader'larında ve Privileged'dadır.
+   - Okuma ve kişinin kendini yarışmacı olarak kaydetmesi ayardan etkilenmez.
+   - Ayar yalnız daraltır. Bu yüzden ekibi yöneten (ekibin ya da üst ekibin Leader'ı) yazar; korunan grupta yalnız Privileged. Ekip yetki devri kapalıyken yalnız Privileged yazar.
+   - Yalnız bir ekibin kendi grubu ayar taşır; Leader grubu, alan ve kök taşımaz. Alt ekibe miras yoktur: karar Owner team'in kendi grubundan okunur.
+   - Değer okunamazsa ya da ekip kodu tek bir grubu göstermiyorsa varsayılan geçerlidir.
+   - Her değişiklik ekip denetim kaydına eski ve yeni değerle yazılır (ekip grubunun öznitelik değişikliği olarak); reddedilen yazma da yazılır.
+3. **ADR-0065 karar 8 ile ilişki.** `members_manage_competitors`, Privileged'da kalan öznitelikler (`public_listing`, `public_leaders`, `team_door_scan`) arasında değildir; onlar yetkiyi genişletir, bu yalnız daraltır (ADR-0065'in 2026-10-25 eki).
+4. **2026-10-12'de kabul edilen, henüz uygulanmamış kurallar:**
+   - **Kimse kendi yarışmacısına puan yazamaz** (A3): Leader ve Privileged dahil. Bugün yalnız Judge için yazılıydı.
+   - **Yarışma görevlisi** (Competition staff) isteğe bağlıdır ve tek bir yarışma kapsamlıdır. Görevli yarışmayı organizatör gibi yönetir ve sonucu ilan eder (A5); görevli atayamaz, arşivleyemez, seri ayarını değiştiremez.
+   - **Seri ayarı** (dönem tarihleri, toplama kuralı, hazır puanlar) yalnız Leader'da ve üstündedir (A2).
+   - **Kulüp genelinde kilit yok** (A7): ayar ekip ekip değişir.
+   - Ayar yalnız yarışmaları kapsar, etkinlik açmayı kapsamaz (A6).
+
+### Açık
+
+- **Üyelere yarışma yönetimini açan seçenek.** 2026-10-12 kararındaki "tüm üyeler" seçeneği, varsayılanı kapalı ve ekibi yönetenin açtığı bir ayardı: açıkken üyeler yarışmayı açar, puan yazar ve sonucu ilan eder (A1). ADR-0065'in 2026-10-25 eki ise lidere yalnız daraltan ayarı açar, genişleten ayarı Privileged'a bırakır. İki kural birbirini tutmuyor ve "tüm üyeler" uygulanmadı. Seçenekler: ayarı Privileged yazar; ADR-0065'teki kurala bu ayar için istisna yazılır; ya da üyelerin yarışma yönetimi gerekmez, görevli yeter. Yusuf karar verecek.
+- **Yarışmacının yeni modele geçişi.** Eski yarışmacı kaydı yarışma modülüne (Entrant) geçince `members_manage_competitors` Entrant eklemeyi de kapsar mı? Bugün yarışma modülünde Entrant'ı yalnız organizatör ekler.
+- **Defter satırının dayanağı.** Puan satırının hangi yetkiyle yazıldığını (Leader, ekip ayarı, görevli, Privileged) taşıması önerildi; yukarıdaki ilk açık soruya bağlıdır.
+
+### Endüstri uygulamasıyla karşılaştırma
+
+**Uyanlar:**
+- **Microsoft Teams üye izinleri.** Ekip sahibi, sahip olmayan üyelerin neyi yapabileceğini ekip başına açıp kapatır; ayarı üye değiştiremez. Teams'te üyelerin kanal açması gibi izinler varsayılan açıktır; `members_manage_competitors` da varsayılan açıktır.
+- **Entra'da kapsamlı rol ataması.** Yetki bütün kiracıya değil, bir birime ya da tek bir kaynağa verilir. Bizde ekip ağacı (ADR-0065) ve yarışma başına görevli.
+- **Entra denetim kaydı.** Aktör, hedef, eski ve yeni değer (ADR-0065 karar 9).
+
+**Sapmalar (hepsi):**
+1. **Ayarı üst ekip de değiştirir.** Teams'te ayarı yalnız o ekibin sahipleri ve kiracı yöneticisi değiştirir. Bizde ADR-0065'in kalıtımı gereği üst ekibin Leader'ı da değiştirir.
+2. **Kulüp genelinde kilit yok** (A7). Teams'te kiracı yöneticisi bazı seçimleri ekip sahiplerinden alabiliyor ("Team owners can change who can manage tags").
+3. **"Üye" alt ekiplerin üyelerini de kapsar.** Microsoft 365 gruplarında iç içe üyelik yok; bizde Member tanımı alt ağacı içerir (A4; GitHub'ın iç içe takımları gibi).
+4. **Tek anahtar.** Teams'te birçok üye izni anahtarı var; bizde yalnız yarışmacılar.
+5. **Kendi puanını yazma yasağı herkese** (A3). Teams'te karşılığı yok.
+
+### Kaynaklar
+
+- Microsoft Teams, etiketleri yönetme ("Who can manage tags"): https://learn.microsoft.com/en-US/microsoftteams/manage-tags
+- Microsoft Learn, Teams'te kanallara erişimi yönetme: https://learn.microsoft.com/en-us/training/modules/manage-collaboration-experiences-for-chat-channels/07-manage-access-channels
+- Microsoft Entra, rolleri farklı kapsamlarda atama: https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/assign-roles-different-scopes
