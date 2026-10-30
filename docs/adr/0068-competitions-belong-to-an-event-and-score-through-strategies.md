@@ -122,9 +122,9 @@ Bugün geçerli olan:
 
 ### Açık
 
-- **Üyelere yarışma yönetimini açan seçenek.** 2026-10-12 kararındaki "tüm üyeler" seçeneği, varsayılanı kapalı ve ekibi yönetenin açtığı bir ayardı: açıkken üyeler yarışmayı açar, puan yazar ve sonucu ilan eder (A1). ADR-0065'in 2026-10-25 eki ise lidere yalnız daraltan ayarı açar, genişleten ayarı Privileged'a bırakır. İki kural birbirini tutmuyor ve "tüm üyeler" uygulanmadı. Seçenekler: ayarı Privileged yazar; ADR-0065'teki kurala bu ayar için istisna yazılır; ya da üyelerin yarışma yönetimi gerekmez, görevli yeter. Yusuf karar verecek.
-- **Yarışmacının yeni modele geçişi.** Eski yarışmacı kaydı yarışma modülüne (Entrant) geçince `members_manage_competitors` Entrant eklemeyi de kapsar mı? Bugün yarışma modülünde Entrant'ı yalnız organizatör ekler.
-- **Defter satırının dayanağı.** Puan satırının hangi yetkiyle yazıldığını (Leader, ekip ayarı, görevli, Privileged) taşıması önerildi; yukarıdaki ilk açık soruya bağlıdır.
+- **"Tüm üyeler yarışmayı yönetsin" ayarını lider kendisi açabilir mi?** 2026-10-12 kararı ve ona göre yazılan uygulama planı bu ayarı ekibi yönetene (lidere) bırakıyordu: açıkken üyeler yarışmayı açar, puan yazar ve sonucu ilan eder (A1). ADR-0065'in 2026-10-25 ekindeki "lider yalnız daraltan ayarı yazar, genişleten Privileged'da kalır" genel kuralı ise yarışmacı ayarının gerekçesi olarak yazıldı; genişleten bir ayar için ayrı bir karar yoktu. Microsoft Teams'te ekip sahibi üyelere yetki açabiliyor; yani bu genel kural Teams'ten bir sapmadır. "Tüm üyeler" uygulanmadı. Cevap "lider açar" olursa ADR-0065'e bu ayar için istisna eki yazılır.
+- *Not:* Eski yarışmacı kaydı yarışma modülüne (Entrant) geçince `members_manage_competitors` Entrant eklemeyi de kapsar (2026-10-25 kararının amacı: üyeler yarışmacı ekler, lider kapatabilir).
+- *Not:* Puan satırının dayanağını (Leader, ekip ayarı, görevli, Privileged) taşıması önerildi; yukarıdaki soruya bağlıdır.
 
 ### Endüstri uygulamasıyla karşılaştırma
 

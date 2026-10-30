@@ -191,7 +191,7 @@ A Group attribute on an Owner team, same pattern as Public listing, default off.
 _Avoid_: treating this as on by default; treating every Owner-team member as Door staff; treating Public listing as this grant
 
 **Team setting** (Ekip ayarı):
-A Team's own setting, kept as an attribute of its Group and written through core by the Team manager (ADR-0065 addendum of 2026-10-25). A Team setting a Leader writes may only narrow what the Team's members may do; one that widens a right stays Privileged's, like Public listing and Team door scan. Unset or unreadable means the default. Each change is a Team audit record row with the old and new value. The first is `members_manage_competitors`: on by default, the Team's members add, edit and remove its Events' competitors; off, only its Leaders, Leaders above and Privileged people do (ADR-0068 addendum). Sub-teams do not inherit it.
+A Team's own setting, kept as an attribute of its Group and written through core by the Team manager (ADR-0065 addendum of 2026-10-25). A Team setting a Leader writes may only narrow what the Team's members may do; one that widens a right stays Privileged's, like Public listing and Team door scan (open for a competition-management setting, ADR-0068 addendum). Unset or unreadable means the default. Each change is a Team audit record row with the old and new value. The first is `members_manage_competitors`: on by default, the Team's members add, edit and remove its Events' competitors; off, only its Leaders, Leaders above and Privileged people do (ADR-0068 addendum). Sub-teams do not inherit it.
 _Avoid_: a Leader-written setting that widens a right; inheriting a setting from a parent team; a second table beside the Group's attributes
 
 **Group**:
@@ -413,7 +413,7 @@ A table that totals the published results of several Competitions under one rule
 _Avoid_: EventType; an implicit total per Owner team; counting unpublished results; treating a period as a second Season
 
 **Competition staff** (Yarışma görevlisi):
-People assigned to one Competition, optionally. Organizers are the Leaders of the Event's Owner team (and of the teams above it), holders of `competition:manage` and Privileged people; Team membership alone manages no Competition (ADR-0068 addendum). Staff manage their Competition like organizers, publishing results included, except assigning staff, archiving or restoring it and Series settings (Yusuf, 2026-10-12). Nobody scores their own Entrant, organizers and Privileged people included. A Judge (jüri üyesi) is assigned to a Competition, Stage or category, sees only what is assigned to them, and does not see others' scores before publication.
+People assigned to one Competition, optionally. Organizers are the Leaders of the Event's Owner team (and of the teams above it), holders of `competition:manage` and Privileged people; Team membership alone manages no Competition (ADR-0068 addendum). Staff manage their Competition like organizers, publishing results included, except opening a new Competition, assigning staff, archiving or restoring it and Series settings. Nobody scores their own Entrant, organizers and Privileged people included. (Both accepted by Yusuf on 2026-10-12, not built yet.) A Judge (jüri üyesi) is assigned to a Competition, Stage or category, sees only what is assigned to them, and does not see others' scores before publication.
 _Avoid_: making every Owner-team Member a manager; deriving judges from team membership; reading the Team setting on competitors as a right to manage Competitions
 
 **Notification** (Bildirim):
