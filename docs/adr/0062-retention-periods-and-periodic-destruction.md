@@ -170,3 +170,16 @@ Karar (Yusuf, 2026-10-27): ADR-0073'ün kaldırma denetim kaydı, çıkışı ge
 | SkyMail: bastırma listesinden kaldırma kaydı (kim, zaman, kaldırılan satırın kaynağı, kodu, sayısı ve ilk görülmesi; adres yok) | 3 yıl, sonra silinir; hesap silinince yetkilinin kimliği değiştirilir | meşru menfaat (ispat) |
 
 - SkyMail'in içerik süpürücüsü siler; süre sabittir, ayarı yoktur.
+
+## Ek (2026-10-31): yönetim görevi kaydı ve ekip denetim kaydı (ADR-0065, ADR-0078)
+
+Karar (Yusuf, 2026-10-31): biten yönetim görevinin kaydı, ekip denetim kaydı gibi 3 yıl saklanır. Bu, ADR-0078'deki "Bitmiş terimlerin saklama süresi" açık sorusunu kapatır. ADR-0065'in Consequences'ındaki denetim kaydı satırı da bu ekle tabloya girer. Tabloya iki satır eklenir:
+
+| Veri | Süre | Dayanak |
+|---|---|---|
+| core: yönetim görevi kaydı (YK, DK ve ekip liderliği; kişi ve grup kimliği, başlangıç, planlanan ve gerçek bitiş, uyarılar; ad ve adres yok) | görev sürdükçe; bitiminden (`ended_at`) 3 yıl sonra silinir; hesap silinince hemen | meşru menfaat (ispat) |
+| core: ekip denetim kaydı (kim, hangi grubu, ne zaman, nasıl değiştirdi; kişi ve grup kimlikleri, grup yolu, kod ve rol adları; ad ve adres yok) | 3 yıl, sonra silinir; hesap silinince silinmez, kimlik kimseye çözülmez | meşru menfaat |
+
+- Süre görevin gerçekten bittiği günden işler: core'dan çıkarma, devir ya da Keycloak'ta artık bulunmama. Planlanan bitiş ya da süre doldu işareti saati başlatmaz; süresi dolmuş ama kişisi hâlâ grupta olan görev açıktır ve kalır.
+- Görevin denetim satırları (uzatma, devir, süre dolması) kendi 3 yılına bağlıdır; görev kaydı silinince onlar kalır.
+- İkisini de core'un periyodik imha işi siler; süre sabittir, ayarı yoktur.
