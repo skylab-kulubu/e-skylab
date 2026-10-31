@@ -103,7 +103,7 @@ Yusuf'a soruldu; yarışmanın ilk dilimini bekletmez, cevap gelene kadar spec'i
 
 Bugün geçerli olan:
 
-1. **Organizatör.** Yarışmayı açmak, düzenlemek, durumunu değiştirmek, yarışmacı (Entrant) eklemek, puan yazmak, sonucu ilan etmek ve arşivlemek Event'in Owner team'inin Leader'larının (ADR-0065'le üst ekiplerinkiler de), `competition:manage` rolünün ve Privileged'ın işidir. Owner team'i olmayan Event'te yalnız Privileged yönetir (ADR-0018). Ekip üyeliği tek başına yarışmayı yönetmez. Bu, "Açık"taki önerinin ve 2026-10-12 kararındaki varsayılanın ("liderler ve koordinatörler") aynısıdır.
+1. **Organizatör.** Yarışmayı açmak, düzenlemek, durumunu değiştirmek, yarışmacı (Entrant) eklemek, puan yazmak, sonucu ilan etmek ve arşivlemek Event'in Owner team'inin Leader'larının (ADR-0065'le üst ekiplerinkiler de), `competition:manage` rolünün ve Privileged'ın işidir. Owner team'i olmayan Event'te yalnız Privileged yönetir (ADR-0018). Ekip üyeliği tek başına yarışmayı yönetmez; ekip "Tüm üyeler" ayarını açarsa üyeler de yönetir (aşağıda, 2026-10-31). Bu, "Açık"taki önerinin ve 2026-10-12 kararındaki varsayılanın ("liderler ve koordinatörler") aynısıdır.
 2. **İlk ekip ayarı: `members_manage_competitors`.** Ekibin kendi grubunun özniteliğidir.
    - Ekibin üyelerinin, ekibin etkinliklerinde eski yarışmacı kaydını (Competitor) ekleyip düzenleyip silip silemeyeceğini söyler.
    - Varsayılan açıktır, yani ayardan önceki kural: üyeler yazar. `false` olunca yazma yalnız ekibin Leader'larında, üst ekiplerin Leader'larında ve Privileged'dadır.
@@ -114,22 +114,30 @@ Bugün geçerli olan:
    - Her değişiklik ekip denetim kaydına eski ve yeni değerle yazılır (ekip grubunun öznitelik değişikliği olarak); reddedilen yazma da yazılır.
 3. **ADR-0065 karar 8 ile ilişki.** `members_manage_competitors`, Privileged'da kalan öznitelikler (`public_listing`, `public_leaders`, `team_door_scan`) arasında değildir; onlar yetkiyi genişletir, bu yalnız daraltır (ADR-0065'in 2026-10-25 eki).
 4. **2026-10-12'de kabul edilen, henüz uygulanmamış kurallar:**
-   - **Kimse kendi yarışmacısına puan yazamaz** (A3): Leader ve Privileged dahil. Bugün yalnız Judge için yazılıydı.
+   - **Kimse kendi yarışmacısına puan yazamaz** (A3): Leader ve Privileged dahil. Bugün yalnız Judge için yazılıydı. *(2026-10-31: core #336 ile uygulanıyor, yayında değil.)*
    - **Yarışma görevlisi** (Competition staff) isteğe bağlıdır ve tek bir yarışma kapsamlıdır. Görevli yarışmayı organizatör gibi yönetir ve sonucu ilan eder (A5); yeni yarışma açamaz, görevli atayamaz, arşivleyemez, seri ayarını değiştiremez.
    - **Seri ayarı** (dönem tarihleri, toplama kuralı, hazır puanlar) yalnız Leader'da ve üstündedir (A2).
    - **Kulüp genelinde kilit yok** (A7): ayar ekip ekip değişir.
    - Ayar yalnız yarışmaları kapsar, etkinlik açmayı kapsamaz (A6).
 
-### Açık
+### Kapandı: "Tüm üyeler" ayarını lider açar (Yusuf, 2026-10-31)
 
-- **"Tüm üyeler yarışmayı yönetsin" ayarını lider kendisi açabilir mi?** 2026-10-12 kararı ve ona göre yazılan uygulama planı bu ayarı ekibi yönetene (lidere) bırakıyordu: açıkken üyeler yarışmayı açar, puan yazar ve sonucu ilan eder (A1). ADR-0065'in 2026-10-25 ekindeki "lider yalnız daraltan ayarı yazar, genişleten Privileged'da kalır" genel kuralı ise yarışmacı ayarının gerekçesi olarak yazıldı; genişleten bir ayar için ayrı bir karar yoktu. Microsoft Teams'te ekip sahibi üyelere yetki açabiliyor; yani bu genel kural Teams'ten bir sapmadır. "Tüm üyeler" uygulanmadı. Cevap "lider açar" olursa ADR-0065'e bu ayar için istisna eki yazılır.
+Bu ekin "Açık" sorusu ("Tüm üyeler yarışmayı yönetsin" ayarını lider kendisi açabilir mi?) kapandı: **evet, lider açar.** 2026-10-12 kararıyla aynıdır. ADR-0065'e bu ayar için istisna eki yazıldı (2026-10-31).
+
+- **Ayar:** ekibin kendi grubunun özniteliği `team_competition_manage`. Panelde "Yarışmaları kim yönetir": *Liderler ve koordinatörler* (varsayılan) ya da *Tüm üyeler*. Yazan, yarışmacı ayarıyla aynıdır: ekibi yöneten ve Privileged; korunan grupta yalnız Privileged.
+- **Açıkken üyeler:** Owner team'in üyeleri, alt ekiplerinin üyeleri dahil (A4), yarışmayı açar, düzenler, durumunu değiştirir, yarışmacı ekler, puan yazar ve geri alır. Sonuç ilanı geldiğinde onu da yapar (A1). Arşivleyemez, geri getiremez, görevli atayamaz, seri ayarını değiştiremez (A2). Üst ekibin sıradan üyesi ve kardeş ekip yine yönetmez. Owner team'i olmayan Event'te ayar okunmaz.
+- **Okunamazsa kapalı.** Değer yoksa, okunamazsa ya da ekip kodu tek bir grubu göstermiyorsa ayar kapalıdır. Leader'ın yetkisi bundan etkilenmez.
+- **Defter dayanağı.** Her puan satırı yazanın ve geri alanın dayanağını tutar: `privileged`, `leader`, `member_setting` (ileride `staff`). Ayar kapatılınca üyelerin yetkisi biter; yazdıkları satırlar kalır ve hangi yetkiyle yazıldıklarını söyler.
+- **Kimse kendi yarışmacısına puan yazmaz** (A3, yukarıda 4. maddede): yazan ya da geri alan kişi o Entrant'ın bilet sahibiyse istek reddedilir. Leader ve Privileged dahil.
+- **Aday listesi.** Üyelerin Ticket okuma yetkisi yok. "Gelenlerden ekle" için core yarışma yetkisiyle açılan dar bir liste verir: bilet, ad, misafir mi, check-in var mı, zaten yarışmacı mı. E-posta, telefon ve form cevabı yoktur.
+- Uygulama: core #336 (yayında değil). Panel anahtarı ayrı iş (core-frontend).
 - *Not:* Eski yarışmacı kaydı yarışma modülüne (Entrant) geçince `members_manage_competitors` Entrant eklemeyi de kapsar (2026-10-25 kararının amacı: üyeler yarışmacı ekler, lider kapatabilir).
-- *Not:* Puan satırının dayanağını (Leader, ekip ayarı, görevli, Privileged) taşıması önerildi; yukarıdaki soruya bağlıdır.
 
 ### Endüstri uygulamasıyla karşılaştırma
 
 **Uyanlar:**
 - **Microsoft Teams üye izinleri.** Ekip sahibi, sahip olmayan üyelerin neyi yapabileceğini ekip başına açıp kapatır; ayarı üye değiştiremez. Teams'te üyelerin kanal açması gibi izinler varsayılan açıktır; `members_manage_competitors` da varsayılan açıktır.
+- **Teams "Who can manage tags".** İki seçenekli tek bir seçim (*Team owners* / *Team owners and members*) ve onu ekip sahibi değiştirir. "Yarışmaları kim yönetir" de böyledir (2026-10-31).
 - **Entra'da kapsamlı rol ataması.** Yetki bütün kiracıya değil, bir birime ya da tek bir kaynağa verilir. Bizde ekip ağacı (ADR-0065) ve yarışma başına görevli.
 - **Entra denetim kaydı.** Aktör, hedef, eski ve yeni değer (ADR-0065 karar 9).
 
@@ -137,8 +145,9 @@ Bugün geçerli olan:
 1. **Ayarı üst ekip de değiştirir.** Teams'te ayarı yalnız o ekibin sahipleri ve kiracı yöneticisi değiştirir. Bizde ADR-0065'in kalıtımı gereği üst ekibin Leader'ı da değiştirir.
 2. **Kulüp genelinde kilit yok** (A7). Teams'te kiracı yöneticisi bazı seçimleri ekip sahiplerinden alabiliyor ("Team owners can change who can manage tags").
 3. **"Üye" alt ekiplerin üyelerini de kapsar.** Microsoft 365 gruplarında iç içe üyelik yok; bizde Member tanımı alt ağacı içerir (A4; GitHub'ın iç içe takımları gibi).
-4. **Tek anahtar.** Teams'te birçok üye izni anahtarı var; bizde yalnız yarışmacılar.
+4. **İki anahtar.** Teams'te birçok üye izni anahtarı var; bizde yarışmacılar ve yarışma yönetimi.
 5. **Kendi puanını yazma yasağı herkese** (A3). Teams'te karşılığı yok.
+6. **"Tüm üyeler" varsayılan kapalı.** Teams'te üyelerin kanal açması gibi izinler varsayılan açıktır; yarışma yönetimi yarışmacıların adlarını ve puanlarını kapsadığı için bizde varsayılan *Liderler ve koordinatörler*.
 
 ### Kaynaklar
 
