@@ -151,7 +151,7 @@ Nasıl:
 
 - **Olay ve uç adları, alan adları, sayfalama.** Fatih kesinleştirir; bu ADR yalnız taşınacak bilgiyi yazar.
 - **Görüntüleyen rolü.** Formun yalnız görüntüleyeni (`Viewer`) toplu gönderim başlatabilir mi? Bugün başlatabiliyor ve bu ADR bunu değiştirmiyor. Kural Fatih'indir; değişirse yalnız Forms'un ucu değişir.
-- **Yanıt durumuna göre kitle.** "Yalnız kabul edilenlere" gibi bir süzgeç ilk sürümde yoktur. Gerekirse Forms'un ucuna bir parametre olarak eklenir.
+- ~~**Yanıt durumuna göre kitle.** "Yalnız kabul edilenlere" gibi bir süzgeç ilk sürümde yoktur. Gerekirse Forms'un ucuna bir parametre olarak eklenir.~~ *Kapandı: 2026-11-08 eki (süzülmüş form kitlesi, akış katılımcıları ve sahip ekip).*
 - **Misafir postasında tekrar anahtarı.** `POST /v1/mail_tasks/single` `Idempotency-Key` okumaz. Yanıtı belirsiz kalan misafir postası, bugünkü bilet postası gibi yeniden denenmez. SkyMail'e anahtar desteği ayrı bir iştir.
 
 ## Endüstri uygulamasıyla karşılaştırma
@@ -208,39 +208,53 @@ Nasıl:
 
 ## Ek: süzülmüş form kitlesi, akış katılımcıları ve sahip ekip (2026-11-08)
 
-İstek (Fatih ve Yusuf, 2026-11-08): "akışın 2. adımındakilere", "adımı cevaplamayanlara", "reddedilenlere" posta. Karar 6'nın kitlesi bunun için genişler. Yusuf'un kararları 2026-11-08 tarihlidir. Bu ek "Açık" bölümündeki "Yanıt durumuna göre kitle" maddesini kapatır.
+İstek (Fatih ve Yusuf, 2026-11-08): "akışın 2. adımındakilere", "adımı cevaplamayanlara", "reddedilenlere" posta. Karar 6'nın kitlesi bunun için genişler. Madde 1 orkestratörün kararıdır; sahip ekip ve iki giriş yolu Yusuf'un 2026-11-08 kararlarıdır. Bu ek "Açık" bölümündeki "Yanıt durumuna göre kitle" maddesini kapatır.
 
-1. **Toplu gönderim RabbitMQ'yu beklemez.** Karar 6'nın zinciri (Forms'un yanıtlayanlar ucu, core'un kitle türü, SkyMail ekranı) olaya dayanmaz. Yalnız Forms'un iç okuma ucu ve core'un `skyforms:responses:read-service` rolü gerekir. RabbitMQ'ya bağlı olan karar 5'in kendiliğinden giden postalarıdır. Production geçişinde toplu gönderim adımı olay işlerinden ayrı açılır.
+1. **Toplu gönderim RabbitMQ'yu beklemez** (orkestratör kararı, 2026-11-08). Karar 6'nın zinciri (Forms'un yanıtlayanlar ucu, core'un kitle türü, SkyMail ekranı) olaya dayanmaz. Yalnız Forms'un iç okuma ucu ve core'un `skyforms:responses:read-service` rolü gerekir. RabbitMQ'ya bağlı olan karar 5'in kendiliğinden giden postalarıdır. Production geçişinde toplu gönderim adımı olay işlerinden ayrı açılır.
 2. **Form kitlesi yanıt durumuyla süzülür.** core'un isteği Forms'un bugün kendi ekranında kullandığı durum adlarını taşır: bekleyen, kabul, ret, işaretli, geçici. Süzgeç boşsa bütün yanıtlayanlar gelir (bugünkü davranış). Arşivlenmiş yanıt yine girmez.
 3. **Akış katılımcıları ikinci kaynaktır.** İstek bir form yerine bir akışı da adlandırabilir. Süzgeçler:
-   - adım: akış düğümünün sürümler arasında sabit anahtarı (`NodeKey`), sıra numarası değil, çünkü akış dallanır;
-   - koşu durumu: açık olanlar (cevap bekleniyor, düzeltme istendi, süre işliyor, incelemede) ve bitenler (tamamlandı, reddedildi, süresi doldu, geçersiz sayıldı, durduruldu).
+   - adım: akış düğümünün sürümler arasında sabit anahtarı (`NodeKey`), sıra numarası değil, çünkü akış dallanır; boşsa bütün adımlar;
+   - koşu durumu: açık olanlar (cevap bekleniyor, düzeltme istendi, süre işliyor, incelemede) ve bitenler (tamamlandı, reddedildi, süresi doldu, geçersiz sayıldı, durduruldu). **Boşsa açık durumların hepsi gelir**, bitenler gelmez; bitenler yalnız adıyla istenir.
 
    Birden çok koşusu olan kişide süzgeç kişinin en son koşusuna uygulanır. Yeniden başvurmuş kişi ilk reddiyle "reddedilenler"e girmez. Fatih "herhangi bir koşusu uyan"ı seçerse yalnız Forms'un ucu değişir. Akışlar yalnız hesabı olanlarla çalışır; akış kitlesinde misafir yoktur, core adresi `sub`'dan bulur.
-4. **Kimin yazabileceğini Forms söyler, core uygular.** Form için karar 6'daki kural aynen geçerlidir. Akış için bugünkü kural akışın sahibidir; adım formlarının ortak çalışanlarının da sayılıp sayılmayacağı Fatih'in kararıdır. `skyforms:*` her ikisine yeter. DK'nın okuma rolü `skyforms:read-all` posta yetkisi vermez (ADR-0077: DK okur, yazmaz).
-5. **Sahip ekip.** Bir form bir ekibe ait olabilir. Forms forma "sahip ekip" alanını ekler: CONTEXT.md'deki Owner team, Team code ile.
-   - O ekibin Leader'ları (`LIDERLER` ve `KOORDINATORLER`, üst ekiplerin Leader'ları dahil; ADR-0065) formda ortak çalışan olmasalar da formun kitlesine yazabilir. Yanıtları okuyamazlar; yalnız kitlenin sayısını ve core'un ekran adını görürler.
+4. **Yetki üç yoldan gelir; karar 6'daki 403 kuralı genişler.** Karar 6'da gönderen ya formun ortak çalışanıydı ya da `skyforms:*` taşıyordu, ikisi de yoksa core 403 dönüyordu. Bu ek üçüncü bir yol ekler: gönderen kaynağın sahip ekibinin Leader'ıdır (madde 5). Üçü de yoksa core 403 döner.
+   - Form için ortak çalışanlık kuralı karar 6'daki gibi Forms'tadır. Akış için bugünkü Forms kuralı akışın sahibidir; adım formlarının ortak çalışanlarının da sayılıp sayılmayacağı Fatih'in kararıdır. `skyforms:*`'ı core Keycloak'tan okur.
+   - **Sıra.** core önce yalnız yetkiyi sorar: Forms'un ucunu `limit=0` ile çağırır, Forms gönderenin rolünü ve kaynağın sahip ekibini döner, kişi listesi dönmez. core yetki yollarından birini bulursa listeyi çeker; bulamazsa 403 döner ve listeyi hiç istemez.
+   - DK'nın okuma rolü `skyforms:read-all` posta yetkisi vermez (ADR-0077: DK okur, yazmaz).
+5. **Sahip ekip** (Yusuf, 2026-11-08). Bir form bir ekibe ait olabilir. Forms forma "sahip ekip" alanını ekler: CONTEXT.md'deki Owner team, Team code ile.
+   - O ekibin Leader'ları (`LIDERLER` ve `KOORDINATORLER`, üst ekiplerin Leader'ları dahil; ADR-0065) formda ortak çalışan olmasalar da formun kitlesine yazabilir. Formun sorularını ve cevaplarını okuyamazlar. Alıcıların adını ve adresini görüp göremeyecekleri aşağıdaki açık soruya bağlıdır.
    - **Liderliği core söyler.** Forms liderlik kuralını kopyalamaz. Gönderim yolunda Forms iç ucunda formun sahip ekibini döner, core gönderenin o ekibin Leader'ı olup olmadığına kendi kaydıyla karar verir.
    - Forms'un ekip seçicisi ve atama denetimi için core'un bir iç ucu kişinin üyesi ve Leader'ı olduğu ekipleri verir. Bu bir kimlik okumasıdır (ADR-0071 karar 3'teki platform hizmeti; Forms bugün de adresleri core'dan okur). Karar 3'e yeni bir istisna açmaz.
-   - Sahip ekibi formun sahibi (Owner) ya da `skyforms:*` atar. Mevcut formlar için toplu atama önerisi Forms'ta hazırlanır: önce kuru liste, inceleme, sonra yazma. Sahip ekibi olmayan form bugünkü gibi yalnız ortak çalışanlara açıktır.
-   - Silinen ya da adı değişen Team code yeniden kullanılmadığı için eski bir kod başka bir ekibe yetki vermez; yalnız eşleşmez.
-6. **İki giriş yolu.**
-   - **1. aşama:** Forms'un yanıtlar ve akış koşuları ekranlarında "Bunlara posta at" düğmesi. SkyMail'in gönderim ekranını kaynak ve süzgeçle açar. Bu bir ön yüz bağlantısıdır; Forms backend SkyMail'i çağırmaz (karar 6).
-   - **2. aşama:** İletişim konsolunda form ve akış seçici. core, kişinin görebildiği formların ve akışların yalnız adını ve kimliğini Forms'un iç ucundan sorar. Bunu kişinin Leader'ı olduğu ekiplerin sahip olduğu formlarla birleştirip SkyMail'e verir.
-   - **Okuma vekilliği sınırı (karar 2).** Bu liste karar 2'deki yasağın tek istisnasıdır ve dar tutulur: yalnız ad ve kimlik taşır, liste kişinin yetkisiyle süzülür (Forms'un kuralı artı core'un sahip ekip kararı). Soru, cevap, yanıt sayısı ya da kişi bilgisi taşımaz. Gerekçe: liste core'un kendi kitle kararının girdisidir ve core araya liderlik kaydıyla bir karar ekler. Seçicinin sayıları ve adım adları kitle çözümünün parçasıdır (`countOnly`), ayrı bir okuma değildir.
+   - **Kim atar.** Sahip ekibi formun sahibi (Owner) ya da `skyforms:*` atar. Owner yalnız üyesi ya da Leader'ı olduğu bir ekibi atayabilir; Forms bunu core'un ucuyla denetler. `skyforms:*` her ekibi atayabilir. Sahip ekibi olmayan form bugünkü gibi yalnız ortak çalışanlara açıktır.
+   - **Mevcut formlar.** Toplu atama önerisi Forms'ta hazırlanır: önce kuru liste, Yusuf ve Fatih'in incelemesi, sonra yazma.
+   - **Ekip kodu değişirse.** Silinen ya da adı değişen Team code yeniden kullanılmadığı için eski bir kod başka bir ekibe yetki vermez; yalnız eşleşmez. Ancak core'un kod değiştirme denetimi ("bağlı core kaydı yoksa") Forms'taki bağı görmez. Kodu değişen ekibin formları sahip ekibini sessizce kaybeder ve Leader yolu kapanır. Toplu atama aracı bu durumda yeniden çalıştırılır.
+6. **İki giriş yolu** (Yusuf, 2026-11-08).
+   - **1. aşama:** Forms'un yanıtlar ve akış koşuları ekranlarında "Bunlara posta at" düğmesi. SkyMail'in gönderim ekranını kaynak ve süzgeçle açar. Bu bir ön yüz bağlantısıdır; Forms backend SkyMail'i çağırmaz (karar 6). Düğme yalnız formu Forms'ta açabilen kişiye görünür. **Ortak çalışan olmayan Leader'ın 1. aşamada giriş yolu yoktur.** Leader yolu core'da baştan uygulanır, ama Leader için kullanılabilir hâle 2. aşamada, konsol seçicisiyle gelir.
+   - **2. aşama:** İletişim konsolunda form ve akış seçici. core, kişinin görebildiği formların ve akışların yalnız adını ve kimliğini Forms'un iç ucundan sorar. İsteğe kişinin Leader'ı olduğu ekipleri ekler; Forms bu ekiplerin sahip olduğu kaynakları da listeye katar.
+   - **Okuma vekilliği sınırı (karar 2).** Bu liste karar 2'nin ölçütüne girer ve dar tutulur. Yalnız ad ve kimlik taşır, liste kişinin yetkisiyle süzülür (Forms'un kuralı artı core'un sahip ekip kararı). Soru, cevap ya da kişi bilgisi taşımaz. Gerekçe: liste core'un kendi kitle kararının girdisidir ve core araya liderlik kaydıyla bir karar ekler.
+   - **Özet.** Seçicideki sayılar (form için duruma göre, akış için adım ve duruma göre) ve adım adları kitle çözümünün parçasıdır. Bunlar kişinin yetkisiyle süzülmüş toplu sayılardır; kişi listesi, soru ya da cevap taşımaz. core özeti yalnız madde 4'teki yetki yollarından birini bulduğu gönderen için ister.
 7. **Ekran adını core yazar.** core kaynak başlığından, adım adından ve süzgeçten kısa bir ad üretir ("Başvuru akışı · Teknik form · Cevap bekleniyor"). SkyMail tanımı yorumlamadan saklar, gönderimde ve onayda core'a aynen verir, adı gösterir. SkyMail Forms'u bilmez.
-8. **Denetim kaydı süzgeci de yazar.** Karar 6'daki kayıt kaynak türünü (form ya da akış), süzgeci ve gönderenin hangi yoldan yetkili olduğunu (ortak çalışan, akış sahibi, `skyforms:*`, sahip ekibin Leader'ı) da tutar. Adres ve ad yine yazılmaz.
+8. **Denetim kaydı süzgeci de yazar.** Karar 6'daki kayıt kaynak türünü (form ya da akış), süzgeci, amacı ve gönderenin hangi yoldan yetkili olduğunu (ortak çalışan, akış sahibi, `skyforms:*`, sahip ekibin Leader'ı) da tutar. Adres ve ad yine yazılmaz.
 9. **Amaç ve rıza değişmez.** Aşama ve sonuç postası çoğunlukla alıcının kendi başvurusu hakkındadır (`islem`). Karar 6'nın `islem` ve `duyuru` kuralları ve kontrol noktası aynen geçerlidir. Kitle kuyruğa alma anında belirlenir; turlarda yalnız rıza yeniden sorulur. Forms durumunun tur başına yeniden süzülmesi ilk sürümde yoktur.
+   - **Leader'ın `islem` beyanı.** Leader `islem` beyan ederse posta tercih, çıkış kaydı ve Davet onayı aranmadan bütün süzülmüş kitleye gider; yalnız kalıcı ret bastırması uygulanır. Leader formun cevaplarını görmeden bu beyanı verir. Beyan ve yetki yolu denetim kaydında birlikte durur. Mail onayına düşen gönderimde onaylayan, onay ekranında amacı ve "sahip ekibin Leader'ı" yetki yolunu görür.
 
 **İlk sürümde yok:** cevap değerine göre süzgeç (serbest metin süzgece ve denetim kaydına girerdi), süreli formda başlayıp göndermeyenler, "ekip üyelerinden formu doldurmayanlar", kaydedilmiş segment.
 
-**Açık (Fatih):** son koşu mu herhangi bir koşu mu; akışta kim gönderir (yalnız sahip mi, adım formlarının ortak çalışanları da mı); görüntüleyen (`Viewer`) gönderim başlatabilir mi; akış sahip ekibi kendi alanında mı tutar, başlangıç formundan mı alır. Uç ve alan adları Fatih'indir.
+**Açık (Yusuf'a soruldu): Leader alıcıları görür mü?** SkyMail bugün gönderenin kendi gönderiminde alıcının adını, adresini ve açma-tıklama bilgisini rol istemeden okumasına izin veriyor (`GET /mail_tasks/{id}/tracking/recipients`). Bu yüzden Leader yolundan gelen gönderimde Leader alıcıları görür. İki seçenek:
+- **(a) Öneri.** core kitle yanıtında yetki yolunu da döner. SkyMail bu yoldan gelen gönderimde kişi bazlı takibi göndericiye kapatır. Bunun için genel bir "alıcılar gizli" bayrağı kullanılır; SkyMail Forms'u bilmez, yalnız bayrağa bakar. Gönderen toplu sayıları görür.
+- **(b)** Ek "Leader alıcıların adını ve adresini görür, cevabı görmez" diye yazılır, SkyMail değişmez.
+
+Karar gelene dek madde 5'teki görünürlük ve Sapma 4 bu soruya bağlıdır.
+
+**Açık (Yusuf'a soruldu): Leader yolu akışları kapsar mı?** Öneri: evet. Akışın sahip ekibi başlangıç formunun sahip ekibidir; akışa ayrı alan eklenmez. Adım formları başka bir ekibe aitse yalnız başlangıç formunun sahip ekibi sayılır. Adım formlarının sahip ekiplerinin Leader'ları akışın kitlesine bu yoldan yazamaz.
+
+**Açık (Fatih):** son koşu mu herhangi bir koşu mu; akışta kim gönderir (yalnız sahip mi, adım formlarının ortak çalışanları da mı); görüntüleyen (`Viewer`) gönderim başlatabilir mi. Uç ve alan adları Fatih'indir.
 
 **Endüstriyle karşılaştırma.** Uyanlar: kitle gönderim anında çözülür (HubSpot active segment, Customer.io data-driven segment, Dynamics 365 Customer Insights – Journeys); "cevaplamayan" yalnız beklenen kişi kümesi biliniyorsa tanımlıdır (Qualtrics hatırlatması kişiye özel davetle, Microsoft Forms hatırlatması gruba gönderimle çalışır; bizde küme akışın açılmış adımıdır); kayıt bir ekibe atanabilir (HubSpot'ta kayıt takıma atanır). Sapmalar:
 1. Segmenti posta aracı değil core çözer ve yanıt verisi Forms'ta kalır; Typeform, Mailchimp, HubSpot ve Customer.io yanıtı posta aracına kopyalar (karar 6'nın gerekçesi).
 2. Kaydedilmiş ve statik segment yoktur (HubSpot ve Mailchimp'te var); tanım yalnız gönderim kaydında durur.
 3. Uzun gönderimde Forms durumu tur başına yeniden sorulmaz; Qualtrics hatırlatma anında bitirmiş olanı eler. Kuyruğa alma ile teslim arasında adımı cevaplayan kişiye "seni bekliyor" postası gidebilir; toplu şerit 200 kişiyi yaklaşık 12 dakikada bitirdiği için risk küçüktür.
-4. Sahip ekibin Leader'ı yanıtları okumadan kitleye yazar. HubSpot'ta takım ataması kaydın görünürlüğünü de belirler; bizde posta yetkisi okuma yetkisinden ayrıdır, Leader yanıtları görmez.
-5. Konsol seçicisi için core Forms'tan ad ve kimlik okur (karar 2'nin dar istisnası, madde 6).
+4. Sahip ekibin Leader'ı formun cevaplarını okumadan kitleye yazar. HubSpot'ta takım ataması kaydın görünürlüğünü de belirler; bizde posta yetkisi okuma yetkisinden ayrıdır. Leader'ın alıcı adını ve adresini görüp görmeyeceği açık sorudur: (a) seçilirse yalnız toplu sayıları, (b) seçilirse alıcıları görür.
+5. Konsol seçicisi için core Forms'tan ad ve kimlik okur (karar 2'nin ölçütüne giren dar okuma, madde 6).
 
 Araştırma: sky_lab_genel `notes/forms-asama-postasi-tasarim-20261108.md`. Kaynaklar: Qualtrics, reminder and thank-you emails (https://qualtrics.com/support/survey-platform/distributions-module/email-distribution/reminder-thank-emails); HubSpot, active ve static segmentler (https://knowledge.hubspot.com/segments/change-list-type); Customer.io, segment oluşturma (https://docs.customer.io/messaging/segmentation/creating-segments/); Microsoft Q&A, Forms'ta yalnız cevaplamayanlara hatırlatma (https://learn.microsoft.com/en-us/answers/questions/5393528/how-do-i-send-reminders-in-microsoft-forms-only-to).
