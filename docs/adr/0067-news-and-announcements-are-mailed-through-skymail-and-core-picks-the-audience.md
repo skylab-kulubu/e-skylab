@@ -180,6 +180,7 @@ Bağımlılık: core'un kişinin ekipleri ucunu Forms'un sahip ekibiyle paylaşa
    - Bir üst ekip ile onun alt ekibi birlikte seçilirse alt ekip düşer: üst ekip onu zaten kapsar.
    - Kalan her ekip kendi kategorisiyle ayrı bir gönderimdir; kategori her zaman o ekibinkidir.
    - Alıcı başına tek posta: seçilen iki ayrı ekipte olan kişi postayı bir kez, yol sırasında ilk gelen ve kategorisini kapatmadığı ekibin gönderiminden alır. İkisini de kapattıysa almaz.
+   - Tekilleştirme kuyruğa alma anında yapılır. Kişi kuyruğa alındıktan sonra o ekibin kategorisini kapatırsa gönderim turundaki denetim (ADR-0072 karar 3) postayı durdurur ve öteki ekibin postası ona artık gitmez; bu bilinen ve kabul edilen bir boşluktur.
 9. **Leader'a SkyMail'in liste okuma rolü verilmez** (orkestratör). O rol bütün grupları ve üyelerinin adreslerini açar. Leader ekip listesini alıcı sayısıyla görür.
 
 **Açık (Yusuf'a soruldu): Leader alıcıları görür mü?** SkyMail bugün onaylı bir gönderimi isteyen kişinin gönderimi sayar (`SentBy` isteyendir) ve göndereni kendi gönderiminin alıcılarını adı, adresi ve açma-tıklama bilgisiyle okutur (`GET /mail_tasks/{id}/tracking/recipients`; ADR-0074 karar 9'daki "panel gönderiminin kendi göndereni"). Bu yüzden bugünkü SkyMail'de Leader onaylanan ekip postasının alıcılarını görür. ADR-0075 ekindeki aynı soruyla tutarlı iki seçenek:
@@ -195,12 +196,11 @@ Nasıl:
 - **SkyMail.**
   - Kişinin ekip listesini core'dan alır, her ekip için alıcı sayısını kendisi hesaplar.
   - Onay isteği bir Keycloak grubunu hedefliyorsa ve grup isteyenin Leader olduğu ağaçtaysa liste okuma rolü aranmaz. `LIDERLER` grubunun kendisi, ağaç dışındaki bir grup ve Privileged kökler seçilemez.
-  - Liderliğe istek gönderilirken, yeniden gönderilirken ve **onay anında** yeniden bakılır. Onay anında isteyen artık o ekibin Leader'ı değilse istek gönderilmez, gerekçeyle reddedilir.
-  - core'a ulaşılamıyorsa ekip postası gönderilmez; SkyMail kendi okumasına düşmez.
+  - Liderliğe istek gönderilirken, yeniden gönderilirken ve **onay anında** yeniden bakılır. Onay anında isteyen artık o ekibin Leader'ı değilse o ekip gönderilmez. Çok ekipli istekte yalnız liderliği kaybedilen ekip düşer, ötekiler gider; hiçbiri kalmazsa istek gerekçeyle reddedilir.
+  - core'a ulaşılamıyorsa ekip postası gönderilmez; SkyMail kendi okumasına düşmez. Onay anında ulaşılamazsa istek beklemede kalır, onay sonra yeniden denenir.
+  - **Koltuk rolden değil core'un liderlik cevabından gelir.** Ekip postası rotaları skymail-backend'de `/v1`'in `skymail:access` kapısından önce kendi zincirine alınır: kişinin ekip listesi (`/v1/me/team_audiences`), ekip hedefli onay isteğini gönderme ve yeniden gönderme, kişinin kendi istek listesi ve detayı, serbest duyuru önizlemesi. Zincir `skymail:access` taşıyanı ya da core'un cevabında en az bir `leader` satırı olanı geçirir (60 sn önbellek). core'a ulaşılamazsa yalnız ekip postası 503 olur, SkyMail'in geri kalanı etkilenmez. Emsal: `/v1/me/inbox` ve `/v1/me/email-delivery` da `skymail:access` kapısından önce kendi zincirindedir. Keycloak'ta rol değişmez, Keycloak yayını gerekmez.
   - **Alıcılar SkyMail'in Keycloak grup çözümüyle bulunur.** Bu, "Nasıl" bölümündeki "Kitleye core karar verir" maddesinden ("kendi grup çözümünü bu iş için kullanmaz") bir sapmadır. Bu kararın 2026-10-21 eki buna izin verir: o ret haber gönderimi içindir, panelin grup gönderimi üyeleri Keycloak'tan çözmeye devam eder, ama duyuru akışındaki her alıcı gönderim anında core'a sorulur (ADR-0072 karar 3). Ekip postası bu yolu kullanır; tercih, hesap durumu ve kategori kararı yine core'dadır.
-- **Keycloak.** Alt ekip Leader'ları bugün SkyMail'e giremez: uygulama ataması yalnız en üst ekiplerin Leader gruplarına `skymail:access` ve `skymail:templates:read` verir. e-skylab-keycloak'ta bütün seviyelerdeki `LIDERLER` ve `KOORDINATORLER` grupları için bir atama hedefi eklenir ve bu iki rol oraya verilir; sonraki Keycloak yayınıyla canlıya çıkar.
-  - **ADR-0076 karar 4'e dar istisna.** Konumdan gelen uygulama rolü yalnız en üst ekiplerin Leader gruplarında olurdu. SkyMail'in bu iki uygulama rolü bütün seviyelerdeki Leader gruplarında da olabilir. Gerekçe: roller yalnız konsola girmeyi ve şablon okumayı açar; gönderim yine YK onayından geçer, kitleyi core'un liderlik cevabı sınırlar. Başka rol bu istisnaya girmez. İki rol uygulama rolüdür; grubu Protected group yapmaz.
-- **Arayüz.** "Ekibim" seçeneği, ekip ağacı seçici, alıcı sayısı. Birincil düğme "Onaya sun"dur.
+- **Arayüz.** "Ekibim" seçeneği, ekip ağacı seçici, alıcı sayısı. Birincil düğme "Onaya sun"dur. `skymail:access` taşımayan ama ekip listesi boş olmayan kişi "Erişimin yok" yerine sade bir "Ekibime gönder" görünümü görür. Rolsüz Leader şablon okumaz, serbest duyuru yazar.
 
 Sınırlar:
 
@@ -214,6 +214,9 @@ Endüstri karşılaştırması:
   1. Grup sahibi kendi grubuna onaysız yazamaz. Exchange'de sahipler moderasyondan muaftır, Google Groups'ta yönetici yazar. Bizde her gönderim YK onayından geçer.
   2. Onay kapısı kişiye bağlıdır, kitleye değil (HubSpot gibi; Exchange'in kitle başına moderasyonu gibi değil).
   3. Dağıtım grubu üyesi Exchange'de çıkamaz; bizde çıkabilir, çünkü duyuru meşru menfaate dayanır (ADR-0062).
+  4. **Koltuk rolden değil liderlikten gelir.** Entra'da bir uygulamaya giriş kullanıcıya ya da gruba atamayla (app role assignment) gelir. Bizde rolsüz Leader'ın SkyMail'in ekip postası kısmına girişi core'un liderlik cevabından türetilir; Keycloak'ta rol eşlenmez. Neden: rolü bütün seviyelerdeki Leader gruplarına eşlemek ADR-0076 karar 4'ü delerdi ve tek seferlik seed sonradan açılan alt ekipleri kaçırırdı.
+  5. **Alıcıları posta aracının grup çözümü bulur** (yukarıda, "Nasıl"). Haber gönderiminde kitleyi core çözer; ekip postasında SkyMail Keycloak grubundan çözer, core her alıcıyı gönderimde denetler (2026-10-21 eki).
+  6. **Gönderenin takip ekranı açık sorudur.** ADR-0074 karar 9 panel göndereninin kişi bazında görünümünü açıyor; Leader'a açılıp açılmayacağı yukarıdaki açık soruya bağlıdır.
 
 Kaynaklar:
 
