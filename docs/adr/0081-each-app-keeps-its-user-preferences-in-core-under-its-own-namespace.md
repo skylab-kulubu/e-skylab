@@ -13,7 +13,7 @@ Karar (Yusuf ve Fatih, 2026-11-08: "Hesap servisinde her uygulamaya özel kullan
 3. **Hesap Merkezi istisnası.** Hesap Merkezi (`account-center`) kişinin bütün uygulamalarının özetini (anahtar sayısı, son değişiklik) okur ve bir uygulamanın ayarlarını sıfırlayabilir. Değerleri okumaz, yazmaz. Ekranı ana listede ayrı bir "Uygulama ayarları" satırıdır.
 4. **Core değerin içini yorumlamaz.** Değer opaktır, varsayılanı uygulama verir; sunucuda yalnız kişinin açık seçimi durur. Uygulama değerle birlikte bir `schemaVersion` gönderir; biçim değişirse dönüşümü uygulama yapar.
 5. **Sınırlar.** Anahtar başına değer en çok 4 KB, uygulama başına en çok 32 anahtar ve toplam 32 KB, istek gövdesi en çok 8 KB. Uygulama ve anahtar adları dar bir karakter kümesine uyar.
-6. **Çakışma.** Varsayılan kural anahtar başına son yazanın kazanmasıdır. Her yanıt bir sürüm (`ETag`) taşır; istemci `If-Match` gönderirse tutmayan yazma 412 alır.
+6. **Çakışma.** Varsayılan kural anahtar başına son yazanın kazanmasıdır. Her anahtarın bir sürümü vardır: okuma yanıtında gövdede, yazma yanıtında ayrıca `ETag` başlığında. İstemci `If-Match` gönderirse tutmayan yazma 412 alır.
 7. **Yalnız görünüm durumu yazılır.** Değere kişi adı, e-posta, form içeriği ya da arama metni yazılmaz. Geçici iş durumu (taslak, açık sekme) tarayıcıda kalır.
 8. **Silme.** Hesap silmede core içi `erase_app_preferences` adımı kişinin bütün satırlarını siler (`erase_communication_preferences`'in ardından). Silinmekte olan kişiye yeni satır yazılmaz. Kendiliğinden süre dolması yoktur; listeden çıkan bir uygulamanın satırları tek seferlik bir migration ile silinir.
 9. **Dayanak ve aydınlatma.** Kişisel veridir, dayanak m.5/2-c'dir (hizmetin sunulması), rıza istenmez. Aydınlatma metninin 1. satırının veri sütununa "uygulama görünüm ayarları" eklenir; ayrı satır açılmaz, avukata sorulmaz. Production'da bir uygulama ancak bu metin yayımlandıktan sonra açılır; core'da eşleme boşken özellik kapalıdır.
@@ -21,7 +21,8 @@ Karar (Yusuf ve Fatih, 2026-11-08: "Hesap servisinde her uygulamaya özel kullan
 
 Kaynaklar:
 - **Fatih'in ve Yusuf'un:** ihtiyaç ve "core bilsin" ilkesi (2026-11-08).
-- **Yusuf'un:** 3'teki ekran yeri ve 9'daki aydınlatma kararı (2026-11-08); ilk dilimde yalnız Forms açılır.
+- **Yusuf'un:** 3'teki ekran yeri ve 9'daki aydınlatma kararı (2026-11-08).
+- **Orkestratörün:** ilk dilimde yalnız Forms açılır; değerin içini yorumlamama (4) ve ortak ayarların kapsam dışı olması (10) (2026-11-08).
 - **Tasarım önerisi:** 2–10 (hub'daki `notes/uygulama-tercihleri-tasarim-20261108.md`).
 
 ## Consequences
