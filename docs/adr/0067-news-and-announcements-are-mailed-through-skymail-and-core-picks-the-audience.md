@@ -183,12 +183,14 @@ Bağımlılık: core'un kişinin ekipleri ucunu Forms'un sahip ekibiyle paylaşa
    - Tekilleştirme kuyruğa alma anında yapılır. Kişi kuyruğa alındıktan sonra o ekibin kategorisini kapatırsa gönderim turundaki denetim (ADR-0072 karar 3) postayı durdurur ve öteki ekibin postası ona artık gitmez; bu bilinen ve kabul edilen bir boşluktur.
 9. **Leader'a SkyMail'in liste okuma rolü verilmez** (orkestratör). O rol bütün grupları ve üyelerinin adreslerini açar. Leader ekip listesini alıcı sayısıyla görür.
 
-**Açık (Yusuf'a soruldu): Leader alıcıları görür mü?** SkyMail bugün onaylı bir gönderimi isteyen kişinin gönderimi sayar (`SentBy` isteyendir) ve göndereni kendi gönderiminin alıcılarını adı, adresi ve açma-tıklama bilgisiyle okutur (`GET /mail_tasks/{id}/tracking/recipients`; ADR-0074 karar 9'daki "panel gönderiminin kendi göndereni"). Bu yüzden bugünkü SkyMail'de Leader onaylanan ekip postasının alıcılarını görür. ADR-0075 ekindeki aynı soruyla tutarlı iki seçenek:
+**Gönderen alıcı listesini görmez, yalnız toplu sayıları görür** (Yusuf, 2026-11-08). Genel kuraldır: ekip postası dahil, bütün panel gönderimlerinde geçerlidir.
 
-- **(a) Öneri: yalnız sayı.** Ekip postasında gönderen kişi bazında görünümü görmez, yalnız toplu sayıları görür. Bunun için ADR-0074 karar 9'a bir ek ve SkyMail'de bir bilet gerekir.
-- **(b)** Ek "Leader ekibinin alıcılarını adı ve adresiyle görür; içerik zaten kendi yazdığıdır" diye yazılır. SkyMail değişmez.
-
-Karar gelene dek gönderim formu alıcıları göstermez, yalnız sayıyı gösterir; onaylanan gönderimin takip ekranı bu soruya bağlıdır.
+- SkyMail bugün onaylı bir gönderimi isteyen kişinin gönderimi sayar (`SentBy` isteyendir) ve göndereni kendi gönderiminin alıcılarını adı, adresi ve açma-tıklama bilgisiyle okutur (`GET /mail_tasks/{id}/tracking/recipients`; ADR-0074 karar 9'daki "panel gönderiminin kendi göndereni"). Bu karar o istisnayı varsayılan olarak kapatır.
+- Gönderen kendi gönderiminin toplu sayılarını görür (gitti, atlandı, hata; takip açıksa açılma ve tıklama toplamları, ADR-0074 karar 9'un 10 kişi eşiğiyle).
+- Kişi kişi alıcı listesi yalnız kişi bazında takip okuma rolü olanlara açıktır (`skymail:mails:tracking:read`; Yusuf: YK ve ADMIN).
+- SkyMail'de bir ayar anahtarı bu kuralı değiştirebilir; varsayılanı "yalnız sayı"dır.
+- Bunun için ADR-0074 karar 9'a bir ek ve SkyMail'de bir bilet gerekir (gönderen istisnası anahtara bağlanır, rapor ekranı buna uyar).
+- Gönderim formu da alıcıları göstermez, yalnız sayıyı gösterir.
 
 Nasıl:
 
@@ -206,7 +208,7 @@ Nasıl:
 Sınırlar:
 
 - Leader yalnız kendi ağacına gönderir.
-- Leader'ın kendi onaylı gönderiminin sonuç ekranı (gitti, atlandı, hata sayıları) sonraki iştir; kişi bazında görünüm yukarıdaki açık soruya bağlıdır.
+- Leader'ın kendi onaylı gönderiminin sonuç ekranı (gitti, atlandı, hata sayıları) sonraki iştir; kişi bazında görünüm Leader'a açılmaz (yukarıdaki genel kural).
 
 Endüstri karşılaştırması:
 
@@ -217,7 +219,7 @@ Endüstri karşılaştırması:
   3. Dağıtım grubu üyesi Exchange'de çıkamaz; bizde çıkabilir, çünkü duyuru meşru menfaate dayanır (ADR-0062).
   4. **Koltuk rolden değil liderlikten gelir.** Entra'da bir uygulamaya giriş kullanıcıya ya da gruba atamayla (app role assignment) gelir. Bizde rolsüz Leader'ın SkyMail'in ekip postası kısmına girişi core'un liderlik cevabından türetilir; Keycloak'ta rol eşlenmez. Neden: rolü bütün seviyelerdeki Leader gruplarına eşlemek ADR-0076 karar 4'ü delerdi ve tek seferlik seed sonradan açılan alt ekipleri kaçırırdı.
   5. **Alıcıları posta aracının grup çözümü bulur** (yukarıda, "Nasıl"). Haber gönderiminde kitleyi core çözer; ekip postasında SkyMail Keycloak grubundan çözer, core her alıcıyı gönderimde denetler (2026-10-21 eki).
-  6. **Gönderenin takip ekranı açık sorudur.** ADR-0074 karar 9 panel göndereninin kişi bazında görünümünü açıyor; Leader'a açılıp açılmayacağı yukarıdaki açık soruya bağlıdır.
+  6. **Gönderen kendi gönderiminin alıcılarını görmez, yalnız toplu sayıları görür.** ADR-0074 karar 9 panel göndereninin kişi bazında görünümünü açıyordu; Yusuf'un 2026-11-08 kararı bunu varsayılan olarak kapatır, kişi bazında liste yalnız takip okuma rolüyle açılır. Varsayılanı SkyMail'deki bir anahtar değiştirebilir.
 
 Kaynaklar:
 
