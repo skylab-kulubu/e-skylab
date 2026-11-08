@@ -187,7 +187,7 @@ Bağımlılık: core'un kişinin ekipleri ucunu Forms'un sahip ekibiyle paylaşa
 
 - SkyMail bugün onaylı bir gönderimi isteyen kişinin gönderimi sayar (`SentBy` isteyendir) ve göndereni kendi gönderiminin alıcılarını adı, adresi ve açma-tıklama bilgisiyle okutur (`GET /mail_tasks/{id}/tracking/recipients`; ADR-0074 karar 9'daki "panel gönderiminin kendi göndereni"). Bu karar o istisnayı varsayılan olarak kapatır.
 - Gönderen kendi gönderiminin toplu sayılarını görür (gitti, atlandı, hata; takip açıksa açılma ve tıklama toplamları, ADR-0074 karar 9'un 10 kişi eşiğiyle).
-- Kişi kişi alıcı listesi yalnız kişi bazında takip okuma rolü olanlara açıktır (`skymail:mails:tracking:read`; Yusuf: YK ve ADMIN).
+- Kişi kişi alıcı listesi yalnız kişi bazında takip okuma rolü olanlara açıktır (`skymail:mails:tracking:read`: ADMIN, YK ve DK; ADR-0074 karar 9 aynen geçerlidir, yalnız gönderen istisnası kapanır).
 - SkyMail'de bir ayar anahtarı bu kuralı değiştirebilir; varsayılanı "yalnız sayı"dır.
 - Bunun için ADR-0074 karar 9'a bir ek ve SkyMail'de bir bilet gerekir (gönderen istisnası anahtara bağlanır, rapor ekranı buna uyar).
 - Gönderim formu da alıcıları göstermez, yalnız sayıyı gösterir.
