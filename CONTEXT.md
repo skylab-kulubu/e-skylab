@@ -479,7 +479,7 @@ A SkyMail send whose opens and clicks are recorded per person (ADR-0074). Each r
 _Avoid_: rewriting a reset, verification, login or invitation link; tracking an address without an account; a per-mail "stop tracking" line; storing the IP or raw user-agent; calling an open "read"
 
 **Open event** (Açılma olayı):
-One load of a Tracked send's pixel or one click of its rewritten link, stored with time, the link for a click, a client class and whether it was Likely automated. Never stores the IP, raw user-agent, Referer or location. A weak signal: some clients load images without the person, some never load them. Only `skymail:mails:tracking:read` (ADMIN, YK, DK) reads it per person; the sender sees totals unless SkyMail's switch reopens it (ADR-0074 addendum 2026-11-08), and never for a system mail.
+One load of a Tracked send's pixel or one click of its rewritten link, stored with time, the link for a click, a client class and whether it was Likely automated. Never stores the IP, raw user-agent, Referer or location. A weak signal: some clients load images without the person, some never load them. Only `skymail:mails:tracking:read` (ADMIN, YK, DK) reads it per person; `skymail:mails:read` sees each recipient's name, address and delivery status but not their Open events; the sender sees totals unless SkyMail's switch reopens it (ADR-0074 addendum 2026-11-08), and never for a system mail.
 _Avoid_: "read receipt"; resending automatically to people with no Open event; judging a Member by it; showing a sender their recipients one by one
 
 **Likely automated** (Muhtemelen otomatik):

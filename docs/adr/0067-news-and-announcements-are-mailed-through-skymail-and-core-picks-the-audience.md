@@ -187,7 +187,7 @@ Bağımlılık: core'un kişinin ekipleri ucunu Forms'un sahip ekibiyle paylaşa
 
 - SkyMail bugün onaylı bir gönderimi isteyen kişinin gönderimi sayar (`SentBy` isteyendir) ve göndereni kendi gönderiminin alıcılarını adı, adresi ve açma-tıklama bilgisiyle okutur (`GET /mail_tasks/{id}/tracking/recipients`; ADR-0074 karar 9'daki "panel gönderiminin kendi göndereni"). Bu karar o istisnayı varsayılan olarak kapatır.
 - Gönderen kendi gönderiminin toplu sayılarını görür (gitti, atlandı, hata; takip açıksa açılma ve tıklama toplamları, ADR-0074 karar 9'un 10 kişi eşiğiyle).
-- Kişi kişi alıcı listesi yalnız kişi bazında takip okuma rolü olanlara açıktır (`skymail:mails:tracking:read`: ADMIN, YK ve DK; ADR-0074 karar 9 aynen geçerlidir, yalnız gönderen istisnası kapanır).
+- Kişi bazında açma-tıklama yalnız takip okuma rolü olanlara açıktır (`skymail:mails:tracking:read`: ADMIN, YK ve DK; ADR-0074 karar 9 aynen geçerlidir, yalnız gönderen istisnası kapanır). Gönderim okuma rolü (`skymail:mails:read`) kuyrukta alıcıların adını, adresini ve teslim durumunu bugünkü gibi görür (ADR-0074 2026-11-08 eki).
 - SkyMail'de bir ayar anahtarı bu kuralı değiştirebilir; varsayılanı "yalnız sayı"dır.
 - Bunun için ADR-0074 karar 9'a bir ek ve SkyMail'de bir bilet gerekir (gönderen istisnası anahtara bağlanır, rapor ekranı buna uyar).
 - Gönderim formu da alıcıları göstermez, yalnız sayıyı gösterir.
@@ -219,7 +219,7 @@ Endüstri karşılaştırması:
   3. Dağıtım grubu üyesi Exchange'de çıkamaz; bizde çıkabilir, çünkü duyuru meşru menfaate dayanır (ADR-0062).
   4. **Koltuk rolden değil liderlikten gelir.** Entra'da bir uygulamaya giriş kullanıcıya ya da gruba atamayla (app role assignment) gelir. Bizde rolsüz Leader'ın SkyMail'in ekip postası kısmına girişi core'un liderlik cevabından türetilir; Keycloak'ta rol eşlenmez. Neden: rolü bütün seviyelerdeki Leader gruplarına eşlemek ADR-0076 karar 4'ü delerdi ve tek seferlik seed sonradan açılan alt ekipleri kaçırırdı.
   5. **Alıcıları posta aracının grup çözümü bulur** (yukarıda, "Nasıl"). Haber gönderiminde kitleyi core çözer; ekip postasında SkyMail Keycloak grubundan çözer, core her alıcıyı gönderimde denetler (2026-10-21 eki).
-  6. **Gönderen kendi gönderiminin alıcılarını görmez, yalnız toplu sayıları görür.** ADR-0074 karar 9 panel göndereninin kişi bazında görünümünü açıyordu; Yusuf'un 2026-11-08 kararı bunu varsayılan olarak kapatır, kişi bazında liste yalnız takip okuma rolüyle açılır. Varsayılanı SkyMail'deki bir anahtar değiştirebilir.
+  6. **Gönderen kendi gönderiminin alıcılarını görmez, yalnız toplu sayıları görür.** ADR-0074 karar 9 panel göndereninin kişi bazında görünümünü açıyordu; Yusuf'un 2026-11-08 kararı bunu varsayılan olarak kapatır; kişi bazında açma-tıklama yalnız takip okuma rolüyle, alıcılar ve teslim durumu gönderim okuma rolüyle açılır. Varsayılanı SkyMail'deki bir anahtar değiştirebilir.
 
 Kaynaklar:
 
