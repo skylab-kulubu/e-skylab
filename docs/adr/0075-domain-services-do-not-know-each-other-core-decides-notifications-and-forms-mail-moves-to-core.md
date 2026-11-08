@@ -241,11 +241,11 @@ Nasıl:
    - **Leader'ın `islem` beyanı.** Leader `islem` beyan ederse posta tercih, çıkış kaydı ve Davet onayı aranmadan bütün süzülmüş kitleye gider; yalnız kalıcı ret bastırması uygulanır. Leader formun cevaplarını görmeden bu beyanı verir. Beyan ve yetki yolu denetim kaydında birlikte durur. core kitle yanıtında yetki yolunu her durumda döner; Mail onayına düşen gönderimde onaylayan, onay ekranında amacı ve "sahip ekibin Leader'ı" yetki yolunu görür.
 
 10. **Gönderen alıcı listesini görmez** (Yusuf, 2026-11-08). Bu genel bir kuraldır: yalnız Leader yolu için değil, SkyMail'deki her gönderen için geçerlidir.
-    - Gönderen kendi gönderiminde yalnız toplu sayıları görür (gönderilen, açılan, tıklanan, atlanan). Alıcının adı, adresi ve kişi bazında açma-tıklama bilgisi yalnız takip yetkisi olanlara açıktır (`skymail:mails:tracking:read`; Yusuf'un kararında YK ve ADMIN).
+    - Gönderen kendi gönderiminde yalnız toplu sayıları görür (gönderilen, açılan, tıklanan, atlanan). Alıcının adı, adresi ve kişi bazında açma-tıklama bilgisi yalnız takip okuma rolü olanlara açıktır (`skymail:mails:tracking:read`: YK, ADMIN, DK).
     - Bugün SkyMail gönderenin kendi gönderiminde kişi listesini rol istemeden açıyor (`GET /mail_tasks/{id}/tracking/recipients`). Bu kapanır.
     - **Anahtarla geri alınabilir.** Davranış SkyMail'de bir ayar anahtarıyla değiştirilebilir; varsayılan "yalnız sayı"dır. Anahtar açılırsa gönderen yine kendi gönderiminin kişi listesini görür.
     - core kitle yanıtında yetki yolunu yine döner; SkyMail onu onay ekranında gösterir (madde 9). Kural genel olduğu için SkyMail Forms'u ya da yetki yolunu bilmeden uygular; ayrı bir "alıcılar gizli" bayrağı gerekmez.
-    - **ADR-0074 karar 9'a ek gerekir.** Karar 9 kişi bazında görünümü "panel gönderiminin kendi göndereni"ne de açıyor; bu ek o cümleyi değiştirir. ADR-0074'e tarihli ek ayrı yazılır. 10'dan az takipli alıcılı gönderimde sayıların yalnız kişi bazında okuyabilene gösterilmesi kuralı aynen kalır.
+    - **ADR-0074 karar 9'a ek gerekir.** Karar 9 kişi bazında görünümü "panel gönderiminin kendi göndereni"ne de açıyor; bu ek yalnız o gönderen istisnasını kapatır. Takip okuma rolü ve sahipleri (YK, ADMIN, DK) aynen kalır. ADR-0074'e tarihli ek ayrı yazılır. 10'dan az takipli alıcılı gönderimde sayıların yalnız kişi bazında okuyabilene gösterilmesi kuralı aynen kalır.
     - Uygulama için SkyMail bileti açılır (skymail-backend uç yetkisi ve anahtar, skymail-frontend görünüm).
 
 **İlk sürümde yok:** cevap değerine göre süzgeç (serbest metin süzgece ve denetim kaydına girerdi), süreli formda başlayıp göndermeyenler, "ekip üyelerinden formu doldurmayanlar", kaydedilmiş segment.
