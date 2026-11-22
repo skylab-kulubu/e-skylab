@@ -152,7 +152,7 @@ Nasıl:
 - **Olay ve uç adları, alan adları, sayfalama.** Fatih kesinleştirir; bu ADR yalnız taşınacak bilgiyi yazar.
 - **Görüntüleyen rolü.** Formun yalnız görüntüleyeni (`Viewer`) toplu gönderim başlatabilir mi? Bugün başlatabiliyor ve bu ADR bunu değiştirmiyor. Kural Fatih'indir; değişirse yalnız Forms'un ucu değişir.
 - ~~**Yanıt durumuna göre kitle.** "Yalnız kabul edilenlere" gibi bir süzgeç ilk sürümde yoktur. Gerekirse Forms'un ucuna bir parametre olarak eklenir.~~ *Kapandı: 2026-11-08 eki (süzülmüş form kitlesi, akış katılımcıları ve sahip ekip).*
-- **Misafir postasında tekrar anahtarı.** `POST /v1/mail_tasks/single` `Idempotency-Key` okumaz. Yanıtı belirsiz kalan misafir postası, bugünkü bilet postası gibi yeniden denenmez. SkyMail'e anahtar desteği ayrı bir iştir.
+- ~~**Misafir postasında tekrar anahtarı.** `POST /v1/mail_tasks/single` `Idempotency-Key` okumaz. Yanıtı belirsiz kalan misafir postası, bugünkü bilet postası gibi yeniden denenmez. SkyMail'e anahtar desteği ayrı bir iştir.~~ *SkyMail tarafı kapandı: skymail-backend #133. `/single` servisten isteğe bağlı `Idempotency-Key` okur; kural `/v1/notifications`'ınkidir (aynı anahtar ve istek ilk yanıtı döner, başka istek 422), anahtar 72 saat tutulur ve adres, ad ya da kişi kimliği taşımaz. Anahtarı gönderip belirsiz yanıtta yeniden denemek göndericilerin ayrı işidir (core, Forms).*
 
 ## Endüstri uygulamasıyla karşılaştırma
 
