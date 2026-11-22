@@ -101,7 +101,7 @@ Kaynaklar:
 - **core.** Bilette `access_key`, `code` ve `qr_version` alanları. Bilet imzalayıcısı ve JWKS'te ikinci anahtar. Kapı ucunda `kid`'e göre ayırma ve kanonik `check-in/scan` adı (`/skypass` takma ad olarak kalır, yayındaki sky-app değişmeden çalışır). `/v1/public/tickets/{key}` (JSON, `qr.png`, `pdf`). `/v1/tickets/me`'de `code`, `ticketUrl`, `qrToken`. Yeniden gönder ve yenile uçları. `TICKET_PAGE_URL`, `TICKET_PAGE_GRACE`, `TICKET_PDF_ATTACHMENT`; döndürmede `TICKET_QR_KID` ve geçiş ayarı (Ek 2026-11-22).
 - **İletişim servisi (skymail-backend).** Ek alanı, `mail_attachments` tablosu, SMTP ve Graph eki, maskeleme ve silme kapsamı.
 - **Şablon (skymail-frontend).** "Biletini aç" düğmesi, QR'lı metin, `TicketUrl` hassas değişken.
-- **core (tema ve kapı).** `events.ticket_brand`, `events.ticket_accent_color`, `events.entry_mode`; tema kataloğu ve `ticket-preview`; `venue_entries`, `attendance_displays`; `check-in/me` jeton alır; misafir girişi bilet anahtarı da alır; `SESSION_QR_MODE`, `ATTENDANCE_QR_MAX_USES`, `ATTENDANCE_DISPLAY_URL`.
+- **core (tema ve kapı).** `events.ticket_brand`, `events.ticket_accent_color`, `events.entry_mode`; tema kataloğu ve `ticket-preview`; etkinliğin noktası ve harita görseli, harita bölgeleri (Ek 2026-11-22, PDF v5); `venue_entries`, `attendance_displays`; `check-in/me` jeton alır; misafir girişi bilet anahtarı da alır; `SESSION_QR_MODE`, `ATTENDANCE_QR_MAX_USES`, `ATTENDANCE_DISPLAY_URL`.
 - **Site.** `/bilet/[key]`, PDF ile aynı belge görünümünde ve etkinliğin temasıyla. `/ekran/[key]`. `/kapi` "Oturum yoklaması" olur, bilet anahtarını ve e-postayı hatırlar.
 - **Panel.** Katılımcı satırında kod, yeniden gönder, yenile; masada kodla arama. "Bilet görünümü" kartı, kapı düzeni ayarı, yoklama ekranı bağlantıları, "kapıda okutulmadan girdi" sayısı; statik "Oturum QR indir" `qr` kipinde yoklama ekranı bağlantısına döner.
 - **sky-app (Mobile Lab).** Bugünkü tarayıcı Ticket QR'ı değişmeden okur. Sözleşme: metinler, 410, JWKS ile cihazda doğrulama, "etkinliklerim"de QR; "QR Okut" `/kapi/{id}?dq=` biçimini tanır; tarayıcı `kind: entry` yanıtını alır.
@@ -172,3 +172,20 @@ Karar 1'deki döndürmenin uygulaması (core-backend#370) bir ayar daha gerektir
 - **Core doğrulamada anahtarı `kid`'e göre seçer.** Başka bir `kid` ya da yeni anahtarla imzalanmış eski `kid` reddedilir. JWKS, pencere boyunca iki anahtarı ayrı `kid`'lerle yayımlar.
 - **Döndürme sihirbazı üç değeri birlikte yazar:** yeni `kid`, önceki anahtar ve pencerenin sonu. Ardından JWKS'te iki `kid`'i denetler.
 - **Sızan anahtar döndürülürken** yeni `kid` verilir, önceki anahtar verilmez.
+
+## Ek (2026-11-22): Kurumsal görünüm PDF v5'tir; yerin haritası kendi OpenStreetMap verimizden çizilir
+
+Karar 8'in "Kurumsal" tanımı, Yusuf'un onayladığı PDF v5 tasarımıyla değişti (core-backend#375). Aynı gün bilete yerin haritası eklendi (core-backend#374, #376).
+
+- **Kurumsal = v5.** A4, gerekirse çok sayfa; her sayfanın başında SKY LAB işareti, "SKY LAB: Bilgisayar Bilimleri Kulübü", bilet kodu ve sayfa numarası. Sıra sabit: kapak bandı, bilet ızgarası ve QR, program, etkinlik hakkında, etkinlik yeri (hep en sonda), dipnot. Guilloche, mühür, ekip logosu ve koçan kalktı. **Kapak görseli artık PDF'e girer:** bir bant olarak kırpılır; kapak yoksa kapak rengi. Program günleri yan yana en çok iki sütundur. Metin yalnız veri ve dipnottur, talimat cümlesi yoktur. Yazı tipi Manrope, PDF'e gömülü.
+- **Etkinliğin yeri bir noktadır.** `location` yerin adı olarak kalır; ayrıca isteğe bağlı nokta (`locationLat`, `locationLng`, ikisi birlikte) ve açık adres. Yol tarifi Google Haritalar bağlantısıdır (anahtar yok, görsel gömülmez).
+- **Harita kendi verimizden, bir kez çizilir.** Kaynak kulübün PMTiles arşivi: Protomaps'in OpenStreetMap yapımından çıkarılmış bir bölge (ODbL; atıf "© OpenStreetMap contributors" haritanın altında). Nokta kaydedilince core karoları kendisi SVG olarak çizer, Gotenberg'in Chromium'u fotoğrafını çeker. Görsel `event_map` medyası olarak saklanır; PDF ve bilet sayfası onu kullanır, her bilette yeniden çizilmez. Nokta değişince yeniden çizilir. Gotenberg sayfanın dışına istek atmaz.
+- **Bölgeler.** Başlangıç bölgesi İstanbul'dur. ADMIN panelden yeni bölge ister; core onu en yeni Protomaps yapımından çıkarır ve medya kovasına yükler. Boyutun üst sınırı vardır, varsayılanı 2 GiB. Nokta, onu içeren en küçük bölgeden çizilir; hiçbiri içermiyorsa harita yoktur, yer adı ve yol tarifi kalır. Panelin konum seçme haritası aynı arşivi tarayıcıda okur, yazı tipi ve sembolleri kendi dosyalarından gelir.
+
+Kaynaklar: Yusuf (v5 tasarımı, program için en çok iki sütun, harita için kendi sunucumuz, başlangıçta yalnız İstanbul ve panelden bölge ekleme, 2026-11-22). Uygulama ayrıntısı core'da: `docs/event-location.md`, `docs/event-map.md`, `docs/ticket-page.md`.
+
+**Seçilmeyenler:**
+- **MapTiler Static Maps.** Ücretsiz planda yok. Şartlar da harita görselini sunucuda saklamayı ve API çağrısı yerine statik görsel kullanmayı yasaklıyor.
+- **Gotenberg'de MapLibre.** WebGL ister. Gotenberg'in Chromium'unda GPU yok ve yazılım WebGL'ini açan bayrak verilmiyor. Bu yüzden core SVG çizer, Chromium yalnız fotoğrafını çeker. Panelin tarayıcıdaki haritası MapLibre'dir.
+- **OpenStreetMap'in kendi karo sunucusu.** Kullanım politikası sunucu tarafı ve toplu kullanıma uygun değil.
+- **Her bilette yeniden çizim.** Gereksiz iş; harita etkinlik başına bir kez çizilir.
