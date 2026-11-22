@@ -98,7 +98,7 @@ Kaynaklar:
 
 ## Consequences
 
-- **core.** Bilette `access_key`, `code` ve `qr_version` alanları. Bilet imzalayıcısı ve JWKS'te ikinci anahtar. Kapı ucunda `kid`'e göre ayırma ve kanonik `check-in/scan` adı (`/skypass` takma ad olarak kalır, yayındaki sky-app değişmeden çalışır). `/v1/public/tickets/{key}` (JSON, `qr.png`, `pdf`). `/v1/tickets/me`'de `code`, `ticketUrl`, `qrToken`. Yeniden gönder ve yenile uçları. `TICKET_PAGE_URL`, `TICKET_PAGE_GRACE`, `TICKET_PDF_ATTACHMENT`.
+- **core.** Bilette `access_key`, `code` ve `qr_version` alanları. Bilet imzalayıcısı ve JWKS'te ikinci anahtar. Kapı ucunda `kid`'e göre ayırma ve kanonik `check-in/scan` adı (`/skypass` takma ad olarak kalır, yayındaki sky-app değişmeden çalışır). `/v1/public/tickets/{key}` (JSON, `qr.png`, `pdf`). `/v1/tickets/me`'de `code`, `ticketUrl`, `qrToken`. Yeniden gönder ve yenile uçları. `TICKET_PAGE_URL`, `TICKET_PAGE_GRACE`, `TICKET_PDF_ATTACHMENT`; döndürmede `TICKET_QR_KID` ve geçiş ayarı (Ek 2026-11-22).
 - **İletişim servisi (skymail-backend).** Ek alanı, `mail_attachments` tablosu, SMTP ve Graph eki, maskeleme ve silme kapsamı.
 - **Şablon (skymail-frontend).** "Biletini aç" düğmesi, QR'lı metin, `TicketUrl` hassas değişken.
 - **core (tema ve kapı).** `events.ticket_brand`, `events.ticket_accent_color`, `events.entry_mode`; tema kataloğu ve `ticket-preview`; `venue_entries`, `attendance_displays`; `check-in/me` jeton alır; misafir girişi bilet anahtarı da alır; `SESSION_QR_MODE`, `ATTENDANCE_QR_MAX_USES`, `ATTENDANCE_DISPLAY_URL`.
@@ -162,3 +162,13 @@ Kaynaklar:
 - **Yoklama QR'ının bilet de yazması.** Walk-in'in (Event QR) kararıdır, ayrı yazılır.
 - **Yoklama sayfasında Keycloak girişi.** Yoklama sayfası için gereksiz; telefondaki tek dokunuşluk yolu bozar. Bilet anahtarı ve hesap e-postası yeter.
 - **Yoklama ekranını panelde görevli girişiyle açmak.** OBS'de giriş ve oturum çerezi pratik değil.
+
+## Ek (2026-11-22): döndürmede imzalanan `kid` ayrı ve kalıcı bir ayardır
+
+Karar 1'deki döndürmenin uygulaması (core-backend#370) bir ayar daha gerektirdi.
+
+- **Hangi `kid` ile imzalandığı kalıcı bir ayardır:** `TICKET_QR_KID`. Varsayılanı `tk-e1`; ilk döndürmede `tk-e2` olur, sonraki her döndürmede bir artar. Pencere bitince geri dönmez: dönseydi pencerede `tk-e2` ile basılmış kodlar geçersizleşirdi.
+- **Döndürmeye özgü geçiş ayarı aynen kalır.** Önceki açık anahtar kendi `kid`'iyle JWKS'ten kopyalanır (`TICKET_QR_PREVIOUS_JWK`, OpenBao'da). Pencerenin sonu ayrıca verilir (`TICKET_QR_PREVIOUS_UNTIL`); en çok 366 gün sürer (tarihsiz etkinliğin kodu bir yıl). Önceki anahtarın `kid`'i geçerli `kid`'le aynı olamaz.
+- **Core doğrulamada anahtarı `kid`'e göre seçer.** Başka bir `kid` ya da yeni anahtarla imzalanmış eski `kid` reddedilir. JWKS, pencere boyunca iki anahtarı ayrı `kid`'lerle yayımlar.
+- **Döndürme sihirbazı üç değeri birlikte yazar:** yeni `kid`, önceki anahtar ve pencerenin sonu. Ardından JWKS'te iki `kid`'i denetler.
+- **Sızan anahtar döndürülürken** yeni `kid` verilir, önceki anahtar verilmez.
