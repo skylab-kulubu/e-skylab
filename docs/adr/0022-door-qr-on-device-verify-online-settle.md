@@ -11,3 +11,12 @@ Karar (Yusuf, 2026-10-09). Google Wallet'taki SkyPass kodu imza değil, Google'�
 - **Uygulama içi SkyPass QR değişmez:** imzalıdır (~60 sn), cihazda doğrulanır, core'a ulaşılamazken Queued check-in olarak kuyruğa alınabilir.
 
 Kaynak: core-backend#209, `docs/skypass-google-wallet.md`.
+
+## Ek: Ticket QR imzalıdır (2026-11-22)
+
+Karar (Yusuf, 2026-11-22; ADR-0082). "Ticket QR if signed" kapandı: her biletin (üye ve misafir) bir Ticket QR'ı vardır ve imzalıdır.
+
+- **İmza ve anahtar.** ES256 JWT, `kid=tk-e1`. Anahtar SkyPass anahtarından HKDF ile türetilir; açık anahtar SkyPass'ınkiyle (`sp-e1`) aynı JWKS'te (`/v1/skypass/jwks`) yayımlanır. Tarayıcı anahtarı `kid`'e göre seçer.
+- **Kural SkyPass QR'ınkiyle aynı.** Cihazda doğrulanır, giriş çevrimiçi yazılır, core'a ulaşılamazken geçerli ve süresi dolmamış kod Queued check-in olur.
+- **Kod statiktir.** Süresi etkinliğin bitişi + 1 gündür. Panelden yenilenen eski kod çevrimiçi `410 ticket_qr_superseded` alır; çevrimdışı kapıda geçebilir, bu fail-open kuralının kabul edilen sonucudur.
+- **Giriş oturum başınadır.** Yukarıdaki `POST /v1/tickets/:ticketId/event-days/:eventDayId/check-in` adresi eskidir. SkyPass QR ve Ticket QR aynı oturum ucuna gider; core `kid`'e göre ayırır.

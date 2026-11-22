@@ -155,8 +155,16 @@ The Member's Istanbulkart-style credential: the Member shows it, staff scans it.
 _Avoid_: forgeable `SKYPASS:{skyNumber}:{name}`; treating a decorative card-back pattern as this credential; treating Wallet barcode rotation as the same every-open lock as sky-app; treating the door as SkyPass-QR-only; treating authenticity as a mint or core round-trip; treating the door as concert fail-closed when core is down; refusing a signed unexpired Wallet code because its window is longer than Google's; calling the Google Wallet code signed or verifying it on the scanner; queuing a Google Wallet code while core is down
 
 **Ticket QR**:
-A per-User event ticket the attendee shows at the door. The Staff scanner auto-detects it on the same camera as SkyPass QR; both must work, and if the ticket is signed it follows the same on-device authenticity plus online settlement (Queued check-in when core is down) as SkyPass QR.
-_Avoid_: treating this as the Event poster QR; treating staff door scan as SkyPass-only; treating a signed Ticket QR as mint-round-trip authenticity or concert fail-closed
+The code of one Ticket, one per Ticket for Members and Guests alike, which the attendee shows at the door (ADR-0082). It is a signed, static ES256 JWT (`kid=tk-e1`, published in the same JWKS as SkyPass QR) carrying the Ticket, the Event, a QR version and an expiry of the Event's end plus one day; it carries no name, e-mail or phone. Mail, PDF, Ticket page and sky-app show the same code; it does not rotate. The Staff scanner auto-detects it on the same camera as SkyPass QR; both must work, and it follows the same on-device authenticity plus online settlement (Queued check-in when core is down) as SkyPass QR. A Member's SkyPass QR stays valid beside it; both write the same Check-in. Renewing the link from the panel raises the QR version, so the old code is refused online (`410 ticket_qr_superseded`); offline it may still pass, which fail-open accepts.
+_Avoid_: treating this as the Event poster QR; treating staff door scan as SkyPass-only; treating a signed Ticket QR as mint-round-trip authenticity or concert fail-closed; one Ticket QR per User; a rotating Ticket QR in mail or PDF; putting a name, e-mail or phone inside the code
+
+**Ticket page** (Bilet sayfası):
+The club site page of one Ticket, `yildizskylab.com/bilet/{access key}`, open without login because a Guest has no account (ADR-0082). The link itself is the right to see the ticket: a 128-bit random access key, renewed from the panel, kept with the Ticket and deleted with it. It shows name, Event, Ticket QR, Ticket code and a PDF download, never e-mail or phone; the PDF looks like a formal official document, is rendered by core on request and never stored. It answers `410` with no personal data seven days after the Event ends, `404` for a Draft Event, and hides the QR while the Event is cancelled. Same pattern as the Certificate page: UI on the site, a minimal public endpoint in core, `noindex` and `no-referrer`.
+_Avoid_: a ticket page behind login for guests; a guessable or sequential key; showing the access key in the panel; a page that stays open forever; storing the ticket PDF
+
+**Ticket code** (Bilet kodu):
+The short code printed under the Ticket QR, eight Crockford Base32 characters shown as `XXXX-XXXX` (ADR-0082). Desk check-in finds the Ticket by it, beside name and e-mail; dashes, case and look-alike characters do not matter. It is read out, not scanned.
+_Avoid_: the Ticket code as a door credential; a check-in written from the code alone without staff; the access key or Ticket id as the code
 
 **Wallet**:
 Apple Wallet or Google Wallet as a SkyPass QR surface for Members without sky-app; the pass face is name and skyNumber, no photo, matching SkyPass. Opening the pass must show a scannable SkyPass QR: Google Wallet rotates on-device (`rotatingBarcode` TOTP, 60-second period; verified online only, see SkyPass QR); Apple Wallet has no on-device rotate — PassKit `webServiceURL` so the device can pull a fresh signed barcode, with signed `exp` about 5 minutes if an update did not arrive. Apple VAS / Google Smart Tap is a later certified-terminal slice after physical Student-card NFC, and is not the staff camera or staff-phone NFC.
@@ -403,7 +411,7 @@ A Privileged or Owner-team Leader Member apply on behalf of another User from ad
 _Avoid_: Guest apply for a Member; dumping the Member onto skyforms; treating this as the attendee's own `/applications/me`; Walk-in; inventing a second Ticket type
 
 **Desk check-in**:
-Operator yoklama in superadmin: pick a person or guest email, resolve the Ticket, mark Check-in on an Oturum. Surfaces: `/qr` and the Event hub roster/session. Success copy is name · session · time. Same Check-in row as the Staff scanner; the camera stays sky-app.
+Operator yoklama in superadmin: pick a person or guest email, or type the Ticket code, resolve the Ticket, mark Check-in on an Oturum. Surfaces: `/qr` and the Event hub roster/session. Success copy is name · session · time. Same Check-in row as the Staff scanner; the camera stays sky-app.
 _Avoid_: UUID as the primary label; treating superadmin as the Staff scanner camera; EventDay grain; staff scanning the Event poster
 
 **Apply extra**:
@@ -529,6 +537,10 @@ _Avoid_: a save that changes live mail; comparing versions as raw HTML diffs; ha
 **Required variable**:
 A variable a Mail template must keep referencing because the mail cannot do its job without it: the reset link, the certificate VerifyURL, the ticket QR. The ones the sending service's contract declares are fixed alongside the Template key; an operator may mark further variables required, but cannot release a contract one.
 _Avoid_: locked parts or fixed sections; letting an operator remove a service's link from its mail; treating every variable a sender supplies as required
+
+**Mail attachment** (Posta eki):
+A file the sender hands to the communication service with one mail, today only the ticket PDF (ADR-0082). Only on a single-recipient transactional mail, only on the e-mail Channel, PDF or PNG, at most two and 512 KB in all. The service keeps it only until the mail is sent or fails for good, then deletes it; masking and Account erasure cover it. Bulk sends take none, and the service never fetches a file from core or another domain service.
+_Avoid_: attachments on bulk mail; the service fetching the file itself; keeping attachments after sending; calling a Media attachment or a Form slot by this name
 
 **Template seed**:
 The run that writes the Mail templates kept in the repo (`emails/`) into SkyMail by Template key. It is one of two writers beside SkyMail's own editor, and it updates a template only when no operator has changed it since the last seed; otherwise it refuses unless forced.
