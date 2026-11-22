@@ -32,7 +32,7 @@ Nasıl:
 - **Feedback mode** etkinliğin bir alanıdır: `event` (varsayılan; tek etkinlik formu), `per_session` (oturum başına isteğe bağlı form; etkinlik formu da genel değerlendirme için isteğe bağlı kalır) ya da `event_with_sessions` (tek etkinlik formu, oturumlar içinde sorulur). Kip `per_session` değilken oturum formları silinmez, ama postaları gitmez. Oturumların hangi biçimde sorulacağı (karar 8) core'da saklanmaz, formun kendi yapısıdır.
 - **Alanlar.** Etkinlikte `feedbackMode`, `feedbackFormUrl`, `feedbackFormAlias` ve `feedbackAutoSend` (varsayılan açık). Oturumda `feedbackFormUrl`, `feedbackFormAlias` ve `feedbackAutoSend`. Gövdede gönderilmeyen alan korunur. Oturum güncellemesi bugün bütün gövdeyle yapıldığı için oturumdaki alanlar işaretçidir: eski bir istemci oturumu kaydederken formu silemez.
 - **Bilet yazmaz.** Geri bildirim formu "bu etkinlik bu formu anıyor" listesine girmez. Cevabı hiçbir etkinliğe bilet yazmaz; core her durumda 2xx döner, Forms yeniden denemez.
-- **Bir form tek yerde.** Bir form aynı anda yalnız bir yerde olabilir: bir etkinliğin başvuru ya da ek formu, bir etkinliğin geri bildirim formu ya da bir oturumun geri bildirim formu. Aksi 409'dur. Başvuru formlarının kendi aralarındaki bugünkü serbestlik değişmez.
+- **Bir form tek yerde.** Bir form aynı anda yalnız bir yerde olabilir: bir etkinliğin başvuru ya da ek formu, bir etkinliğin geri bildirim formu ya da bir oturumun geri bildirim formu. Aksi 409'dur. Başvuru formlarının kendi aralarındaki bugünkü serbestlik değişmez. *(Bu serbestlik 2026-11-22 ekiyle kalktı: başvuru ve ek formu da yalnız bir arşivsiz etkinlikte olur.)*
 - **Kısa link.** Geri bildirim formunun Form link'ini etkinlik yönetir, başvuru formunda olduğu gibi. Arşivde link bırakılır.
 - **Bitiş zamanı.** Etkinlik için ADR-0066'daki bitiş (bitiş tarihi, yoksa başlangıç + 1 gün). Oturum için oturumun bitişi, yoksa günün bitişi, yoksa etkinliğin bitişi. Hiçbiri yoksa otomatik gönderim olmaz, yalnız "Şimdi gönder" çalışır.
 - **Durum.** Taslakta form bağlanabilir, posta gitmez. İptal edilen etkinliğe ya da oturuma posta ve hatırlatma gitmez, kuyruktakiler düşer. Kayıt kapanışı geri bildirim formunu etkilemez.
@@ -77,3 +77,35 @@ Nasıl:
 - **Yanıtlayan kısıtı (yalnız katılanlar doldurabilir):** Forms'ta böyle bir ayar yok ve misafirin hesabı yok. Linki olan herkes doldurabilir (karar 6).
 - **Oturum başına ayrı posta:** çok oturumlu bir günde kişiye beş posta gider. Yusuf günde tek postayı seçti (karar 9).
 - **Hatırlatmasız ilk sürüm:** Yusuf hatırlatmayı ilk sürümde istedi (karar 5).
+
+## Ek (2026-11-22): başvuru formu yalnız bir arşivsiz etkinlikte; bitmiş etkinlik yeni başvuru bileti almaz
+
+Karar 1'in "Bir form tek yerde" kuralı başvuru ve ek formlarını kendi aralarında serbest bırakıyordu. Bunun iki sonucu çıktı:
+
+- Geçen yılın etkinliğine bağlı form yeni etkinliğe de bağlanınca her kabul edilen cevap iki etkinliğe birden bilet yazıyor. Eski, bitmiş etkinlik yeni başvuranlarla doluyor; kısa link ise yeni etkinliğe geçiyor.
+- Bitmiş etkinliğe form cevabı bilet yazmaya devam ediyordu. core'daki gerekçe ("geri bildirim formları etkinlikten sonra gelir") bu ADR geri bildirim formlarını ayırdığından beri geçersiz.
+
+Uyarı yalnız belgedeydi ("form yeniden kullanılınca eskisinden çıkarın"). Panel ne uyarıyor ne engelliyordu.
+
+Karar (Yusuf, 2026-11-22):
+
+1. **Başvuru ve ek formu aynı anda yalnız bir arşivsiz etkinlikte olur.** Taslak ve bitmiş etkinlik de sayılır. Formu başka bir arşivsiz etkinliğin başvuru ya da ek formu olan etkinliği oluşturmak, güncellemek ya da arşivden geri almak `409 form_in_use` verir. Arşivlenen etkinlik formlarını bırakır.
+2. **409 nerede olduğunu söyler.** Yanıt formu ve, isteği yapan görebiliyorsa, formu tutan etkinliğin kimliğini, adını ve durumunu taşır. Göremediği taslağı (başka ekibin taslağı) adlandırmaz. Panel etkinliği adlandırır ve Skyforms'ta "bu formdan yeni form" yolunu önerir (kopya akışındaki yol, ADR-0066).
+3. **Bitmiş etkinlik formundan yeni başvuru bileti almaz.** Bitiş ADR-0066'daki gibidir: bitiş tarihi, yoksa başlangıç + 1 gün. Tarihsiz etkinlik bitmez. Karar core'un cevabı okuduğu andır: etkinlik bittikten sonra onaylanan cevap da bilet almaz, çünkü kapı ve sertifika o ana kadar Check-in ister. core Forms'a yine 2xx döner. Düzenleyen geç kalanı panelden elle ekler.
+4. **Var olan veri değişmez.** Kuraldan önce iki etkinliğin paylaştığı form iki etkinlikte de kalır: o etkinliklerin yazımları eskisi gibi geçer, yalnız yeni bağlama engellenir. Formu bırakan etkinlik onu geri alamaz. core bu formları silmez, taşımaz. Bir cevap geldiğinde log satırı formu kaç arşivsiz etkinliğin listelediğini yazar. Yayından önce production'da bu formların sayısı salt okur sorguyla okunur.
+
+Sonuçlar:
+
+- **core:** var olan tek yer denetimi, aynı kilit ve aynı hata koduyla başvuru formlarına genişler. Forms'ta değişiklik yok.
+- **Kısa link:** kayma kalkar. Form tek etkinlikte olduğu için linkin yöneticisi de tektir (Form link).
+- **Geç bağlanan form:** form bağlanmadan önce kabul edilmiş cevaplar bugün bilet almaz (core bağsız cevabı saklamaz). Kalıcı çözüm şudur: core form bağlanınca ve günlük turda Forms'tan formun kabul edilmiş cevaplarını çeker (ADR-0071 karar 6'nın çekme yolu). Bu yol, tek yer kuralı production'a çıkmadan açılmaz: aksi halde eski etkinliğin başvuranları yeni etkinliğe taşınır.
+- **sky-app ve panel:** başvuru formunu ikinci etkinliğe yazan istemci 409 alır. Mobile Lab'e sözleşme notu verilir.
+- **CONTEXT.md:** Form slot ("her etkinliğe" yerine "tek arşivsiz etkinlik"), Event copy, Registration closure.
+
+Endüstri karşılaştırması:
+
+- **Uyanlar:** Eventbrite, Luma ve Tito'da kayıt soruları etkinliğe aittir; iki etkinlik bir soru formunu paylaşmaz, tekrar eden etkinlikte sorular kopyalanır (Tito). Bizde de form tek etkinlikte, tekrar eden etkinlik eski formdan yeni form açar. Bitmiş etkinliğe yeni kayıt alınmaz (Eventbrite ve Luma'da kayıt en geç etkinlik bitince kapanır).
+- **Sapma 1:** kuraldan önce paylaşılmış formlar kalır. Bu ürünlerde böyle bir durum oluşmaz. Biz var olan veriyi değiştirmiyoruz, yalnız yeni bağlamayı engelliyoruz ve durumu logluyoruz.
+- **Sapma 2:** sorular ayrı bir üründe (Skyforms) ve bağlama form adresiyle yapılıyor. Kuralı Forms değil core uygular, çünkü Forms etkinliği bilmez (ADR-0071 karar 3).
+- **Sapma 3:** bitişten sonra onaylanan cevap otomatik bilet almaz, düzenleyen elle ekler. Onaylı kayıt akışlarında (Luma'nın "approval required" kaydı) onay da etkinlikten önce yapılır, bu yüzden pratikte fark küçük.
+
