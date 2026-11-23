@@ -162,7 +162,16 @@ Bu ekin "Açık" sorusu ("Tüm üyeler yarışmayı yönetsin" ayarını lider k
 Yukarıdaki ekin 2. maddesi (`members_manage_competitors`, varsayılan açık) ve Entrant notu bu kararla değişti:
 
 - **Ayar kalktı.** core `members_manage_competitors`'ı okumaz; ayar ucu onu almaz. Gruplarda eski değer kalabilir; okunmadığı için etkisizdir.
-- **Başkasını yarışmacı ekleyen, düzenleyen, silen yalnız yarışmaları yönetebilenlerdir:** Privileged (yarışmacı yönetme rolü), Owner team'in Leader'ları (koordinatörler dahil) ve üst ekiplerin Leader'ları, etkinliği düzenleyebilen üyeler (etkinlik politikası) ve "Yarışmaları kim yönetir" *Tüm üyeler* iken ekibin üyeleri. Eski kayıt (Competitor) ve yarışma modülü (Entrant) aynı kurala bağlıdır.
+- **Başkasını yarışmacı ekleyen, düzenleyen, silen yalnız yarışmaları yönetebilenlerdir:** Privileged (yarışmacı yönetme rolü), Owner team'in Leader'ları (koordinatörler dahil) ve üst ekiplerin Leader'ları, etkinliği düzenleyebilen üyeler (etkinlik politikası; *aynı gün kalktı, aşağıdaki ek*) ve "Yarışmaları kim yönetir" *Tüm üyeler* iken ekibin üyeleri. Eski kayıt (Competitor) ve yarışma modülü (Entrant) aynı kurala bağlıdır.
 - **Sıradan üye yalnız kendini ekler ve çıkarır,** kendi kullanıcı kimliğiyle; kendine puan ya da kazanan veremez. Ekip dışından giriş yapmış kişi de kendini ekleyebilir. Okuma değişmez.
 - Kalan tek ekip ayarı "Yarışmaları kim yönetir"dır (2026-10-31 eki). Bu ekteki karşılaştırmanın "İki anahtar" sapması tek anahtara iner.
 - Uygulama: core-backend #387, core-frontend #138 (panelde anahtar kalktı).
+
+## Ek: etkinliği düzenlemek başkasını yarışmacı eklemeye yetmez (2026-11-23, ikinci)
+
+Yukarıdaki ekteki listeden "etkinliği düzenleyebilen üyeler (etkinlik politikası)" çıktı. Etkinlik politikası (örneğin GECEKODU'da üyelerin etkinliği düzenleyebilmesi) yarışmacı yazmasında artık okunmaz; eski kayıt (Competitor) da yarışma modülü (Entrant) gibi yalnız yarışmaları yönetebilenlere bağlıdır.
+
+- **Başkasını yarışmacı ekleyen, düzenleyen, silen:** Owner team'in Leader'ları (koordinatörler dahil), üst ekiplerin Leader'ları, "Yarışmaları kim yönetir" *Tüm üyeler* iken ekibin üyeleri ve Privileged (YK, ADMIN; `competitor:manage` ya da `competition:manage`).
+- **Kişi kendini ekler ve çıkarır;** kendine puan ya da kazanan veremez. Okuma değişmez.
+- Etkinlik politikası etkinliği düzenleme, bilet okuma ve sertifika kararlarında aynen geçerlidir; yalnız yarışmacı yazmasından düştü.
+- Uygulama: core-backend #393 (59ac199).
