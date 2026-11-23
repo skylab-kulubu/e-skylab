@@ -479,7 +479,7 @@ _Avoid_: EventType; an implicit total per Owner team; counting unpublished resul
 
 **Competition staff** (Yarışma görevlisi):
 People assigned to one Competition, optionally. Organizers are the Leaders of the Event's Owner team (and of the teams above it), holders of `competition:manage` and Privileged people; Team membership alone manages no Competition unless the Team setting `team_competition_manage` is on (ADR-0068 addendum). Staff manage their Competition like organizers, publishing results included, except opening a new Competition, assigning staff, archiving or restoring it and Series settings (accepted by Yusuf on 2026-10-12, not built yet). Nobody scores their own Entrant, organizers and Privileged people included (core #336, not live yet). A Judge (jüri üyesi) is assigned to a Competition, Stage or category, sees only what is assigned to them, and does not see others' scores before publication.
-_Avoid_: making every Owner-team Member a manager; deriving judges from team membership; reading the Team setting on competitors as a right to manage Competitions
+_Avoid_: making every Owner-team Member a manager; deriving judges from team membership; reading the retired Team setting on competitors (`members_manage_competitors`) as any right; letting a plain member add someone else as a competitor
 
 **Notification** (Bildirim):
 One "what happened, to whom" request a service such as core sends to the communication service (SkyMail, ADR-0070): a Notification type, its recipients by Keycloak `sub`, the variables, and an `Idempotency-Key`. The sender says what and to whom; SkyMail picks the Channels, the time and the wording. For optional types the sender also passes the Channels each person allows, from their Communication preference.
