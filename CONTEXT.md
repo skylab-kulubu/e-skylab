@@ -223,7 +223,7 @@ _Avoid_: treating this as on by default; treating every Owner-team member as Doo
 
 **Team setting** (Ekip ayarı):
 A Team's own setting, kept as an attribute of its Group and written through core by the Team manager (ADR-0065 addendum of 2026-10-25). A Team setting a Leader writes may only narrow what the Team's members may do; one that widens a right stays Privileged's, like Public listing and Team door scan. The one exception is the competition-management setting (ADR-0065 addendum of 2026-10-31). Unset or unreadable means the default. Each change is a Team audit record row with the old and new value. Sub-teams do not inherit a setting.
-- `members_manage_competitors`: on by default, the Team's members add, edit and remove its Events' competitors; off, only its Leaders, Leaders above and Privileged people do (ADR-0068 addendum).
+- `members_manage_competitors`: retired (2026-11-23, ADR-0068 addendum). core no longer reads it; a value left on a Group has no effect. Adding, editing or removing someone else as a competitor (Competitor or Entrant) is for those who manage the Team's Competitions only; a plain member adds and removes only themselves.
 - `team_competition_manage` ("Yarışmaları kim yönetir"): off by default, only organizers manage the Team's Competitions; on ("Tüm üyeler"), the Owner team's members, its Sub-teams' members included, manage them too, but do not archive or restore them, assign staff or change Series settings. Unreadable means off (ADR-0068 addendum; core #336, not live yet).
 _Avoid_: a Leader-written setting that widens a right, other than the competition-management setting; inheriting a setting from a parent team; a second table beside the Group's attributes
 
