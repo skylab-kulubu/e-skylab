@@ -8,11 +8,11 @@ ADR-0078 karar 6, yıllık gözden geçirmeyi hafif hâliyle tanımlamıştı: k
 
 Karar (Yusuf, 2026-11-11, karar 22: gözden geçirmenin tam hâli; 2026-11-23 01:01: yanıtsız kalan üyelik kalır, "çıksın" kararları dönem kapanınca kendiliğinden uygulanır, kapsam ekip üyelikleri, `/ROLLER`, doğrudan atamalar ve `/ADMIN`):
 
-1. **Dönem.** Aktif Season'ın bitişinden 30 gün önce core bir gözden geçirme dönemi açar; dönem Season bitişinde kapanır (2027: 31 Mayıs – 30 Haziran, İstanbul saatiyle gün sonu). Season başına bir yıllık dönem açılır. Privileged writer ayrıca 3 ile 60 gün arası elle bir dönem açabilir ve açık dönemi erken kapatabilir. Aynı anda tek bir dönem açık olur.
+1. **Dönem.** Aktif Season'ın bitişinden 30 gün önce core bir gözden geçirme dönemi açar; dönem Season bitişinde kapanır (2027: 31 Mayıs – 30 Haziran, İstanbul saatiyle gün sonu). Season başına bir yıllık dönem açılır. Yazabilen Privileged (ADMIN, YK; ADR-0077) ayrıca 3 ile 60 gün arası elle bir dönem açabilir ve açık dönemi erken kapatabilir. Aynı anda tek bir dönem açık olur.
 2. **Kapsam ve gözden geçirenler** (Yusuf).
    - **Ekip ya da alt ekip grubuna doğrudan sıradan üyelik.** Ekibin Leader'ları gözden geçirir; yoksa en yakın üst ekibin Leader'ları, o da yoksa YK. Üyeliği değiştirebilen herkes (Team manager, ADR-0065) karar verebilir.
-   - **`/ROLLER` üyelikleri ve uygulamaların kişiye doğrudan atamaları.** YK gözden geçirir; Privileged writer karar verir.
-   - **`/ADMIN` üyeliği.** ADMIN'in öbür üyeleri gözden geçirir.
+   - **`/ROLLER` üyelikleri ve uygulamaların kişiye doğrudan atamaları.** YK gözden geçirir; yazabilen Privileged (ADMIN, YK) karar verir.
+   - **`/ADMIN` üyeliği.** ADMIN'in öbür üyeleri gözden geçirir. Kalem için karar verebilecek başka ADMIN üyesi yoksa (tek üye), o kaleme YK karar verir; kişi yine kendi kalemine karar veremez.
    - **Yönetim üyelikleri** (ADR-0078 karar 1) bu dönemde karar kalemi değildir. Bitişleri ve kendi ekranları vardır (Dönem devri); gözden geçirme ekranı sayılarını gösterir ve oraya bağlanır.
    - **Kimse kendi kalemine karar veremez.** Kalem öbür karar verebilenlere kalır.
    - DK (Privileged reader) bütün kalemleri ve ilerlemeyi okur, karar veremez (ADR-0077).

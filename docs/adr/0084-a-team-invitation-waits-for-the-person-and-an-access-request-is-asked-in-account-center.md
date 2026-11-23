@@ -8,7 +8,7 @@ Bugün hesabı olmayan birini ekibe almanın yolu iki adımlıdır: kişi my.yil
 
 Karar (Yusuf, 2026-11-11, karar 21: davet ve erişim talebi şimdi yapılır; 2026-11-23 01:01: davet 14 gün geçerlidir, davet ve talep production'da `TEAM_DELEGATION` ile birlikte açılır):
 
-1. **Davet bekleyen davettir** (Invitation). Bir ekibi yöneten (Team manager, ADR-0065; `TEAM_DELEGATION` kapalıyken yalnız Privileged writer) bir e-posta adresini o ekibe ya da alt ekibine davet eder.
+1. **Davet bekleyen davettir** (Invitation). Bir ekibi yöneten (Team manager, ADR-0065; `TEAM_DELEGATION` kapalıyken yalnız yazabilen Privileged (ADMIN, YK; ADR-0077)) bir e-posta adresini o ekibe ya da alt ekibine davet eder.
    - core yalnız bir davet kaydı açar. Keycloak'ta hesap açılmaz ve üyelik yazılmaz.
    - Kişi kendisi giriş yapar ya da kaydolur (ADR-0063) ve daveti Hesap Merkezi'nde kabul eder. Üyelik o an, davet edenin adına core'un denetimli yazıcısından yazılır.
    - Davet edenin yetkisi kabul anında Keycloak'tan yeniden okunur; yetkisi kalmamışsa davet geçersizdir. Kabul, davet edenin o an yapamayacağı bir ekleme yapamaz.
@@ -21,7 +21,8 @@ Karar (Yusuf, 2026-11-11, karar 21: davet ve erişim talebi şimdi yapılır; 20
    - Adres yalnız davet beklerken tutulur. Kabul, ret, süre dolumu, geri çekme ya da geçersizlikte hemen silinir; kişisiz kayıt 90 gün sonra silinir.
    - Davet eden ya da o grubu yöneten biri daveti geri çekebilir. Posta 24 saatte en çok bir kez, toplamda en çok iki kez yeniden gönderilir; süre yenilenmez.
    - Sınırlar: davet eden başına günde 20, ekip başına 50 açık davet, aynı ekip ve adrese 1 açık davet, aynı adrese bütün kulüpte 30 günde 3 davet.
-   - Posta SkyMail'den işlem postası olarak gider (`club.team-invitation`). Davetliye ad yazılmaz; posta gönderildikten sonra SkyMail'de tutulmaz, açılması ve tıklanması izlenmez. İletişim tercihi bu postaya uygulanmaz.
+   - Posta SkyMail'den işlem postası olarak gider (`club.team-invitation`). Davet edenin bu ekibe tek seferlik işlem postasıdır; dayanağı KVKK m. 5/2-f'dir ve Contact consent'in (Davet onayı, ADR-0062) kapsamına girmez: kişiyi başka etkinlik ya da duyurular için bir listeye almaz. Davetliye ad yazılmaz; posta gönderildikten sonra SkyMail'de tutulmaz, açılması ve tıklanması izlenmez. İletişim tercihi bu postaya uygulanmaz.
+   - Posta aydınlatma metni bağlantısını (`noticeUrl`) ve adresin silineceği tarihi taşır (KVKK m. 10).
 4. **Erişim talebi Hesap Merkezi'nden istenir** (Access request). Girmiş her etkin hesap, public listelenen bir ekibe ya da alt ekibine katılmak isteyebilir. Protected gruplar, Leader grupları, Privileged kökler ve `/ROLLER` hedef olamaz.
    - İsteğe bağlı gerekçe en çok 500 karakter düz metindir.
    - Kişi başına 3 açık talep ve günde 5 talep, hedef başına 1 açık talep olur. Reddedilen hedefe 30 gün sonra yeniden talep açılabilir.
@@ -42,9 +43,9 @@ Kaynaklar:
 ## Consequences
 
 - **CONTEXT.md:** iki yeni terim gelir: **Invitation** ve **Access request**. **Promote** ve **Self-registration**'a kabul ve onay yolları eklenir.
-- **Aydınlatma metni:** davet adresi, talep gerekçesi ve süreleri faaliyet tablosuna ve "Ekibe Davet" alt başlığına yazılır. Production'da açılıştan önce yayında olur. Hesap açılmadığı için yeni bir hukuki sebep gerekmez.
+- **Aydınlatma metni:** davet adresi, talep gerekçesi ve süreleri faaliyet tablosuna ve "Ekibe Davet" alt başlığına yazılır. Production'da açılıştan önce yayında olur. Hesap açılmadığı için yeni bir hukuki sebep gerekmez (m. 5/2-f).
 - **Kabul edilmeyen davet hiçbir şey bırakmaz:** üyelik yok, hesap yok, adres yok. Bedeli: kişi kabul edene kadar ekip postası almaz ve uygulama ataması devralmaz.
-- **ADR-0062 saklama tablosuna satırlar eklenir:** `team_invitations_age`, `access_requests_age` ve davet adres sayacı. Hesap silme saga'sı (ADR-0051) bu iki tablodaki kişiye ait satırları siler; davet edenin hesabı silinirse açık davetleri geçersiz olur.
+- **ADR-0062 saklama tablosuna satırlar eklenir:** `team_invitations_age`, `access_requests_age` ve davet adres sayacı ("aynı adrese 30 günde 3 davet" sınırı için; yalnız sha256(adres) ve gün tutulur, 30 gün sonra silinir). Hesap silme saga'sı (ADR-0051) bu iki tablodaki kişiye ait satırları siler; davet edenin hesabı silinirse açık davetleri geçersiz olur.
 - **Sunucuda yetki okuma.** Kabul anında yetki denetimi, davet edenin bugünkü gruplarını Keycloak'tan okur. Gözden geçirmenin kapanışı da aynı yardımcıyı kullanır (ADR-0085).
 - **Panel rozeti:** bekleyen talep sayısı panelin yetki yanıtıyla döner.
 
