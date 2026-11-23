@@ -97,7 +97,7 @@ The one of School e-mail and Personal e-mail the person has chosen; stored as Ke
 _Avoid_: assuming primary equals school; services learning both addresses; login that only accepts the primary; overwriting an existing account's primary on a YTÜ login
 
 **Self-registration**:
-Opening a SKY LAB account without YTÜ through the single "E-postayla devam et" door: a person with no account proves an address with a Login code and then gives a first and last name; no password is asked. The address becomes both the Primary e-mail and the Personal e-mail. It is not offered for YTÜ school domains (`std.yildiz.edu.tr`, `yildiz.edu.tr`); that person is sent to the YTÜ Microsoft login. It grants no rights: groups and roles are the realm defaults, and membership stays an admin decision. The account is not a Verified YTÜ account until YTÜ is linked. Right after it, the sign-in flow offers once to link YTÜ and to add a passkey or a password; each can be skipped. See ADR-0063.
+Opening a SKY LAB account without YTÜ through the single "E-postayla devam et" door: a person with no account proves an address with a Login code and then gives a first and last name; no password is asked. The address becomes both the Primary e-mail and the Personal e-mail. It is not offered for YTÜ school domains (`std.yildiz.edu.tr`, `yildiz.edu.tr`); that person is sent to the YTÜ Microsoft login. It grants no rights: groups and roles are the realm defaults, and membership stays an admin decision (a Team manager's: an add, an accepted Invitation or an approved Access request, ADR-0084). The account is not a Verified YTÜ account until YTÜ is linked. Right after it, the sign-in flow offers once to link YTÜ and to add a passkey or a password; each can be skipped. See ADR-0063.
 _Avoid_: Keycloak's built-in registration page (`registrationAllowed`); verifying the address with a link; asking for a password at registration; opening the account before the code is verified; a school-domain address as a self-registered address; treating a self-registered account as a Member
 
 **Login code**:
@@ -260,7 +260,7 @@ The state where a person is in more Groups than a token carries (above 30 paths)
 _Avoid_: reading a missing group list as "no Groups"; cutting the group list short
 
 **Promote**:
-Granting Member status by placing a User into the right Keycloak groups. No directory write. Privileged people promote anyone; a Team manager adds any enabled account to a team they manage (ADR-0065), and the person gets the team-membership mail.
+Granting Member status by placing a User into the right Keycloak groups. No directory write. Privileged people promote anyone; a Team manager adds any enabled account to a team they manage (ADR-0065), or the person accepts an Invitation or has an Access request approved (ADR-0084); either way the person gets the team-membership mail.
 _Avoid_: promote to LDAP, federation link
 
 **Privileged**:
@@ -292,11 +292,11 @@ A change of Groups, memberships or role mappings made in Keycloak's admin consol
 _Avoid_: making membership changes in the console as routine; a person's everyday e-skylab account in the console; Keycloak's 30-day admin events as the only record
 
 **Management membership** (Yönetim üyeliği):
-A direct membership of a Privileged root other than ADMIN or a Group under it (YK, YK's office groups, DK), or of a team's `LIDERLER` or `KOORDINATORLER` group. It has a Membership term; ADMIN's trees and ordinary team membership have none (ADR-0078; not live yet).
+A direct membership of a Privileged root other than ADMIN or a Group under it (YK, YK's office groups, DK), or of a team's `LIDERLER` or `KOORDINATORLER` group. It has a Membership term; ADMIN's trees and ordinary team membership have none (ADR-0078; live since 2026-11-08).
 _Avoid_: putting an end on ordinary membership; counting ADMIN as a management membership
 
 **Membership term** (Üyelik süresi):
-Core's record of when a Management membership ends: the last day of the active Season (Europe/Istanbul), or none when there is no active Season. 14 days and 1 day before, the holder and those over them are warned; at the end core only marks it expired, records it and lists it to ADMIN. Nobody is taken out of a Group by the term; removal is done by hand from the admin panel. Extended or handed over only by someone who may change that Group's membership, never by the holder, and at most to the next Season's end or, with none defined, a year (ADR-0078; not live yet).
+Core's record of when a Management membership ends: the last day of the active Season (Europe/Istanbul), or none when there is no active Season. 14 days and 1 day before, the holder and those over them are warned; at the end core only marks it expired, records it and lists it to ADMIN. Nobody is taken out of a Group by the term; removal is done by hand from the admin panel. Extended or handed over only by someone who may change that Group's membership, never by the holder, and at most to the next Season's end or, with none defined, a year (ADR-0078; live since 2026-11-08).
 _Avoid_: removing access automatically when the term ends; counting the term from the day of the add; keeping it in Keycloak
 
 **Season handover** (Dönem devri):
@@ -304,8 +304,16 @@ The yearly change of YK, DK and team Leaders at a Season's end, done from the ad
 _Avoid_: handing over by letting terms expire; doing it in Keycloak's console
 
 **Access review** (Erişim gözden geçirme):
-A once-a-year check, during the Season handover window (30 days before the Season ends until it ends), where each Leader marks their team's members, YK the top teams' Leaders and ADMIN the Privileged roots as keep or remove. Removals go through core's audited writer; an unanswered membership stays. The marks are deleted when the window closes (ADR-0078; not live yet).
-_Avoid_: a campaign engine; removing members nobody reviewed
+A yearly review period that core opens 30 days before the active Season ends and closes at its end (Privileged writers may also open one by hand, 3 to 60 days, one at a time). At opening it snapshots the items: direct ordinary memberships of a team or sub-team (reviewed by the team's Leaders, else the nearest ancestor's, else YK), `/ROLLER` memberships and apps' direct assignments to a person (YK), and `/ADMIN` (the other ADMIN members). Each item is marked keep or remove; nobody decides their own item. Mails go at opening, D-14 and D-3; at D-7 undecided items are reported to the fallback reviewer; at close ADMIN and YK get a summary with counts only. An unanswered item stays. Remove decisions are applied automatically at close through core's audited writer, in the decider's name and only with the decider's current rights (`via = access_review`); a reviewer may apply their own earlier. Decisions are deleted 30 days after close; the count summary stays. Management memberships are not items; they are reviewed through their Membership term and the Season handover (ADR-0085, replacing ADR-0078 decision 6).
+_Avoid_: removing members nobody reviewed; reviewing Management memberships twice; deciding one's own item; keeping keep/remove marks beyond 30 days
+
+**Invitation** (Davet):
+A Team manager's pending invitation of an e-mail address to a team or sub-team's own group (ordinary membership only; not Leader groups, Privileged roots, `/ROLLER` or a Protected group). Core keeps only an invitation record: no Keycloak account and no membership are created. The person signs in or self-registers and accepts in Account center; the membership is then written in the inviter's name, with the inviter's rights checked again at that moment (`member.add`, `via = invitation`). Acceptance needs an exact match with one of the account's proven addresses (verified Primary e-mail, the School e-mail of a Verified YTÜ account, a code-verified Personal e-mail). Valid 14 days; the mail (`club.team-invitation`, transactional, not tracked) has a decline link that needs no sign-in. The address is kept only while pending; the record without it is deleted after 90 days. The response is the same whether or not the address has an account (ADR-0084).
+_Avoid_: creating an account or a guest at invitation; adding the person before they accept; accepting by a forwarded link without owning the address; telling the inviter whether the address has an account; inviting to a Leader group or a Privileged root
+
+**Access request** (Erişim talebi):
+A signed-in person's request, made in Account center, to join a publicly listed team or sub-team, with an optional reason of at most 500 characters. Whoever may change that group's membership (Team manager) decides in the admin panel; mail goes to the team's Leaders, else the nearest ancestor's, else YK, with one reminder on day 7; it expires after 14 days. Approval writes the membership in the approver's name (`member.add`, `via = access_request`) and sends the usual membership mail; denial and expiry are mailed to the requester. Limits: 3 open per person, 1 open per target, 30 days before asking a denied target again. The reason is deleted when the request ends; the record after a year. The membership has no end and is covered by the Access review (ADR-0084).
+_Avoid_: requesting in the admin panel; requesting a Leader group, a Privileged root, `/ROLLER` or a Protected group; an end date on the approved membership; a free-text denial reason
 
 **Leader**:
 Membership in a team's `LIDERLER` or `KOORDINATORLER` subgroup, matched as a whole path segment. A Leader is a Team manager of that team and everything under it, and a Leader of the team's Events and of its sub-teams' Events (ADR-0065). A team's Leader group is changed only by the parent team's Leader or by Privileged people: nobody makes themselves Leader or removes their own leadership, and a Leader cannot add co-leaders to their own team. Top-level team Leaders are set by Privileged people only.
