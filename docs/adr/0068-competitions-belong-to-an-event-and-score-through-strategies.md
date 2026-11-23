@@ -104,7 +104,7 @@ Yusuf'a soruldu; yarışmanın ilk dilimini bekletmez, cevap gelene kadar spec'i
 Bugün geçerli olan:
 
 1. **Organizatör.** Yarışmayı açmak, düzenlemek, durumunu değiştirmek, yarışmacı (Entrant) eklemek, puan yazmak, sonucu ilan etmek ve arşivlemek Event'in Owner team'inin Leader'larının (ADR-0065'le üst ekiplerinkiler de), `competition:manage` rolünün ve Privileged'ın işidir. Owner team'i olmayan Event'te yalnız Privileged yönetir (ADR-0018). Ekip üyeliği tek başına yarışmayı yönetmez; ekip "Tüm üyeler" ayarını açarsa üyeler de yönetir (aşağıda, 2026-10-31). Bu, "Açık"taki önerinin ve 2026-10-12 kararındaki varsayılanın ("liderler ve koordinatörler") aynısıdır.
-2. **İlk ekip ayarı: `members_manage_competitors`.** Ekibin kendi grubunun özniteliğidir.
+2. **İlk ekip ayarı: `members_manage_competitors`.** *(2026-11-23'te kalktı; aşağıdaki "Ek: üye yalnız kendini yarışmacı ekler" geçerlidir. Bu madde tarihçe olarak duruyor.)* Ekibin kendi grubunun özniteliğidir.
    - Ekibin üyelerinin, ekibin etkinliklerinde eski yarışmacı kaydını (Competitor) ekleyip düzenleyip silip silemeyeceğini söyler.
    - Varsayılan açıktır, yani ayardan önceki kural: üyeler yazar. `false` olunca yazma yalnız ekibin Leader'larında, üst ekiplerin Leader'larında ve Privileged'dadır.
    - Okuma ve kişinin kendini yarışmacı olarak kaydetmesi ayardan etkilenmez.
@@ -131,12 +131,12 @@ Bu ekin "Açık" sorusu ("Tüm üyeler yarışmayı yönetsin" ayarını lider k
 - **Kimse kendi yarışmacısına puan yazmaz** (A3, yukarıda 4. maddede): yazan ya da geri alan kişi o Entrant'ın bilet sahibiyse istek reddedilir. Leader ve Privileged dahil.
 - **Aday listesi.** Üyelerin Ticket okuma yetkisi yok. "Gelenlerden ekle" için core yarışma yetkisiyle açılan dar bir liste verir: bilet, ad, misafir mi, check-in var mı, zaten yarışmacı mı. E-posta, telefon ve form cevabı yoktur.
 - Uygulama: core #336 (yayında değil). Panel anahtarı ayrı iş (core-frontend).
-- *Not:* Eski yarışmacı kaydı yarışma modülüne (Entrant) geçince `members_manage_competitors` Entrant eklemeyi de kapsar (2026-10-25 kararının amacı: üyeler yarışmacı ekler, lider kapatabilir).
+- *Not (2026-11-23'te değişti):* `members_manage_competitors` kalktı; Entrant eklemeyi de kapsamaz. Başkasını yarışmacı (Competitor ya da Entrant) yalnız yarışmaları yönetebilenler ekler; bu ayarın "Tüm üyeler" seçeneği açıksa ekibin üyeleri de. Sıradan üye yalnız kendini ekler ve çıkarır (aşağıdaki ek).
 
 ### Endüstri uygulamasıyla karşılaştırma
 
 **Uyanlar:**
-- **Microsoft Teams üye izinleri.** Ekip sahibi, sahip olmayan üyelerin neyi yapabileceğini ekip başına açıp kapatır; ayarı üye değiştiremez. Teams'te üyelerin kanal açması gibi izinler varsayılan açıktır; `members_manage_competitors` da varsayılan açıktır.
+- **Microsoft Teams üye izinleri.** Ekip sahibi, sahip olmayan üyelerin neyi yapabileceğini ekip başına açıp kapatır; ayarı üye değiştiremez. Teams'te üyelerin kanal açması gibi izinler varsayılan açıktır; `members_manage_competitors` da varsayılan açıktı (2026-11-23'te kalktı).
 - **Teams "Who can manage tags".** İki seçenekli tek bir seçim (*Team owners* / *Team owners and members*) ve onu ekip sahibi değiştirir. "Yarışmaları kim yönetir" de böyledir (2026-10-31).
 - **Entra'da kapsamlı rol ataması.** Yetki bütün kiracıya değil, bir birime ya da tek bir kaynağa verilir. Bizde ekip ağacı (ADR-0065) ve yarışma başına görevli.
 - **Entra denetim kaydı.** Aktör, hedef, eski ve yeni değer (ADR-0065 karar 9).
@@ -145,7 +145,7 @@ Bu ekin "Açık" sorusu ("Tüm üyeler yarışmayı yönetsin" ayarını lider k
 1. **Ayarı üst ekip de değiştirir.** Teams'te ayarı yalnız o ekibin sahipleri ve kiracı yöneticisi değiştirir. Bizde ADR-0065'in kalıtımı gereği üst ekibin Leader'ı da değiştirir.
 2. **Kulüp genelinde kilit yok** (A7). Teams'te kiracı yöneticisi bazı seçimleri ekip sahiplerinden alabiliyor ("Team owners can change who can manage tags").
 3. **"Üye" alt ekiplerin üyelerini de kapsar.** Microsoft 365 gruplarında iç içe üyelik yok; bizde Member tanımı alt ağacı içerir (A4; GitHub'ın iç içe takımları gibi).
-4. **İki anahtar.** Teams'te birçok üye izni anahtarı var; bizde yarışmacılar ve yarışma yönetimi.
+4. **Tek anahtar.** Teams'te birçok üye izni anahtarı var; bizde 2026-11-23'ten beri yalnız yarışma yönetimi (yarışmacı anahtarı kalktı).
 5. **Kendi puanını yazma yasağı herkese** (A3). Teams'te karşılığı yok.
 6. **"Tüm üyeler" varsayılan kapalı.** Teams'te üyelerin kanal açması gibi izinler varsayılan açıktır; yarışma yönetimi yarışmacıların adlarını ve puanlarını kapsadığı için bizde varsayılan *Liderler ve koordinatörler*.
 
@@ -154,3 +154,15 @@ Bu ekin "Açık" sorusu ("Tüm üyeler yarışmayı yönetsin" ayarını lider k
 - Microsoft Teams, etiketleri yönetme ("Who can manage tags"): https://learn.microsoft.com/en-US/microsoftteams/manage-tags
 - Microsoft Learn, Teams'te kanallara erişimi yönetme: https://learn.microsoft.com/en-us/training/modules/manage-collaboration-experiences-for-chat-channels/07-manage-access-channels
 - Microsoft Entra, rolleri farklı kapsamlarda atama: https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/assign-roles-different-scopes
+
+## Ek: üye yalnız kendini yarışmacı ekler; `members_manage_competitors` kalktı (2026-11-23)
+
+**Yusuf, 2026-11-23:** "Üyelerin yarışmacı ekleyebilmesi çok saçma ve bir açık; Ahmet Kaya olsam Yusuf İnan diye birini ekleyebilirim. Yöneticiler, etkinlik sahipleri vs ekleyebilmeli veya kişi kendisi katılabilmeli."
+
+Yukarıdaki ekin 2. maddesi (`members_manage_competitors`, varsayılan açık) ve Entrant notu bu kararla değişti:
+
+- **Ayar kalktı.** core `members_manage_competitors`'ı okumaz; ayar ucu onu almaz. Gruplarda eski değer kalabilir; okunmadığı için etkisizdir.
+- **Başkasını yarışmacı ekleyen, düzenleyen, silen yalnız yarışmaları yönetebilenlerdir:** Privileged (yarışmacı yönetme rolü), Owner team'in Leader'ları (koordinatörler dahil) ve üst ekiplerin Leader'ları, etkinliği düzenleyebilen üyeler (etkinlik politikası) ve "Yarışmaları kim yönetir" *Tüm üyeler* iken ekibin üyeleri. Eski kayıt (Competitor) ve yarışma modülü (Entrant) aynı kurala bağlıdır.
+- **Sıradan üye yalnız kendini ekler ve çıkarır,** kendi kullanıcı kimliğiyle; kendine puan ya da kazanan veremez. Ekip dışından giriş yapmış kişi de kendini ekleyebilir. Okuma değişmez.
+- Kalan tek ekip ayarı "Yarışmaları kim yönetir"dır (2026-10-31 eki). Bu ekteki karşılaştırmanın "İki anahtar" sapması tek anahtara iner.
+- Uygulama: core-backend #387, core-frontend #138 (panelde anahtar kalktı).

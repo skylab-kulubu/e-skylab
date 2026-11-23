@@ -223,7 +223,7 @@ _Avoid_: treating this as on by default; treating every Owner-team member as Doo
 
 **Team setting** (Ekip ayarı):
 A Team's own setting, kept as an attribute of its Group and written through core by the Team manager (ADR-0065 addendum of 2026-10-25). A Team setting a Leader writes may only narrow what the Team's members may do; one that widens a right stays Privileged's, like Public listing and Team door scan. The one exception is the competition-management setting (ADR-0065 addendum of 2026-10-31). Unset or unreadable means the default. Each change is a Team audit record row with the old and new value. Sub-teams do not inherit a setting.
-- `members_manage_competitors`: on by default, the Team's members add, edit and remove its Events' competitors; off, only its Leaders, Leaders above and Privileged people do (ADR-0068 addendum).
+- `members_manage_competitors`: retired (2026-11-23, ADR-0068 addendum). core no longer reads it; a value left on a Group has no effect. Adding, editing or removing someone else as a competitor (Competitor or Entrant) is for those who manage the Team's Competitions only; a plain member adds and removes only themselves.
 - `team_competition_manage` ("Yarışmaları kim yönetir"): off by default, only organizers manage the Team's Competitions; on ("Tüm üyeler"), the Owner team's members, its Sub-teams' members included, manage them too, but do not archive or restore them, assign staff or change Series settings. Unreadable means off (ADR-0068 addendum; core #336, not live yet).
 _Avoid_: a Leader-written setting that widens a right, other than the competition-management setting; inheriting a setting from a parent team; a second table beside the Group's attributes
 
@@ -479,7 +479,7 @@ _Avoid_: EventType; an implicit total per Owner team; counting unpublished resul
 
 **Competition staff** (Yarışma görevlisi):
 People assigned to one Competition, optionally. Organizers are the Leaders of the Event's Owner team (and of the teams above it), holders of `competition:manage` and Privileged people; Team membership alone manages no Competition unless the Team setting `team_competition_manage` is on (ADR-0068 addendum). Staff manage their Competition like organizers, publishing results included, except opening a new Competition, assigning staff, archiving or restoring it and Series settings (accepted by Yusuf on 2026-10-12, not built yet). Nobody scores their own Entrant, organizers and Privileged people included (core #336, not live yet). A Judge (jüri üyesi) is assigned to a Competition, Stage or category, sees only what is assigned to them, and does not see others' scores before publication.
-_Avoid_: making every Owner-team Member a manager; deriving judges from team membership; reading the Team setting on competitors as a right to manage Competitions
+_Avoid_: making every Owner-team Member a manager; deriving judges from team membership; reading the retired Team setting on competitors (`members_manage_competitors`) as any right; letting a plain member add someone else as a competitor
 
 **Notification** (Bildirim):
 One "what happened, to whom" request a service such as core sends to the communication service (SkyMail, ADR-0070): a Notification type, its recipients by Keycloak `sub`, the variables, and an `Idempotency-Key`. The sender says what and to whom; SkyMail picks the Channels, the time and the wording. For optional types the sender also passes the Channels each person allows, from their Communication preference.
