@@ -14,6 +14,10 @@ Karar (Yusuf, 2026-11-23). Kural tamamen özelleştirilir: hangi oturumların sa
 - Payda, iptal ve sıfır oturum ayrıntıları ADR-0027'nin ekinde.
 - Uygulama: core-backend #399 (kural modeli), #401 (uygunluk); panel core-frontend #163.
 
+## Ek: oturumsuz etkinlikte alana giriş katılımdır (2026-11-25)
+
+Karar (Yusuf, 2026-11-25): canlı oturumu olmayan etkinlikte etkinliğin kendisi tek sayılan birimdir (N = 1) ve Venue entry katılım sayılır; "alana giriş sertifikada sayılmaz" kuralı (kapı postaları K3) yalnız oturumlu etkinlik için geçerlidir. Bütün oturumlar iptal edilirse kapı girişleri ölçüt olur. Uygulama: core-backend #422.
+
 ### Endüstri uygulamasıyla karşılaştırma
 
 Kaynak: `sky_lab_genel/notes/sertifika-oturum/01-arastirma.md` §3 (ürünlerin kendi belgeleri).
