@@ -51,7 +51,7 @@ Kullanıcı
    ├── admin.yildizskylab.com ─ core-frontend
    ├── my.yildizskylab.com ──── account-center
    ├── forms.yildizskylab.com ─ forms-frontend
-   ├── mail.yildizskylab.com ── skymail-frontend
+   ├── notify.yildizskylab.com ─ skymail-frontend
    └── sky-app ───────────────── mobil istemci
              │
              ├── e.yildizskylab.com ─ e-skylab-keycloak

@@ -419,6 +419,10 @@ _Avoid_: treating cms:access as superuser of all content; treating it as retired
 A client role on a Site client for CMS tenant administration: creating a team and fixing any team's Teams item, for example after its Leader leaves or for a Sub-team (whose Leaders are no Site editors). It can also change that site's CMS tenant settings, so only the `ADMIN` and `YK` roots hold it (Yusuf, 2026-10-12), never DK, which reads and does not write. It is an admin role: a group that holds it is a Protected group.
 _Avoid_: giving it to Leaders or to DK; treating it as the editor role (that is `cms:access`)
 
+**Product hostname**:
+The subdomain of `yildizskylab.com` a product is served on, with `sandbox-<name>.` for its sandbox (ADR-0090). Product names are short English words for the product's job: `admin.`, `my.`, `forms.`, `notify.` (the SkyMail UI), `status.` (the status page; the server jobs' heartbeat is its `/heartbeat` path), `events.` (SkyEvents). Event and club names are proper nouns and stay as they are (`gecekodu.`, `artlab.`, `skydays.`, `yildizjam.`, `ekstrem.`, `arge.`, `agc.`). A renamed product has one address: the old name is deleted at the cutover, not kept as a redirect. `bildirim.` and `duyuru.` are Microsoft 365 sender subdomains, not product hostnames.
+_Avoid_: Turkish product hostnames (`iletisim.`, `durum.`, `nabiz.`); `mail.` for the SkyMail UI; keeping an old hostname as a redirect; renaming repositories, the Keycloak client `skymail` or the `skymail:*` roles along with a hostname
+
 ### Event operations
 
 **Ticket**:
