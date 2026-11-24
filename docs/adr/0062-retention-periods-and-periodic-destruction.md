@@ -4,6 +4,8 @@ status: accepted
 
 # Saklama süreleri ve periyodik imha
 
+_Güncelleme (2026-11-24): Servis olaylarının saklama satırları, Forms yanıtı ile Answer file arasındaki çelişki notu, veri sorumlusu, yurt dışı aktarım ve İYS (Yusuf) aşağıdaki ekte._
+
 Gizlilik denetimi (2026-10-03) süresiz kalan kişisel veri buldu: konuk biletleri (telefon dahil), SkyMail alıcı satırları ve gövdeleri, sistem postalarındaki sıfırlama bağlantıları, form yanıtları, Place ve Guessr'daki IP'ler. Core `PERIODIC_DESTRUCTION_INTERVAL` (90 gün) değerini açılışta okuyor, ama onu kullanan bir iş yok. KVKK md. 4/2-(d) saklamayı işlendiği amaç için gereken süreyle sınırlıyor. Silme Yönetmeliği md. 11 de süresi dolan verinin periyodik imhada yok edilmesini istiyor.
 
 Karar (Yusuf, 2026-10-03): her veri kategorisi **hukuken savunulabilecek en uzun süre** tutulur. "Süresiz" ancak iki durumda yazılır: amaç sürüyorsa (hesap açık, rıza geri alınmamış, sertifika doğrulanıyor, sonuç yayında) ya da veri anonimse. Bu kapsama yeni amaçlar eklenir: gelecek etkinliklere davet, topluluk ve mezun ilişkileri, etkinlik geçmişi ve arşivi, sertifika doğrulama. Tasarım, kod kanıtları ve hukuki gerekçe: `sky_lab_genel/.scratch/data-lifecycle/saklama-sureleri-onerisi.md`.
@@ -183,3 +185,23 @@ Karar (Yusuf, 2026-10-31): biten yönetim görevinin kaydı, ekip denetim kaydı
 - Süre görevin gerçekten bittiği günden işler: core'dan çıkarma, devir ya da Keycloak'ta artık bulunmama. Planlanan bitiş ya da süre doldu işareti saati başlatmaz; süresi dolmuş ama kişisi hâlâ grupta olan görev açıktır ve kalır.
 - Görevin denetim satırları (uzatma, devir, süre dolması) kendi 3 yılına bağlıdır; görev kaydı silinince onlar kalır.
 - İkisini de core'un periyodik imha işi siler; süre sabittir, ayarı yoktur.
+
+## Ek (2026-11-24): servis olaylarının kayıtları (ADR-0071); Forms yanıtı ile Answer file; veri sorumlusu, yurt dışı aktarım ve İYS
+
+**Süreler tablosuna eklenen satırlar.** ADR-0071 karar 6'nın saklama maddesi tabloya girer. Olaylarda ad, e-posta, telefon ve IP yoktur, yalnız kimlikler vardır (ADR-0071 karar 5).
+
+| Veri | Süre | Dayanak |
+|---|---|---|
+| Tüketicinin işlenmiş olay kaydı (`consumed_events`: olay kimliği; tekrar eleme için) | 30 gün | meşru menfaat |
+| RabbitMQ: DLQ'daki olay | 14 gün | meşru menfaat |
+| RabbitMQ: `unrouted` kuyruğundaki olay | 1 gün | meşru menfaat |
+| Yayıncının giden kutusu satırı (yayımlanmamış olay) | onayda silinir; onay gelmezse 7 gün sonra bırakılır | meşru menfaat |
+
+- DLQ'daki kimlikler KVKK'nın 30 günlük silme süresi içinde düşer.
+
+**Forms yanıtı ile Answer file çelişkisi.** ADR-0052, Answer file'ı formun kapanışından 6 ay sonra siler. Bu ADR'nin 2026-10-24 eki ise SkyForms yanıtları için "kural yok, kendiliğinden silme yok" der. Yanıt dururken eki silinebilir. Yanıt süresi Fatih'in kararıdır; soru ve önerimiz (amaca göre süre) Fatih'e iletildi. Karar gelene kadar iki metin de olduğu gibi kalır.
+
+**Veri sorumlusu, yurt dışı aktarım ve İYS** (Yusuf, 2026-11-24):
+- Kulüp tüzel kişi değildir, YTÜ Sağlık, Kültür ve Spor Daire Başkanlığı'na (SKS) bağlıdır. Açık sorulardaki "veri sorumlusunun kim olduğu" sorusu böyle cevaplanır.
+- Yurt dışına aktarım (Microsoft 365, Cloudflare) SKS'nin ve YTÜ'nün kapsamındadır; kulüp ayrı sözleşme yapmaz.
+- Tanıtım postası için İYS kaydı gerekmez. 2026-10-24 ekinin İYS maddesi (tanıtım yalnız kulübün kendi tanıtım iznine dayanır) aynen kalır.

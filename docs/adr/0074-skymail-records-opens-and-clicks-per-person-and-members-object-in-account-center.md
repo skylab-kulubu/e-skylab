@@ -4,6 +4,8 @@ status: accepted
 
 # SkyMail postaların açılmasını ve tıklanmasını kişi bazında kaydeder; dayanak meşru menfaattir, üye Hesap Merkezi'nden itiraz eder, gizli bağlantılar hiçbir zaman sayılmaz, her şey kapalı bayrakların arkasındadır
 
+_Güncelleme (2026-11-24, Yusuf): Karar 13'teki bilgilendirme postası gönderildi, itiraz gelmedi. Kişi bazında takip sürer. Takip ekranlarındaki gizleme ve eşik sınırları kaldırılır: ön yüzde skymail-frontend #180, 10 kişi eşiği skymail-backend'de (karar 9'daki eşik ve 2026-11-08 ekinin 4. maddesi düşer)._
+
 ADR-0067 haber ve duyuru postalarını SkyMail'e verdi, açılma izlemeyi açık soru olarak bıraktı (Sapmalar 5). ADR-0070 iletişimi tek servise topladı, açılma ve tıklama izlemeyi "ayrı bir kararla" diye kapsam dışında tuttu. ADR-0072 karar 2 "takip akışa bağlı değildir, bütün postalar takiplidir" dedi ve takip kararını ayrı bir ADR'a bıraktı. Bu ADR o karardır.
 
 Kulübün bugün bir postanın hangi üyeye ulaştığını bilmesinin yolu yok. Uygulama içi kutu ve push gelince (ADR-0070) ulaşmayan üyeye başka kanaldan ulaşmak mümkün olacak; bunun için kime ulaşmadığını bilmek gerekiyor. Giriş kodu gibi hesap postalarının gereksiz klasörüne düşüp düşmediği de görünmüyor.

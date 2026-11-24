@@ -4,6 +4,8 @@ status: accepted
 
 # Forms kendi postasını kendisi gönderir, core araya girmez; form yanıtlayanlarına toplu gönderimde Forms kitleyi SkyMail'e kaynak olarak verir (ADR-0075'in posta bölümünün yerine)
 
+_Güncelleme (2026-11-24): Karar 5'in "iki yazılı istisna"sı ilkeye dönüştü (ADR-0071'in 2026-11-24 eki): SkyMail ortak teslim hizmetidir, her ürün kendi işlem postasını doğrudan SkyMail'e gönderir, core yalnız kendi kaydına dayanan kararda (tercih, rıza, kitle, ekip) girer. Forms → SkyMail `/single` bu ilkenin örneğidir; yalnız `form_mail_sources` ucu ADR-0075 karar 4'e istisna olarak kalır._
+
 ADR-0075 karar 5, 6 ve 8, Forms'un kendiliğinden giden postalarını ve form yanıtlayanlarına toplu gönderimi core'a taşıyordu: Forms olay yayımlayacak, core posta kararını verip kendi kuyruğundan SkyMail'e gönderecek, 36 saatlik hatırlatmayı core zamanlayacak, toplu gönderimin kitlesini core'un `form_respondents` türü çözecekti. Bunların hiçbiri production'a çıkmadı.
 
 ADR-0075'in en somut gerekçesi "Forms yeniden başlarsa kuyruktaki posta kaybolur" idi. Bu gerekçe kapandı: Forms postayı artık bellek içi kuyruk yerine kendi veritabanındaki giden kutusuna yazıyor ve bir gün boyunca yeniden deniyor (forms-backend `OutboxMailDispatcher.cs`, `MailOutboxHandler`). Kalan gerekçe "bildirim kararı tek yerde olsun" idi. LinkedIn'in Air Traffic Controller'ı merkezi bir kararı destekler; ama orada merkez bir bildirim platformudur, bizde SkyMail'e denk gelir. Nick Tune üretici ile bildirim platformu arasında böyle bir ara bağlam önerir; neden sapıldığı Sapma 1'de.

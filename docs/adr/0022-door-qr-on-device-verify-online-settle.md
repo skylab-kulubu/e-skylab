@@ -1,5 +1,7 @@
 # Door QR authenticity is on-device; check-in settles online
 
+_Güncelleme (2026-11-24): Çevrimdışı kapı (Queued check-in) kararı değişmedi, ama bugün kodda yok. Tarayıcı tarafı Mobile Lab'e iletildi (Yusuf, 2026-11-24); sözleşme Mobile Lab'in belgesindedir. core'un kapı ucu kuyruktan gelen girişin tarandığı anı isteğe bağlı `scannedAt` alanıyla alacak (core işi açık)._
+
 Staff scanner proves SkyPass QR (and Ticket QR if signed) authentic by verifying the signature on-device; it does not call mint or core to know the code is real. Check-in still settles online (`POST /v1/tickets/:ticketId/event-days/:eventDayId/check-in` or the SkyPass equivalent) so double-entry and live counts exist when core is up. If core is unreachable, a valid unexpired signature is accepted at the door as a Queued check-in and duplicates are reconciled after sync — club/campus fail-open, not concert fail-closed. Student-card UID tap stays an online lookup (UID → bound User); a last-known cache is not locked. Rejected: mint-round-trip as the authenticity path; concert-style fail-closed when the network is down; treating a bound Student-card UID as an on-device-signed credential. Who may scan is ADR 0021.
 
 ## Ek: Google Wallet kodu yalnız çevrimiçi (2026-10-09)
