@@ -8,13 +8,19 @@ ADR-0028 sunucuda derleme yapılmayacağını ve Dokploy'un GHCR'dan çekeceğin
 
 Karar (Yusuf: main → production tek squash, Eylül 2026; tek komut, 2026-11-22; sektör denetiminden sonra yazıya geçti, 2026-11-24):
 
-1. **main kendiliğinden sandbox'a gider.** İş kısa ömürlü dallardan PR'la main'e girer. main'e her push'ta CI koşar, imaj GHCR'a `:latest`, `:sandbox`, commit ve `tree-<git ağacı>` etiketleriyle basılır, sandbox'ın Dokploy kancası çağrılır.
+1. **main kendiliğinden sandbox'a gider.** İş kısa ömürlü dallardan PR'la main'e girer. main'e her push'ta CI koşar, imaj GHCR'a `:latest`, `:sandbox` ve commit etiketleriyle basılır (core-backend ayrıca `tree-<git ağacı>`), sandbox'ın Dokploy kancası çağrılır. e-skylab-keycloak'a bu karar uygulanmaz: main GHCR'a imaj basmaz, sandbox kancası yoktur (karar 3).
 2. **production dalı squash'lıdır.** Yayın, main'in ağacını production'ın üstüne tek bir commit yapar (`git commit-tree "$(git rev-parse 'origin/main^{tree}')" -p origin/production`), bunu `release/production-<tarih>-<konu>` dalına iter, production'a PR açar ve `gate` yeşil olunca squash'la birleştirir. production'ın ağacı main'in bir ağacına bayt bayt eşittir; satır düzeyinde birleştirme kararı yoktur.
    - production'ın soy ağacı main'e bağlı değildir. Ne yayında, ne değil, `git log` ile değil `git diff origin/production origin/main` ile okunur.
    - Ağaç eşitliği main'deki her işi taşır. main'de başkasının birleştirip henüz yayınlanmamış işi varsa yayından önce sahibine sorulur.
-3. **İmaj yeniden derlenmez, terfi eder.** production push'unda GHCR iş akışı aynı ağacın tam test koşusunun yeşil geçtiğini arar (`scripts/ci/tested-tree.sh`), main'in o ağaçtaki imajını `:production` ve commit etiketiyle yeniden etiketler (aynı özet: sandbox'ta koşan bayt production'da koşar), sonra production'ın Dokploy kancasını çağırır. Bunu core-backend, account-center, skymail-backend, skymail-frontend ve e-skylab-keycloak yapar; Keycloak ayrıca CI'daki aday paketin SHA-256'sını yayında yeniden doğrular. Yeni depolar bu kalıpla açılır.
-4. **Hotfix yolu.** main yayınlanmamış iş taşıyorsa ve yalnız bir düzeltme çıkacaksa: production'dan `hotfix/<ad>` dalı açılır, düzeltmenin main'deki commit'leri cherry-pick edilir, PR production'a açılır. Bu ağaç main'de hiç olmadığı için CI onu kendi koşusunda test eder ve imajı yeniden derler. Sonraki tam yayın (ağaç = main) onu çakışmasız içine alır.
-5. **Geri dönüş aynı imajladır.** Ağaç etiketleri kalıcıdır. Geri dönmek, önceki ağacın imajını yeniden `:production` yapmak ve kancayı çağırmaktır; yeni derleme gerekmez.
+3. **İmaj yeniden derlenmez, terfi eder.** production push'unda main'de test edilmiş imaj yeniden etiketlenir ve production'ın Dokploy kancası çağrılır; sandbox'ta koşan bayt production'da koşar. Depoya göre yol:
+   - **core-backend:** GHCR iş akışı aynı ağacın tam test koşusunun yeşil geçtiğini arar (`scripts/ci/tested-tree.sh`) ve main'in `tree-<ağaç>` imajını `:production` ve commit etiketiyle yeniden etiketler.
+   - **skymail-backend, skymail-frontend:** main'deki `gate` koşusunu GitHub API'siyle bulur, o koşunun `sha-` etiketli imajını terfi ettirir.
+   - **account-center:** imaj `production-<sha7>` etiketiyle terfi eder.
+   - **core-frontend:** `production-candidate` imajı terfi eder (bu imaj ayrı derlenir, sapma 5).
+   - **e-skylab-keycloak:** production push'unda CI'ın test ettiği aday paket yayımlanır; CI'daki adayın SHA-256'sı yayında yeniden doğrulanır.
+   - Yeni depolar bu kalıpla açılır.
+4. **Hotfix yolu.** main yayınlanmamış iş taşıyorsa ve yalnız bir düzeltme çıkacaksa: production'dan `hotfix/<ad>` dalı açılır, düzeltmenin main'deki commit'leri cherry-pick edilir, PR production'a açılır. Bu ağaç main'de hiç olmadığı için CI onu kendi koşusunda test eder ve imajı yeniden derler (core-backend'de iş akışı bunu kendisi ayırır). Sonraki tam yayın (ağaç = main) onu çakışmasız içine alır.
+5. **Geri dönüş aynı imajladır.** core-backend'de ağaç etiketleri kalıcıdır: geri dönmek, önceki ağacın imajını yeniden `:production` yapmak ve kancayı çağırmaktır; yeni derleme gerekmez. Öbür depolarda geri dönüş, önceki yayının imajına ya da adayına aynı yolla dönmektir; ağaç etiketiyle geri dönüş yalnız core-backend'de vardır.
 6. **Yayını insan Mac'ten tek komutla başlatır.** `ops/wizards/tek-komut.sh` bir planın adımlarını sırayla koşar: kuru koşu ve beklenen satırlar, PR, `gate`, `--match-head-commit` ile squash birleştirme, GHCR terfisini bekleme, kanca, çalışan konteynerin özetini GHCR özetiyle karşılaştırma. Sunucu adımları (göç öncesi DB dökümü, Dokploy ve OpenBao ayarları, doğrulamalar) sunucuda `systemd-run` birimlerinde koşar ve SSH koparsa sürer. Plan dışı bir şeyde durur ve geri alma satırını basar. Planlı adımlar onay sormaz; insana yalnız parola ve tarayıcı girişi sorulur. Sırlar argv'ye, ekrana ve günlüğe girmez.
 7. **GitHub Environments onay kapısı kullanılmaz.**
    - Onay zaten vardır: yayın bir PR'ın birleşmesidir ve onu yayını başlatan insan yapar. "Required reviewers" aynı kişiye ikinci bir tıklama ekler; ayrı bir onaylayan yoktur.
@@ -32,7 +38,7 @@ Karar (Yusuf: main → production tek squash, Eylül 2026; tek komut, 2026-11-22
 **Uyanlar:**
 - **Bir kez derle, terfi ettir** (karar 3). 12-factor'ün derleme, yayın ve çalıştırma ayrımı ve Google Cloud Deploy'un aynı yapıtı ortamdan ortama terfi ettirmesi.
 - **Trunk-based geliştirme ve GitHub Flow** (karar 1). Kısa ömürlü dallar, main her zaman sandbox'ta.
-- **Tekrarlanabilir, denetlenebilir yayın** (karar 6). Google SRE release engineering: kuru koşu, beklenen satır, çalışan özetin doğrulanması, ölü adam anahtarlı geri dönüş.
+- **Tekrarlanabilir, denetlenebilir yayın** (karar 6). Google SRE release engineering: kuru koşu, beklenen satır, çalışan özetin doğrulanması.
 - **Test edilmiş ağaç kapısı** (karar 3). NIST SSDF PW.7/PW.8: gözden geçir, test et, sonra yayınla.
 
 **Sapmalar (hepsi):**
@@ -41,7 +47,7 @@ Karar (Yusuf: main → production tek squash, Eylül 2026; tek komut, 2026-11-22
 3. **Onay kapısı yok, yayın tek kişinin Mac'inden** (karar 7). GitHub Environments'ın "required reviewers" kuralı ve yalnız production dalından deploy kullanılmıyor. Tek kişi bağımlılığı bilinçli kabul.
 4. **GitOps yok.** OpenGitOps, Argo CD ve Flux istenen durumu Git'te tutar ve sürekli uzlaştırır. Dokploy'un istenen durumu (env, ağ, alan adı) kendi veritabanındadır ve GitOps desteği yoktur; sapmayı olgu betikleri yakalar. Yayın başına kopyalanan sihirbaz SRE'nin "toil" dediği iştir (Consequences'taki açık iş).
 5. **core-frontend her commit için iki imaj basar.** `NEXT_PUBLIC_*` adresleri derlemede gömülür, production baytları sandbox'ta koşmamış olur (12-factor III). Aynı ağaçtan, aynı koşuda derlenir.
-6. **Bazı depolar production push'unda yeniden derler ve test adımı yoktur** (skylab-site, arge, artlab-site, cms-backend, yildizplace-backend, ekstremspor, Forms). Karar 3'e ve SSDF'ye aykırıdır; sahiplerinin işidir.
+6. **Bazı depolarda yayın, ağacın main'de test edilmiş olmasına bağlı değildir** (skylab-site, arge, artlab-site, cms-backend, yildizplace-backend, ekstremspor, Forms): production push'unda imaj yeniden derlenir. arge'nin testi PR'da ve main'de koşar, ama production yayını o koşuya bakmaz; yildizplace-backend production'da `mvn verify` koşup derler. Karar 3'e ve SSDF'ye aykırıdır; sahiplerinin işidir.
 7. **Değişiklik kaydı GitHub Deployments'ta değil,** hub'daki yayın günlüklerindedir. DORA'nın dört ölçütünden yalnız yayın sıklığı ölçülebiliyor.
 
 ## Considered Options

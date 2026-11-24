@@ -4,7 +4,7 @@ status: accepted
 
 # Yetki yalnız gruplardan gelir: kişiye ve realm'e rol verilmez, roller üç yerde eşlenir; Keycloak konsolu master'daki kişi başına ayrı hesaplarla kullanılır
 
-_Güncelleme (2026-11-24): K1 ve K4, panelin "Uygulamalar" özelliğiyle değişti: uygulama rolü kişiye ve ekip gruplarına da atanabilir; yönetici rolü yine yalnız Privileged kökte ve `/ROLLER`'de. Ayrıntı aşağıdaki ekte._
+_Güncelleme (2026-11-24): K1 ve K4, panelin "Uygulamalar" özelliğiyle değişti: uygulama rolü kişiye ve ekip gruplarına da atanabilir; yönetici rolü yine yalnız Privileged kökte, `/ROLLER`'de ve en üst ekiplerin Leader gruplarında. Ayrıntı aşağıdaki ekte._
 
 ADR-0006 realm rollerinin kalkacağını, ADR-0059 yetkinin Microsoft modelinde olacağını yazdı. Production'daki rol ölçümü (2026-10-12) bunun yarıda kaldığını gösterdi:
 
@@ -152,9 +152,9 @@ Kaynaklar:
 
 ## Ek (2026-11-24): Uygulamalar: uygulama rolü kişiye ve ekip gruplarına atanır
 
-Karar (Yusuf, 2026-10-23, ekip-yetkileri bilet 15; sektör denetimiyle 2026-11-24'te ADR'ye işlendi). core'un "Uygulamalar" özelliği (`APP_ASSIGNMENTS`) K1 ve K4'ün yazdığından geniştir; ADR koda uyar.
+Karar (Yusuf, 2026-10-23, ekip-yetkileri bilet 15; sektör denetimiyle 2026-11-24'te ADR'ye işlendi). core'un "Uygulamalar" özelliği K1 ve K4'ün yazdığından geniştir; ADR koda uyar. Özellik `APP_ASSIGNMENTS` bayrağının arkasındadır, varsayılan kapalıdır (`off`; kapalıyken uçları 404 döner).
 
 1. **Uygulama rolü kişiye ve ekip gruplarına atanabilir.** ADMIN ve YK panelin Uygulamalar sayfasından bir uygulamanın rolünü bir ekibe, alt ekibe, bunların Leader grubuna ya da doğrudan bir kişiye atar ve kaldırır; DK okur. Her değişiklik ve okuyabilen birinin reddedilen her denemesi ekip denetim kaydına bir satırdır (`app.assign`, `app.unassign`). Microsoft Entra'nın Enterprise apps → "Users and groups" ekranının karşılığıdır.
-2. **Yönetici rolü yine yalnız Privileged kökte ve `/ROLLER`'de.** core'un Protected sınıflamasında yönetici rolü sayılan bir rol kişiye ya da ekip grubuna atanamaz. Privileged köklerdeki, `/ROLLER` yapraklarındaki ve servis hesaplarındaki eşlemeler kodda (Keycloak'ın uzlaştırıcısında) durur; panel onları kilitli gösterir, değiştiremez. En üst ekiplerin Leader gruplarındaki konumdan gelen roller (K4/2, karar 6) aynen kalır.
+2. **Yönetici rolü yine yalnız Privileged kökte, `/ROLLER`'de ve en üst ekiplerin Leader gruplarında** (core `docs/app-assignments.md`). core'un Protected sınıflamasında yönetici rolü sayılan bir rol Uygulamalar sayfasından kişiye ya da ekip grubuna atanamaz. Privileged köklerdeki, `/ROLLER` yapraklarındaki, Leader gruplarındaki konumdan gelen (K4/2, karar 6) ve servis hesaplarındaki eşlemeler kodda (Keycloak'ın uzlaştırıcısında) durur; panel onları kilitli gösterir, değiştiremez.
 3. **K1 ve K4 yalnız yönetici rolleri için geçerlidir.** "Kişiye rol yok" ve "rol yalnız üç yerde" kuralları uygulama rolüne uygulanmaz. K2 (realm rolü yok) ve K3 değişmez.
 4. **Düşen cümleler.** Sapmalar listesinin 11. maddesi ("Kişiye doğrudan uygulama rolü yasak … daha sıkıyız") düşer: artık Entra gibi atıyoruz. Consequences'taki "Kişiye doğrudan rol kalmaz" cümlesi uygulama rolü için geçmez.
