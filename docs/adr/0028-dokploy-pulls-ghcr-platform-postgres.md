@@ -1,5 +1,7 @@
 # Dokploy pulls GHCR; one Postgres is the platform only
 
+_Güncelleme (2026-11-24): "Production pins `:latest`" cümlesi artık doğru değil. Production `:production` etiketini çeker; `:latest` ve `:sandbox` main'in imajıdır ve sandbox'a gider. Yayın modeli ADR-0089'da._
+
 Dokploy on the production server never compiles club apps: no `docker build` on the prod host, no Dokploy Git/Nixpacks build. GitHub Actions publishes `linux/amd64` to GHCR; Dokploy only pulls a tag. Production pins **`:latest`** (club convention). Developer machines run tests; they may also build+push, but Actions is the release path.
 
 The forms **product** stays **skyforms** (waffle SPA, Keycloak public client `skyforms`, roles `skyforms:*`). The HTTP API, GHCR image, compose/Dokploy DNS, and confidential client are **forms** — not `dotnet`. Keycloak does not rename `clientId` in place: new confidential `forms`, copy roles/maps/SA, switch env, disable `dotnet`. That IdP cut is under NPM, before Traefik. Container DNS `dotnet-api` → `forms` when Traefik replaces NPM. Two OAuth clients stay separate (public SPA vs confidential API). `.NET` the runtime is unrelated.

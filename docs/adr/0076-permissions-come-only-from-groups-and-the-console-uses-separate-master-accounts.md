@@ -4,6 +4,8 @@ status: accepted
 
 # Yetki yalnız gruplardan gelir: kişiye ve realm'e rol verilmez, roller üç yerde eşlenir; Keycloak konsolu master'daki kişi başına ayrı hesaplarla kullanılır
 
+_Güncelleme (2026-11-24): K1 ve K4, panelin "Uygulamalar" özelliğiyle değişti: uygulama rolü kişiye ve ekip gruplarına da atanabilir; yönetici rolü yine yalnız Privileged kökte ve `/ROLLER`'de. Ayrıntı aşağıdaki ekte._
+
 ADR-0006 realm rollerinin kalkacağını, ADR-0059 yetkinin Microsoft modelinde olacağını yazdı. Production'daki rol ölçümü (2026-10-12) bunun yarıda kaldığını gösterdi:
 
 - **Kişiye doğrudan rol.** 19 insan hesabında doğrudan client rolü vardı (25 rol, 36 atama). Panel kişiye "ekstra rol" vermeye izin veriyordu. Kimin neden bir yetkisi olduğu gruptan okunamıyordu.
@@ -147,3 +149,12 @@ Kaynaklar:
 - Keycloak, master realm ve kullanıcı açma: https://www.keycloak.org/docs/latest/server_admin/index.html
 - Keycloak, yönetici kurtarma: https://www.keycloak.org/server/bootstrap-admin-recovery
 - Hub'daki rol temizliği spec'i (2026-10-12) ve grup yönetimi değerlendirmesi (2026-10-12).
+
+## Ek (2026-11-24): Uygulamalar: uygulama rolü kişiye ve ekip gruplarına atanır
+
+Karar (Yusuf, 2026-10-23, ekip-yetkileri bilet 15; sektör denetimiyle 2026-11-24'te ADR'ye işlendi). core'un "Uygulamalar" özelliği (`APP_ASSIGNMENTS`) K1 ve K4'ün yazdığından geniştir; ADR koda uyar.
+
+1. **Uygulama rolü kişiye ve ekip gruplarına atanabilir.** ADMIN ve YK panelin Uygulamalar sayfasından bir uygulamanın rolünü bir ekibe, alt ekibe, bunların Leader grubuna ya da doğrudan bir kişiye atar ve kaldırır; DK okur. Her değişiklik ve okuyabilen birinin reddedilen her denemesi ekip denetim kaydına bir satırdır (`app.assign`, `app.unassign`). Microsoft Entra'nın Enterprise apps → "Users and groups" ekranının karşılığıdır.
+2. **Yönetici rolü yine yalnız Privileged kökte ve `/ROLLER`'de.** core'un Protected sınıflamasında yönetici rolü sayılan bir rol kişiye ya da ekip grubuna atanamaz. Privileged köklerdeki, `/ROLLER` yapraklarındaki ve servis hesaplarındaki eşlemeler kodda (Keycloak'ın uzlaştırıcısında) durur; panel onları kilitli gösterir, değiştiremez. En üst ekiplerin Leader gruplarındaki konumdan gelen roller (K4/2, karar 6) aynen kalır.
+3. **K1 ve K4 yalnız yönetici rolleri için geçerlidir.** "Kişiye rol yok" ve "rol yalnız üç yerde" kuralları uygulama rolüne uygulanmaz. K2 (realm rolü yok) ve K3 değişmez.
+4. **Düşen cümleler.** Sapmalar listesinin 11. maddesi ("Kişiye doğrudan uygulama rolü yasak … daha sıkıyız") düşer: artık Entra gibi atıyoruz. Consequences'taki "Kişiye doğrudan rol kalmaz" cümlesi uygulama rolü için geçmez.

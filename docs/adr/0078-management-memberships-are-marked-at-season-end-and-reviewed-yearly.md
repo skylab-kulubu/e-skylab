@@ -6,6 +6,8 @@ status: accepted
 
 _Güncelleme (2026-11-23): Karar 6, **ADR-0085 ile değişti** (dönemli, hatırlatmalı, kapanışta kendiliğinden uygulanan tam gözden geçirme). Karar 1–5 değişmedi; 2026-11-08'den beri production'da açık._
 
+_Güncelleme (2026-11-24): Karar 3 değişti (Yusuf, 2026-11-24): süresi dolan Privileged kök üyeliği bitişten 30 gün sonra kendiliğinden kalkar. Kaldırmayı core'un denetimli yazıcısı yapar; her kaldırma denetim kaydına ve ADR-0080 postasına girer. Bu 30 gün uzatma ve devir içindir._
+
 YK, DK ve ekip liderliği bir dönem (Season) içindir, ama Keycloak'taki üyeliklerin bitişi yok. Eski yönetimin yetkisi, biri hatırlayıp elle alana kadar sürüyor. Kimin hâlâ hangi ekipte olduğu da yıllarca gözden geçirilmiyor. Bir sonraki dönem devri 2027 Mayıs'ının sonunda.
 
 Karar (Yusuf, 2026-10-12: GY2 ve GY7; aynı gün 22:15 düzeltmesi "bitiş günü yalnız işaretlenir"; 2026-10-19: lider uyarısının alıcıları ve uzatma sınırı):

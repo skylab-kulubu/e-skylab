@@ -4,6 +4,8 @@ status: accepted
 
 # Servisler arası olaylar RabbitMQ'dan geçer; core orkestratördür, alan servisleri core'u bilmez
 
+_Güncelleme (2026-11-24): Karar 3'te SkyMail alan servisi değil, ortak teslim hizmetidir; ilke aşağıdaki ekte. Karar 6'daki saklama satırları ADR-0062'ye eklendi._
+
 Bugün servisler arasında tek kalıp, OAuth client credentials'lı HTTP. Forms her cevabı kendi giden kutusundan core'a `POST /v1/forms/{formId}/responses` ile bildiriyor ve core'un yanıt koduna göre yeniden deniyor. Yani Forms core'un bilet alanını biliyor. Fatih'in ilkesi bunun tersi: core orkestratör ve ana mikroservis; Forms ve öteki servisler core'u bilmez, core onları bilir. Yakın istekler de aynı yöne itiyor:
 - geri bildirim formu, form kapanınca core'un haberdar olmasını istiyor (ADR-0069);
 - e-postayla kayıt core'a haber vermiyor, core 5 dakikalık eşitlemeyle yakalıyor (core-backend #270);
@@ -173,3 +175,20 @@ Kararlar (Yusuf, 2026-10-25 ve 2026-10-26). Karar 1–16 aynen geçerlidir. Bu e
 - **Uyan:** `traceparent` CloudEvents'in Distributed Tracing uzantısı ve W3C Trace Context'tir.
 - **Sapma 14. `traceparent` var, toplayıcı yok.** OpenTelemetry'de iz bir toplayıcıya gider; bizde yalnız tüketici loguna yazılır. Yayıncı ve tüketici logları zaten olay `id`'siyle bağlanır. Toplayıcı ayrı bir iştir.
 - **Sapma 4'ün devamı.** Keycloak grup silme olayı da giden kutusuz ve confirms'süzdür. Kaçan olayı core'un günlük temizlik turu kapatır.
+
+## Ek (2026-11-24): SkyMail ortak teslim hizmetidir; her ürün kendi işlem postasını gönderir
+
+Karar (Yusuf, 2026-11-24; sektör denetimi). ADR-0087, Forms'un postasını karar 3'e "iki yazılı istisna" diye yazmıştı. İstisna bugünü çözer ama bir sonraki ürün (Place, Guessr, SkyEvents, inscribed) kendi postasını göndermek istediğinde aynı tartışma yeniden açılırdı. Bu ek onu ilke yapar.
+
+1. **SkyMail ortak teslim hizmetidir.** Kullanıcı okuma, media, kısa link ve hesap erişim kapısı gibi bir platform hizmetidir. Karar 3'teki alan servisleri listesinden çıkar: alan servisleri Forms ve inscribed'dır (sonraki ürünler de).
+2. **Her ürün kendi işlem postasını doğrudan SkyMail'e gönderir.** Tetikleyiciye, alıcıya ve zamana ürün karar verir; SkyMail şablonu, gönderimi, yeniden denemeyi ve abonelik çıkışını yönetir. Gönderim bir komuttur (karar 2): `POST /v1/mail_tasks/single`, belirsiz yanıtta çift posta gitmesin diye `Idempotency-Key` ile.
+3. **core yalnız kendi kaydına dayanan kararda girer:** İletişim tercihi, rıza (Davet onayı, tanıtım izni), kitle (üyeler) ve ekip. Bunları SkyMail gönderim anında core'un kontrol noktasına sorar (ADR-0072); ürün core'u araya koymaz.
+4. **"Alan servisleri birbirini bilmez" alan servisleri arasında aynen kalır** (Forms, inscribed, etkinlik uygulamaları).
+
+Sonuçlar:
+- ADR-0087 karar 5'teki Forms → SkyMail `/single` çağrısı istisna olmaktan çıkar, bu ilkenin örneğidir. SkyMail'in Forms'a özel `form_mail_sources` ucu ADR-0075 karar 4'e ("iletişim servisi üreticiyi bilmez") istisna olarak kalır.
+- ADR-0075 karar 3 ("Forms, SkyMail ve inscribed birbirini bilmez") SkyMail için geçmez.
+
+**Endüstri uygulamasıyla karşılaştırma.** Uyan: bildirim platformu kalıbında olayı üreten ürün platformu doğrudan tetikler; platform kanalı, şablonu, yeniden denemeyi ve aboneliği yönetir (LinkedIn Air Traffic Controller, Knock, Microsoft Teams etkinlik akışı). Üretici ile teslim platformu arasına üçüncü bir iş servisi giren örnek yok. Sapma: tercih ve rıza kaydı platformda değil core'dadır; SkyMail onu gönderim anında sorar (karar 14).
+
+Kaynaklar: LinkedIn https://engineering.linkedin.com/blog/2018/03/air-traffic-controller--member-first-notifications-at-linkedin · Knock https://knock.app/manuals/notification-infrastructure/how-to-choose-a-notification-infrastructure-platform · Microsoft Teams etkinlik akışı https://learn.microsoft.com/en-us/graph/teams-send-activityfeednotifications

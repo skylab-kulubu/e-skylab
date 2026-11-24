@@ -4,6 +4,8 @@ status: accepted
 
 # E-SKY LAB'e e-posta koduyla kayıt ve giriş; YTÜ hesabı isteğe bağlı, ilk YTÜ girişinde okul adresi birincil
 
+_Güncelleme (2026-11-24): Yönetici hesaplarında (ADMIN, YK, DK; panel) ikinci adım (passkey ya da TOTP) zorunlu değildir. Bu bilinçli bir sapmadır (Yusuf, 2026-11-24): Microsoft yönetici hesaplarında oltalamaya dayanıklı ikinci adım ister, NIST SP 800-63B-4 e-posta kodunu doğrulayıcı saymaz. Yönetici de sıradan hesap gibi kodla, parolayla ya da passkey'le girer._
+
 Kişiler okul e-postası ve okul Microsoft şifresi istenince "bilgilerimizi çalıyorlar" hissine kapılıyor. Bir kısmı da okul şifresini bilmediği için vazgeçiyor. 128 hesabın 115'i YTÜ Microsoft'a bağlı, parolası olan tek kişi var. YTÜ'süz kendi kendine kayıt kapalı (`registrationAllowed=false`); mezun, personel ve başka üniversiteden gelen kişi hesap açamıyor. İlk YTÜ girişi altı ekran sürüyor: SKY LAB eşleyicisi Microsoft'tan gelen e-postayı her girişte siliyor, bu yüzden yeni kişiye bir profil formu ve bir doğrulama bağlantısı daha çıkıyor. 20 hesabın birincil adresi hiç yok. Araştırma ve spec hub'daki `eskylab-login-ux` çalışma notlarında (2026-10-04).
 
 Karar (Yusuf, 2026-10-04; S1-S8 olduğu gibi onaylandı):

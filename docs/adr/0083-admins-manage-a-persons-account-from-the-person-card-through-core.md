@@ -4,6 +4,8 @@ status: accepted
 
 # Yönetici kişinin Keycloak hesabını kişi kartından, core üzerinden yönetir; Privileged kişinin hesabını yalnız ADMIN değiştirir; geçici parola bir kez gösterilir; kişi kendi hesabını Hesap merkezinde değiştirir
 
+_Güncelleme (2026-11-24): Karar 2'deki "Kişiye doğrudan rol yok (ADR-0076 K1)" cümlesi ADR-0076'nın 2026-11-24 ekiyle daralır: kişi kartı kişiye rol yazmaz, ama uygulama rolü panelin Uygulamalar sayfasından kişiye atanabilir. Yönetici rolü yine yalnız Privileged kökte ve `/ROLLER`'de._
+
 Panelin kişi kartı bugüne kadar yalnız kulüp profilini, grupları ve oturum kapatmayı gösteriyordu. Bir kişinin e-postasını değiştirmek, onaylı saymak, parolasını sıfırlatmak, hesabını kapatmak ya da bir passkey'ini silmek için Keycloak konsoluna gidiliyordu; konsolda yapılan değişiklik core'un denetim kaydına girmiyor (ADR-0079) ve kişiye kim, ne zaman dokundu okunamıyor. CONTEXT "User" maddesi "resetting password on the admin card"ı kaçınılacaklar arasında sayıyordu.
 
 Karar (Yusuf, 2026-11-22: "kullanıcının her detayını burdan da güncelleyebilmeliyiz … Keycloak'taki tüm özellikleri burdan da yönetebilmeliyiz"; 2026-11-23 sabahı soruların cevapları):
