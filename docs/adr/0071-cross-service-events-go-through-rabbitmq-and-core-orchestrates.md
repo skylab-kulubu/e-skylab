@@ -141,6 +141,8 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 
 ## Ek (2026-10-25): Forms'un postaları ve iki yeni olay (ADR-0075)
 
+_Güncelleme (2026-11-24): ADR-0087 ile Forms postasına ilişkin kısımlar geri çekildi._
+
 ADR-0075 karar 3'ü alan servislerinin birbirine de uygular: Forms SkyMail'i, SkyMail Forms'u bilmez. Forms'un postaları core'un bildirim kararına geçtiği için:
 
 - **Olay listesi genişler.** `forms.response.status_changed` `nextFormId`, `returnedQuestionCount` ve `reviewedAt` alanlarını da taşır. İki yeni tür gelir: `forms.workflow_run.reopened` ve `forms.attempt.updated`. Karar 5 aynen geçerlidir: olaylarda yalnız kimlik ve karar alanları vardır.
@@ -164,7 +166,7 @@ Kararlar (Yusuf, 2026-10-25 ve 2026-10-26). Karar 1–16 aynen geçerlidir. Bu e
   - Kişisel veri değildir. Alan eklemek olduğu için şema sürümü değişmez. Keycloak olayları CloudEvents olmadığı için taşımaz.
 - **SkyMail bastırması olay olmaz.** `skymail.events` bu ekle açılmaz; karar 1'deki "sonra" hâli sürer.
   - Kişiye gösterim olay değil, SkyMail'in kişi ucudur (ADR-0075 karar 2, ADR-0073 eki 2026-10-26). core bastırma bilgisini hiçbir kararında kullanmaz.
-  - Kişiye kendiliğinden bildirim (kutu, push) istenirse bu bir bildirim kararıdır ve ADR-0075 karar 1'e göre core'a girer. Olay yolu o gün yeniden değerlendirilir.
+  - Kişiye kendiliğinden bildirim (kutu, push) istenirse bu bir bildirim kararıdır ve ADR-0075 karar 1'e göre core'a girer (Forms postası için ADR-0087 ile geri çekildi). Olay yolu o gün yeniden değerlendirilir.
 - **Saklama değişmez.** Karar 6'daki saklama listesine satır eklenmez: yeni giden kutusu ya da yeni tüketici tablosu yoktur.
 
 **Endüstri uygulamasıyla karşılaştırma (bu ek).**

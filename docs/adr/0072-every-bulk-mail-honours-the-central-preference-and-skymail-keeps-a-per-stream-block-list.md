@@ -330,6 +330,8 @@ Karar 2'nin "Takip kararı ayrı bir ADR ile yazılacak" cümlesindeki ADR, ADR-
 
 ## Ek (2026-10-25): Forms'un postaları ve form yanıtlayanlarına toplu gönderim core'dan (ADR-0075)
 
+_Güncelleme (2026-11-24): ADR-0087 ile Forms postasına ilişkin kısımlar geri çekildi._
+
 Karar 8'in iki yolu ADR-0075 ile değişir; akış sınıfları değişmez.
 
 - **Kendiliğinden giden postalar.** "Forms bunları kendi servis hesabıyla `/v1/mail_tasks/single`'dan gönderir" cümlesinin yerine şu geçer: bu postaları Forms'un olaylarıyla core gönderir. Yine `islem` akışından, başlıksız ve tercihe bakmadan giderler.

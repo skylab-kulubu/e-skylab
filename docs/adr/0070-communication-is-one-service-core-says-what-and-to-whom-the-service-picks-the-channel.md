@@ -94,4 +94,6 @@ Nasıl:
 
 ## Ek (2026-10-25): Forms'un postalarını core gönderir (ADR-0075)
 
+_Güncelleme (2026-11-24): ADR-0087 ile Forms postasına ilişkin kısımlar geri çekildi._
+
 Karar 3'teki "Keycloak, Forms ve core'un mevcut çağrıları değişmez" cümlesinin ve Consequences'taki "Keycloak SPI, Forms ve core `/single` ile göndermeye devam eder" cümlesinin Forms kısmı ADR-0075 ile değişir. Forms SkyMail'e göndermez. Forms olay yayımlar, postanın kime ve hangi Bildirim türüyle gideceğine core karar verir. core postayı kendi kuyruğundan gönderir: hesabı olan alıcıya `POST /v1/notifications` ile, misafire `/v1/mail_tasks/single` ile. Karar 2 bu yönü zaten söylüyordu. Keycloak'ın sistem postası SkyMail'e doğrudan gitmeye devam eder (ADR-0045). `forms.*` şablon anahtarları ve değişkenleri aynı kalır; sözleşmelerinin sahibi core olur.
