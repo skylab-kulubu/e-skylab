@@ -69,7 +69,7 @@ Değerlendirilen ve seçilmeyenler:
 Yukarıdaki "Hesap silme ve erişim kapısı" maddesi daraldı: inscribed'a erişim kapısı gelmez, tam silme ucu da gerekmez (ayrıntı ve gerekçe ADR-0051'in 2026-10-03 ekinde).
 
 - **Küçük uç, sahibinden.** Fatih inscribed'a core'un silme komutunu karşılayan küçük bir uç ekler. Uç düzenleyen kolonlarındaki (`UpdatedBy`) kişinin `sub`'ını herkes için aynı "Silinmiş kullanıcı" yer tutucusuna çevirir; içerik, sürüm ve tarih değişmez. Makbuz tablosu ve tenant çözümü yoktur; token `core-erasure`'ın, rol `skycms` üzerindeki `cms:account:erase`'tir.
-- **Kapı yok.** inscribed hesap tutmaz; eski token bir hesabı diriltemez. Kalan risk, kişi kapatılmadan önce alınmış access token'ın ömrü (300 sn + 30 sn skew) içinde yapılan bir düzenlemedir. Core CMS adımını kimlik kapandıktan 6 dk sonra gönderir; o düzenleme de temizlenir.
+- **Kapı yok.** inscribed hesap tutmaz; eski token bir hesabı diriltemez. Core CMS adımını kimlik kapandıktan 6 dk sonra gönderir; kişi kapatılmadan önce alınmış access token'ın ömrü (300 sn + 30 sn skew) içinde yapılan düzenleme de böylece temizlenir.
 - **Eski `ArchivedBy` kolonları** (cms-backend kopyası) bir kez, herkes için boşaltılır.
 
 ## Ek: SkyApp'ten haber ve takım düzenleme (2026-10-03)

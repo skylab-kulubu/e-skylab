@@ -40,7 +40,7 @@ Nasıl:
 
 ## Consequences
 
-- **E-posta kodu NIST SP 800-63B-4'te doğrulayıcı (authenticator) sayılmaz.** Bunu bilerek kabul ediyoruz: "Parolanı mı unuttun?" zaten posta kutusuna sahip olana hesabı veriyor; posta kutusu sahibi için kod saldırı yüzeyini büyütmüyor. TOTP'si olanın hesabı posta kutusu ele geçirilse de korunur.
+- **E-posta kodu NIST SP 800-63B-4'te doğrulayıcı (authenticator) sayılmaz.** Gerekçe: "Parolanı mı unuttun?" zaten posta kutusuna sahip olana hesabı veriyor; posta kutusu sahibi için kod saldırı yüzeyini büyütmüyor. TOTP'si olanın hesabı posta kutusu ele geçirilse de korunur.
 - **Çevrim içi tahmin ise yeni bir yüzeydir.** Sıfırlama bağlantısı tahmin edilemez, kod ise kısadır. Güncel karar altı hane ve hesap başına yanlış kod tavanıdır (2026-10-16); sekiz hane için hesaplanan eski olasılık yalnız 15 Ekim tarihsel ekine aittir.
 - **Kayıtla açılan hesap Verified YTÜ account değildir.** Adı kilitsiz, bölümü elle yazılır, Place'e giremez. Yönetici üye alırken rozete bakar. YTÜ bağlanınca kilit gelir.
 - **Application Initiated Actions.** CONTEXT.md'deki "Application Initiated Actions as the product path" yasağı Account center'ın kimlik, kimlik bilgisi ve e-posta değişikliklerini kapsar; onlar yine yalnız sky-account SPI'sinden geçer. İki yer bu yasağın dışındadır ve yeni değildir:

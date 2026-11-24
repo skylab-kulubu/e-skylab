@@ -56,7 +56,7 @@ Kaynaklar:
 - **Erişim gözden geçirme ve "değişiklik yok" seçeneği.** Entra access reviews ve Okta Access Certification kampanyalarının karşılığıdır; Entra'da yanıtsız kalanlar için "değişiklik yok" seçilebilir.
 
 **Sapmalar (hepsi):**
-1. **Süre dolunca erişim kalır** (Yusuf, 2026-10-12 22:15). İncelenen ürünlerin hepsi süre dolunca erişimi kendiliğinden kaldırıyor. Bizde yalnız işaretlenir ve bildirilir; çıkarma elledir.
+1. **Süre dolunca erişim hemen kalkmaz** (Yusuf, 2026-10-12 22:15; 2026-11-24 güncellemesi). İncelenen ürünlerin hepsi süre dolunca erişimi kendiliğinden kaldırıyor. Bizde önce işaretlenir ve bildirilir; bitişten 30 gün sonra kendiliğinden kalkar.
 2. **Süre sabit bir tarihten sayılır** (dönem sonu), atama anından değil.
 3. **Uyarı iki kez gider:** 14 gün ve 1 gün önce. Google'da tek uyarı var, 72 saat önce.
 4. **Sıradan üyeliğe süre konmaz.** Yalnız yönetim üyeliği süreli.

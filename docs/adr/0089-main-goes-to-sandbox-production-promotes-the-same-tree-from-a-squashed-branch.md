@@ -46,8 +46,7 @@ Karar (Yusuf: main → production tek squash, Eylül 2026; tek komut, 2026-11-22
 2. **Kademeli yayın (canary) yok.** Google SRE canary'yi, Microsoft halka halka yayını önerir. Tek sunucu ve küçük trafikte bunun yerine sandbox ön ortamı, özet doğrulaması ve aynı imajla geri dönüş var.
 3. **GitOps yok.** OpenGitOps, Argo CD ve Flux istenen durumu Git'te tutar ve sürekli uzlaştırır. Dokploy'un istenen durumu (env, ağ, alan adı) kendi veritabanındadır ve GitOps desteği yoktur; sapmayı olgu betikleri yakalar. Yayın başına kopyalanan sihirbaz SRE'nin "toil" dediği iştir (Consequences'taki açık iş).
 4. **core-frontend her commit için iki imaj basar.** `NEXT_PUBLIC_*` adresleri derlemede gömülür, production baytları sandbox'ta koşmamış olur (12-factor III). Aynı ağaçtan, aynı koşuda derlenir.
-5. **Bazı depolarda yayın, ağacın main'de test edilmiş olmasına bağlı değildir** (skylab-site, arge, artlab-site, cms-backend, yildizplace-backend, ekstremspor, Forms): production push'unda imaj yeniden derlenir. arge'nin testi PR'da ve main'de koşar, ama production yayını o koşuya bakmaz; yildizplace-backend production'da `mvn verify` koşup derler. Karar 3'e ve SSDF'ye aykırıdır; sahiplerinin işidir.
-6. **Değişiklik kaydı GitHub Deployments'ta değil,** hub'daki yayın günlüklerindedir. DORA'nın dört ölçütünden yalnız yayın sıklığı ölçülebiliyor.
+5. **Değişiklik kaydı GitHub Deployments'ta değil,** hub'daki yayın günlüklerindedir. DORA'nın dört ölçütünden yalnız yayın sıklığı ölçülebiliyor.
 
 ## Considered Options
 

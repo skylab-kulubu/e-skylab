@@ -58,7 +58,6 @@ Kaynaklar:
 1. **Dizinin kurallarımızı bilmeyen bir konsolu var.** Entra'da kurallar ve kayıt dizinin kendisindedir. Bizde kurallar core'da, dizin Keycloak'ta. Bunu teknik olarak değil, politika ve tespitle kapatıyoruz.
 2. **Tespit gecikmelidir:** birkaç dakikada bir okunur.
 3. **Deneme yılda bir yapılır.** Entra 90 günde bir önerir; bizde dönem devriyle birlikte.
-4. **Konsol yazıcısı sayısı** Microsoft'un "beşten az Global Administrator" önerisini aşar (ADR-0076, sapma 6).
 
 ## Considered Options
 

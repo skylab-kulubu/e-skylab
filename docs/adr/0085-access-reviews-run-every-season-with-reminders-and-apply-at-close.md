@@ -42,7 +42,7 @@ Kaynaklar:
 - **Gizlilik metnine bir ek gelir:** "kalsın / çıksın" kararları ve 30 günlük süre. Production'da `apply` açılmadan önce yayında olur.
 - **ADR-0062 tablosuna bir satır eklenir:** `access_review_items_age`.
 - **Uygulama adımının sunucuda yetki okuması gerekir.** Kapanış işi, kararı verenin bugünkü gruplarını Keycloak'tan okuyarak yetkiyi denetler. Davet kabulü (ADR-0084) de aynı yardımcıyı kullanır.
-- **Bilinçli risk:** yanıt vermeyen liderin ekibinde kimse çıkmaz. D-7 yükseltmesi ve kapanış özeti bunu görünür tutar.
+- **Yanıtsız ekipte üyelikler kalır:** yanıt vermeyen liderin ekibinde kimse çıkmaz. D-7 yükseltmesi ve kapanış özeti bunu görünür tutar.
 
 ## Endüstri uygulamasıyla karşılaştırma
 

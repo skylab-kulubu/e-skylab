@@ -4,7 +4,7 @@ status: accepted
 
 # Veri servisleri yalnız onları kullanan uygulamalarla paylaştıkları özel ağlardadır; `dokploy-network`'te yalnız Traefik'in ulaşması gerekenler kalır
 
-Bugün sunucudaki her Dokploy servisi tek bir overlay ağında, `dokploy-network`'te duruyor (2026-10-03 sayımında 36 konteyner). Platform Postgres'i ve Redis'i (production ve sandbox), kapı Redis'i (account-access), OpenBao, Dokploy'un kendi Postgres'i, etkinlik uygulamalarının veritabanları ve Traefik aynı ağda. Etkinlik uygulamaları da orada. Bir veritabanını bugün yalnız parolası koruyor. ADR-0057 bunu bilerek kabul etmişti ("Ağ yalıtımı yok"). Bu ADR o maddeyi değiştirir.
+Bugün sunucudaki her Dokploy servisi tek bir overlay ağında, `dokploy-network`'te duruyor (2026-10-03 sayımında 36 konteyner). Platform Postgres'i ve Redis'i (production ve sandbox), kapı Redis'i (account-access), OpenBao, Dokploy'un kendi Postgres'i, etkinlik uygulamalarının veritabanları ve Traefik aynı ağda. Etkinlik uygulamaları da orada. ADR-0057 ağ yalıtımı kurmamıştı. Bu ADR o maddeyi değiştirir.
 
 Karar (Yusuf, 2026-10-03):
 

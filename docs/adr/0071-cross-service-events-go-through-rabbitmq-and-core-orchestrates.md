@@ -48,7 +48,6 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 7. **Güvenlik.**
    - Her servisin kendi RabbitMQ kullanıcısı var: yalnız kendi exchange'ine kendi önekiyle yazar ya da yalnız kendi kuyruğunu okur, hiçbir şey kuramaz.
    - Parolalar OpenBao'da (ADR-0049) ve gece döner. Bu ADR, ADR-0050'yi yeni bir `rabbitmq` sınıfıyla genişletir: veritabanı gibi iki kullanıcı dönüşümlü, Keycloak'unki pazar gecesi.
-   - İç ağda TLS ilk sürümde yok. İkinci sunucu gelirse açılır.
 8. **Keycloak.**
    - Mevcut sağlayıcı kullanılır, biçimi korunur.
    - Fork, IP'yi, `sessionId`'yi, `details`'i ve admin temsilini yayımlamayacak ve yalnız seçilen olay türlerini gönderecek şekilde değişir.
@@ -115,15 +114,14 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 2. **CloudEvents'in AMQP bağlaması AMQP 1.0 içindir.** İstemcilerimiz AMQP 0-9-1, yalnız yapılı mod kullanılır.
 3. **Tür adlarında ters DNS öneki yok.** Platform içi.
 4. **Keycloak olayları CloudEvents değil, giden kutusuz ve confirms'süz.** Kayıp periyodik eşitlemeyle kapanır.
-5. **İç ağda TLS yok** (tek sunucu, `internal` ağ, mesajda yalnız kimlik). Kapı Redis'inde TLS var.
-6. **Gecikmeli yeniden deneme kuyruğu yok.** Süreç içinde birkaç deneme, sonra DLQ ve elle geri alma.
-7. **Broker tarafında tekrar eleme yok** (Service Bus'ta var). Tekrar eleme tüketicide.
-8. **Topolojiyi ops kurar, kütüphaneler kurmaz.** Servis kullanıcılarına configure izni verilmez.
-9. **Giden kutusu 7 gün sonra vazgeçer** (Forms'un bugünkü davranışı). Kalıpta aktarıcı başarıya kadar dener. Arayı günlük çekme kapatır.
-10. **Komutlar broker'dan geçmez.** Microsoft rehberi zamansal bağımlılığı azaltmak için asenkron komut mesajlarını da önerir. Bizde komutun sonucu bekleniyor, silme komutundaki adres kalıcı bir kopyaya (kuyruk, DLQ) yazılmamalı (ADR-0051).
-11. **Şema kaydı ve AsyncAPI kataloğu yok.** Sözleşme bu ADR'da, SPEC'te ve kodda. Makinece okunur katalog sonraki adım.
-12. **Tek broker örneği tek arıza noktası.** Kesintide yayın giden kutusunda bekler, tüketiciler yeniden bağlanır, Keycloak olayları kaybolur ve eşitleme turu yakalar.
-13. **İki alan servisi çağrısı core'a gider** (karar 13 ve 14): Forms'un rıza yazımı ve SkyMail'in kitle okuması. Saf olay mimarisinde ikisi de olayla yapılırdı (rıza olayı, kitlenin olayla beslenen kopyası). Rızada ispat yükü, kitlede güncellik için eşzamanlı çağrı seçildi.
+5. **Gecikmeli yeniden deneme kuyruğu yok.** Süreç içinde birkaç deneme, sonra DLQ ve elle geri alma.
+6. **Broker tarafında tekrar eleme yok** (Service Bus'ta var). Tekrar eleme tüketicide.
+7. **Topolojiyi ops kurar, kütüphaneler kurmaz.** Servis kullanıcılarına configure izni verilmez.
+8. **Giden kutusu 7 gün sonra vazgeçer** (Forms'un bugünkü davranışı). Kalıpta aktarıcı başarıya kadar dener. Arayı günlük çekme kapatır.
+9. **Komutlar broker'dan geçmez.** Microsoft rehberi zamansal bağımlılığı azaltmak için asenkron komut mesajlarını da önerir. Bizde komutun sonucu bekleniyor, silme komutundaki adres kalıcı bir kopyaya (kuyruk, DLQ) yazılmamalı (ADR-0051).
+10. **Şema kaydı ve AsyncAPI kataloğu yok.** Sözleşme bu ADR'da, SPEC'te ve kodda. Makinece okunur katalog sonraki adım.
+11. **Tek broker örneği tek arıza noktası.** Kesintide yayın giden kutusunda bekler, tüketiciler yeniden bağlanır, Keycloak olayları kaybolur ve eşitleme turu yakalar.
+12. **İki alan servisi çağrısı core'a gider** (karar 13 ve 14): Forms'un rıza yazımı ve SkyMail'in kitle okuması. Saf olay mimarisinde ikisi de olayla yapılırdı (rıza olayı, kitlenin olayla beslenen kopyası). Rızada ispat yükü, kitlede güncellik için eşzamanlı çağrı seçildi.
 
 ## Considered Options
 
@@ -173,7 +171,7 @@ Kararlar (Yusuf, 2026-10-25 ve 2026-10-26). Karar 1–16 aynen geçerlidir. Bu e
 
 **Endüstri uygulamasıyla karşılaştırma (bu ek).**
 - **Uyan:** `traceparent` CloudEvents'in Distributed Tracing uzantısı ve W3C Trace Context'tir.
-- **Sapma 14. `traceparent` var, toplayıcı yok.** OpenTelemetry'de iz bir toplayıcıya gider; bizde yalnız tüketici loguna yazılır. Yayıncı ve tüketici logları zaten olay `id`'siyle bağlanır. Toplayıcı ayrı bir iştir.
+- **Sapma 13. `traceparent` var, toplayıcı yok.** OpenTelemetry'de iz bir toplayıcıya gider; bizde yalnız tüketici loguna yazılır. Yayıncı ve tüketici logları zaten olay `id`'siyle bağlanır. Toplayıcı ayrı bir iştir.
 - **Sapma 4'ün devamı.** Keycloak grup silme olayı da giden kutusuz ve confirms'süzdür. Kaçan olayı core'un günlük temizlik turu kapatır.
 
 ## Ek (2026-11-24): SkyMail ortak teslim hizmetidir; her ürün kendi işlem postasını gönderir

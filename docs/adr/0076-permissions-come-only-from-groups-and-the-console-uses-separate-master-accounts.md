@@ -74,7 +74,7 @@ Kaynaklar:
 - **Token.** `/ROLLER` yolları token'ın `groups` claim'inde görünür. İleride grup mapper'ına bir önek süzgeci eklenebilir (Entra'nın "groups assigned to the application" karşılığı).
 - **Forms etiketi.** Forms giriş client'ı `realm_access`'i yalnız etiket için okuyor. Realm rolleri kalkınca Forms kenar çubuğundaki rol etiketi değişir; yetki değişmez. Forms'un sahibine bildirildi.
 - **SkyApp.** SkyApp realm rollerini yalnız bilgi amaçlı tutuyor. Değişiklik ona sözleşme notuyla bildirilir; uygulamaya dokunulmaz.
-- **Konsol hesaplarının bedeli.** Keycloak'ın belgesi master'da kullanıcı açmaktan kaçınmayı öneriyor. Bu bilinçli bir sapmadır: tek sınır ayrı realm. Her konsol hesabı ilk girişte passkey kaydetmelidir; kaydetmeyen konsola giremez. e-skylab'ın kendi konsolu kullanılmaz: kimse orada yönetim rolü taşımadığı için açılmaz.
+- **Konsol hesapları master realm'dedir.** Her konsol hesabı ilk girişte passkey kaydetmelidir; kaydetmeyen konsola giremez. e-skylab'ın kendi konsolu kullanılmaz: kimse orada yönetim rolü taşımadığı için açılmaz.
 - **Keycloak'ın sunucu yöneticisi** (`kc.sh bootstrap-admin` ile kurtarma) bu kararın dışındadır; ADR-0079'dadır.
 - **Göç sırası.** Konsol (master hesapları), doğrudan rollerin `/ROLLER`'e taşınması, realm rollerinin kaldırılması, eski client'ların kapatılması, lidersiz ekiplerin tamamlanması. Her adım önce sandbox realm'inde denenir ve geri alınabilir. Tek istisna eski client'ların silinmesidir: 14 günlük izlemeden sonra ayrı bir adımla yapılır.
 - **CONTEXT.md'de değişenler:**
@@ -104,16 +104,12 @@ Kaynaklar:
 
 **Sapmalar (hepsi):**
 1. **İki düzlem.** Entra'da tek dizin var. Bizde Keycloak ve core iki ayrı yetki düzlemi. Keycloak'ta realm içinde ayrıcalıklı katman olmadığı için yönetici hesapları ayrı realm'dedir.
-2. **Master'da kullanıcı.** Keycloak master'da kullanıcı açmamayı öneriyor; biz konsol hesaplarını orada açıyoruz. Gerekçe yukarıdaki yükseltme yolu.
-3. **Rol eşlemesi alt gruplara akar.** Entra'da uygulama ataması iç içe gruba akmaz, Keycloak'ta akar. Bunu yaprak kuralı (K4) kapatır.
-4. **Role-assignable gruplar iç içe olmaz.** Bizde YK'nın görev alt grupları var ve YK'nın yetkisini alırlar. Privileged olmak bir bayrakla değil, sabit köklerle belirlenir.
-5. **Örgüt şeması.** Entra'da örgüt şeması kullanıcı özniteliklerindedir, gruplar düzdür. Bizde örgüt şeması grup ağacıdır, YK görevleri birer alt gruptur (GitHub'ın iç içe takımları ve Google Cloud'un iç içe `org.` grupları gibi). Yetkinin durabildiği yerler K4 ile sınırlıdır.
-6. **Yönetici sayısı.** Microsoft beşten az Global Administrator ve ondan az ayrıcalıklı rol ataması önerir. Bizde e-skylab'ı tam yöneten altı konsol yazıcısı var, ayrıca master `admin` taşıyan işletme hesabı ve iki acil hesap (S2). Telafi: kişi başına ayrı hesap, passkey, konsolun önündeki ek erişim denetimi, konsol değişikliklerinin core'un denetim kaydına girmesi (ADR-0079).
-7. **PIM yok.** Entra'da ayrıcalıklı rol tam zamanında ve süreli verilir. Bizde konsol üyeliği kalıcıdır (lisans ve kulüp ölçeği). Süreli yönetim üyeliği yalnız YK, DK ve Leader gruplarındadır ve yalnız işaret koyar (ADR-0078).
-8. **Grup süzgeci yok.** Entra token'a yalnız uygulamaya atanmış grupları koyabilir. Bizde `/ROLLER` yolları her token'ın `groups`'unda görünür.
-9. **Ad ayırıcısı ve önekler.** Graph `.` kullanır, biz `:` kullanıyoruz. Bazı client'larda tarihsel önek var (`skymail:`, `skyforms:`, `place:`); yeniden adlandırılmıyor (karar 10).
-10. **Ad politikası yetki içindir.** Entra'nın adlandırma politikası yalnız Microsoft 365 gruplarında var ve önek ya da sonek ekler. Bizde ad bir yetki anahtarı olduğu için kural daha sıkıdır (ADR-0065 karar 7, N2, N3).
-11. **Kişiye doğrudan uygulama rolü yasak** (K1). Entra uygulama rolünü kişiye doğrudan atamaya izin verir; biz hiç izin vermiyoruz, yani daha sıkıyız.
+2. **Rol eşlemesi alt gruplara akar.** Entra'da uygulama ataması iç içe gruba akmaz, Keycloak'ta akar. Bunu yaprak kuralı (K4) kapatır.
+3. **Role-assignable gruplar iç içe olmaz.** Bizde YK'nın görev alt grupları var ve YK'nın yetkisini alırlar. Privileged olmak bir bayrakla değil, sabit köklerle belirlenir.
+4. **Örgüt şeması.** Entra'da örgüt şeması kullanıcı özniteliklerindedir, gruplar düzdür. Bizde örgüt şeması grup ağacıdır, YK görevleri birer alt gruptur (GitHub'ın iç içe takımları ve Google Cloud'un iç içe `org.` grupları gibi). Yetkinin durabildiği yerler K4 ile sınırlıdır.
+5. **Ad ayırıcısı ve önekler.** Graph `.` kullanır, biz `:` kullanıyoruz. Bazı client'larda tarihsel önek var (`skymail:`, `skyforms:`, `place:`); yeniden adlandırılmıyor (karar 10).
+6. **Ad politikası yetki içindir.** Entra'nın adlandırma politikası yalnız Microsoft 365 gruplarında var ve önek ya da sonek ekler. Bizde ad bir yetki anahtarı olduğu için kural daha sıkıdır (ADR-0065 karar 7, N2, N3).
+7. **Kişiye doğrudan uygulama rolü yasak** (K1). Entra uygulama rolünü kişiye doğrudan atamaya izin verir; biz hiç izin vermiyoruz, yani daha sıkıyız.
 
 ## Considered Options
 
@@ -157,4 +153,4 @@ Karar (Yusuf, 2026-10-23, ekip-yetkileri bilet 15; sektör denetimiyle 2026-11-2
 1. **Uygulama rolü kişiye ve ekip gruplarına atanabilir.** ADMIN ve YK panelin Uygulamalar sayfasından bir uygulamanın rolünü bir ekibe, alt ekibe, bunların Leader grubuna ya da doğrudan bir kişiye atar ve kaldırır; DK okur. Her değişiklik ve okuyabilen birinin reddedilen her denemesi ekip denetim kaydına bir satırdır (`app.assign`, `app.unassign`). Microsoft Entra'nın Enterprise apps → "Users and groups" ekranının karşılığıdır.
 2. **Yönetici rolü yine yalnız Privileged kökte, `/ROLLER`'de ve en üst ekiplerin Leader gruplarında** (core `docs/app-assignments.md`). core'un Protected sınıflamasında yönetici rolü sayılan bir rol Uygulamalar sayfasından kişiye ya da ekip grubuna atanamaz. Privileged köklerdeki, `/ROLLER` yapraklarındaki, Leader gruplarındaki konumdan gelen (K4/2, karar 6) ve servis hesaplarındaki eşlemeler kodda (Keycloak'ın uzlaştırıcısında) durur; panel onları kilitli gösterir, değiştiremez.
 3. **K1 ve K4 yalnız yönetici rolleri için geçerlidir.** "Kişiye rol yok" ve "rol yalnız üç yerde" kuralları uygulama rolüne uygulanmaz. K2 (realm rolü yok) ve K3 değişmez.
-4. **Düşen cümleler.** Sapmalar listesinin 11. maddesi ("Kişiye doğrudan uygulama rolü yasak … daha sıkıyız") düşer: artık Entra gibi atıyoruz. Consequences'taki "Kişiye doğrudan rol kalmaz" cümlesi uygulama rolü için geçmez.
+4. **Düşen cümleler.** Sapmalar listesinin 7. maddesi ("Kişiye doğrudan uygulama rolü yasak … daha sıkıyız") düşer: artık Entra gibi atıyoruz. Consequences'taki "Kişiye doğrudan rol kalmaz" cümlesi uygulama rolü için geçmez.
