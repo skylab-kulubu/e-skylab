@@ -45,4 +45,4 @@ Karar (Yusuf, 2026-11-23; 2026-11-24 akşamı güncellendi: "varsayılanda da ol
 
 **Sapmalar:**
 1. **Varsayılan şablonda QR var.** Credly'de basılı QR yoktur; bizde varsayılan QR'lıdır, kaldırmak düzenleyenin seçimidir.
-2. **Sitede hesap ya da rozet cüzdanı yok.** Doğrulama yalnız seriyle yapılır: `yildizskylab.com/sertifika` sayfasına numara girilir (Coursera ve Credly'deki numarayla doğrulama kalıbı), kişinin profil sayfası yoktur.
+2. **Sitede hesap ya da rozet cüzdanı yok.** Doğrulama yalnız seriyle yapılır: `yildizskylab.com/sertifika` sayfasına numara girilir ve `yildizskylab.com/sertifika/{seri}` açılır (Coursera'nın `verify/{kod}` adresi gibi); kişinin profil sayfası yoktur.
