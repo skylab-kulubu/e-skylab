@@ -87,22 +87,16 @@ Her adım ayrı bir wizard koşusudur; bir sonrakine, öncekinin ertesi günkü 
 - Değişiklik geri dönüşlü ve önce sandbox'ta.
 
 **Sapmalar (hepsi):**
-1. **Overlay şifresiz** (CIS Docker Benchmark v1.8.0 §7.3 "bütün Swarm overlay ağları şifreli olmalı"). Docker'ın `--opt encrypted`'i düğümler arasında IPsec tüneli kurar; tek düğümde tünel yoktur, trafik hiç VXLAN'a çıkmaz, kazanç sıfır, Docker belgesi ise "kayda değer performans bedeli" diyor. Dokploy da şifreli ağ kuramaz. VXLAN portları internete kapalı (post-cutover 12). Sunucuya ikinci bir düğüm eklenirse bu sapma kapanmalıdır.
-2. **Etkinlik uygulamaları ve platform aynı sunucuda** (NIST SP 800-190 §4.3.4, farklı hassasiyetteki iş yüklerini ayrı makinelerde tutmak). ADR-0057'den devralınan kabul; kaynak sınırlarıyla hafifletiliyor.
-3. **Ayrım ağ üyeliği düzeyinde, akış düzeyinde değil.** Kubernetes NetworkPolicy'nin "varsayılan red + port başına izin" karşılığı yok. Aynı veri ağındaki iki uygulama birbirine o ağdan da ulaşabilir; core, Redis'i kullanmasa da Postgres'le aynı ağdaki Redis'e ulaşabilir.
-4. **Etkinlik uygulamaları platform uygulamalarıyla `dokploy-network`'te kalıyor** (Traefik'in tek ağda olması). Uygulamadan uygulamaya iç erişimi kimlik doğrulaması korur, ağ korumaz.
-5. **`sky-lab-production-data` ve `sky-lab-secrets` `attachable`.** Docker soketine erişen biri (root) bu ağlara bir konteyner bağlayabilir. Rotatorun kapı adımı ve OpenBao arayüz tüneli bunu gerektirir; root'a karşı ağ zaten koruma değildir. Öteki ağlarda kapalı.
-6. **Veritabanı bağlantıları TLS'siz** (Microsoft cloud security benchmark DP-3, aktarılan veriyi şifrelemek). Trafik tek makinenin içinde, özel ağda kalır; kapı Redis'i zaten mTLS.
-7. **Ölü adam geri dönüşü Dokploy'un veritabanına doğrudan SQL yazar** (API'yi ve denetim kaydını atlar). API anahtarı diske konmasın diye seçildi; yalnız geri dönüşte ve yalnız ağ alanlarına.
+1. **Etkinlik uygulamaları ve platform aynı sunucuda** (NIST SP 800-190 §4.3.4, farklı hassasiyetteki iş yüklerini ayrı makinelerde tutmak). ADR-0057'den devralınan kabul; kaynak sınırlarıyla hafifletiliyor.
 
 ## Considered Options
 
-- **Bugünkü kabulü sürdürmek (ADR-0057):** Etkinlik uygulaması ya da başka bir konteyner ele geçerse platform veritabanlarına ve Dokploy'un veritabanına parola denemesi yapabilir. Dokploy veritabanı eski sabit parolayla duruyorsa doğrudan okunabilir.
+- **Bugünkü kabulü sürdürmek (ADR-0057):** veri servisleri uygulamalarla aynı ağda kalırdı.
 - **Docker'da elle `docker network connect` / `--network-add`:** Dokploy'un ilk deploy'u siler. Yalnız Dokploy'un yönetmediği servislerde kullanılır.
 - **Tek bir `skylab-platform-internal` ağı (production ve sandbox birlikte):** Sandbox uygulamaları production veritabanına ulaşırdı; ortam ayrımı bozulur.
-- **Her veri servisine ayrı ağ:** Daha ince ayrım ama Dokploy'da her uygulamaya üç dört ağ, panelde kalabalık. Ortam başına bir veri ağı bu ölçekte yeterli; sapma 3 olarak kayıtlı.
+- **Her veri servisine ayrı ağ:** Daha ince ayrım ama Dokploy'da her uygulamaya üç dört ağ, panelde kalabalık. Ortam başına bir veri ağı bu ölçekte yeterli.
 - **Etkinlik uygulamalarını da `dokploy-network`'ten çıkarmak (compose + Isolated Deployment ya da Traefik'i elle bağlayan systemd birimi):** Uygulamadan uygulamaya erişimi de keser ama Traefik yeniden yaratıldığında bir sonraki deploy'a kadar yönlendirme kopar. Ayrı karar (ticket 10).
-- **Şifreli overlay:** Tek düğümde etkisiz, Dokploy kuramıyor; sapma 1.
+- **Şifreli overlay:** tek düğümde etkisiz, Dokploy kuramıyor.
 
 ## Ek: tek ClamAV, ortamlar arası ikinci ağ `sky-lab-scan` (2026-10-05)
 
@@ -115,7 +109,7 @@ Neden tek kurulum: bellek. clamd imza veritabanını yükleyince ~1 GiB tutar ve
 | `sky-lab-scan` | clamav (production projesinde), core (production), core (sandbox) | hayır | hayır | freshclam imza veritabanını internetten indirir, bu yüzden internal değil. clamav `dokploy-network`'ten ayrılır; alan adı ve yayınlanmış portu yok. İki core `dokploy-network`'te kalır ve bu ağı ek olarak alır. |
 
 - **Bu, "bir ağ bir ortama aittir" kuralının OpenBao'dan sonra ikinci istisnasıdır.** Ad, ortamı olmayanların kuralıyla verildi (`<proje>-<amaç>`), çünkü ağ iki ortama hizmet ediyor; `sky-lab-secrets` gibi.
-- **Koruma yalnız ağ üyeliğidir.** clamd'nin kimlik denetimi yoktur; tarama dışında `SHUTDOWN` gibi komutları da vardır. Bu yüzden `dokploy-network`'te durmaz. Üyelik Dokploy'un alanlarına yazılır, her deploy aynı ağları kurar:
+- **clamd yalnız bu ağın üyelerine açıktır;** `dokploy-network`'te durmaz. Üyelik Dokploy'un alanlarına yazılır, her deploy aynı ağları kurar:
   - clamav: `networkIds` = [`sky-lab-scan`] ve `detachDokployNetwork`;
   - core'lar: var olan `networkIds`'e eklenir.
 - **Yalıtımı kurulum wizard'ı her koşuda denetler:**
@@ -123,8 +117,8 @@ Neden tek kurulum: bellek. clamd imza veritabanını yükleyince ~1 GiB tutar ve
   - Aynı yoklama clamav'ın kendi ad alanından PONG almalıdır. Bu, yoklama aracının çalıştığını kanıtlar.
   - İki core'dan EICAR öz-denemesi FOUND dönmelidir.
   - Sonuçlardan biri tutmazsa wizard FAIL verir.
-- **Ortamlar arası etki.** İki core aynı ağda olduğu için sandbox core'u production core'una bu ağdan da ulaşabilir. Ama ikisi zaten `dokploy-network`'te birbirine ulaşıyordu; yeni bir yol açılmaz (sapma 4).
-  - Sandbox core'unu ele geçiren biri clamd'yi meşgul edebilir ya da kapatabilir. Tarama durur, Swarm clamd'yi yeniden başlatır.
+- **Ortamlar arası etki.** İki core bu ağda buluşur; ikisi zaten `dokploy-network`'te buluşuyordu, yeni bir yol açılmaz.
+  - clamd durursa tarama durur, Swarm clamd'yi yeniden başlatır.
   - core taranamayan dosyayı hiçbir zaman temiz saymaz (fail-closed). Production'daki dosyalar `scanning` durumunda bekler ve açılmaz.
   - Gizlilik etkisi yoktur: clamd dosyayı yalnız tarar, saklamaz ve kimseye geri vermez.
 - **Geçiş sırası 4 (production Postgres ve Redis)** core'un `networkIds`'ine yalnız ekleme yapar; `sky-lab-scan`'i korur. İki ortamın core'unun bu ağda buluşması o adımda engel sayılmaz.
@@ -132,8 +126,7 @@ Neden tek kurulum: bellek. clamd imza veritabanını yükleyince ~1 GiB tutar ve
 
 Sapmalar (bu ekle gelenler):
 
-8. **Ortamlar arası ikinci ağ.** Ortam ayrımı (NIST SP 800-190 §4.3.3) bir yardımcı servis için kaldırıldı. Bedeli yukarıda: yalnız erişilebilirlik, fail-closed.
-9. **clamd protokolü kimliksiz ve şifresiz.** Gerekçe sapma 6 ile aynı: trafik tek makinede ve özel ağda kalır.
+2. **Ortamlar arası ikinci ağ.** Ortam ayrımı (NIST SP 800-190 §4.3.3) bir yardımcı servis için kaldırıldı. Bedeli yukarıda: yalnız erişilebilirlik, fail-closed.
 
 Değerlendirilen ve seçilmeyenler:
 

@@ -16,7 +16,7 @@ Karar (Yusuf: main → production tek squash, Eylül 2026; tek komut, 2026-11-22
    - **core-backend:** GHCR iş akışı aynı ağacın tam test koşusunun yeşil geçtiğini arar (`scripts/ci/tested-tree.sh`) ve main'in `tree-<ağaç>` imajını `:production` ve commit etiketiyle yeniden etiketler.
    - **skymail-backend, skymail-frontend:** main'deki `gate` koşusunu GitHub API'siyle bulur, o koşunun `sha-` etiketli imajını terfi ettirir.
    - **account-center:** imaj `production-<sha7>` etiketiyle terfi eder.
-   - **core-frontend:** `production-candidate` imajı terfi eder (bu imaj ayrı derlenir, sapma 5).
+   - **core-frontend:** `production-candidate` imajı terfi eder (bu imaj ayrı derlenir, sapma 4).
    - **e-skylab-keycloak:** production push'unda CI'ın test ettiği aday paket yayımlanır; CI'daki adayın SHA-256'sı yayında yeniden doğrulanır.
    - Yeni depolar bu kalıpla açılır.
 4. **Hotfix yolu.** main yayınlanmamış iş taşıyorsa ve yalnız bir düzeltme çıkacaksa: production'dan `hotfix/<ad>` dalı açılır, düzeltmenin main'deki commit'leri cherry-pick edilir, PR production'a açılır. Bu ağaç main'de hiç olmadığı için CI onu kendi koşusunda test eder ve imajı yeniden derler (core-backend'de iş akışı bunu kendisi ayırır). Sonraki tam yayın (ağaç = main) onu çakışmasız içine alır.
@@ -44,11 +44,10 @@ Karar (Yusuf: main → production tek squash, Eylül 2026; tek komut, 2026-11-22
 **Sapmalar (hepsi):**
 1. **Ortam dalı.** Sektörde yayını genelde değişmez bir sürüm etiketi ya da GitHub Deployments kaydı belirler. Bizde squash'lı production dalı belirler ve `git log` yanıltır. Dal, kancanın tetikleyicisi ve PR'daki `gate`'in yeridir; ağaç eşitliği sürümün kanıtıdır.
 2. **Kademeli yayın (canary) yok.** Google SRE canary'yi, Microsoft halka halka yayını önerir. Tek sunucu ve küçük trafikte bunun yerine sandbox ön ortamı, özet doğrulaması ve aynı imajla geri dönüş var.
-3. **Onay kapısı yok, yayın tek kişinin Mac'inden** (karar 7). GitHub Environments'ın "required reviewers" kuralı ve yalnız production dalından deploy kullanılmıyor. Tek kişi bağımlılığı bilinçli kabul.
-4. **GitOps yok.** OpenGitOps, Argo CD ve Flux istenen durumu Git'te tutar ve sürekli uzlaştırır. Dokploy'un istenen durumu (env, ağ, alan adı) kendi veritabanındadır ve GitOps desteği yoktur; sapmayı olgu betikleri yakalar. Yayın başına kopyalanan sihirbaz SRE'nin "toil" dediği iştir (Consequences'taki açık iş).
-5. **core-frontend her commit için iki imaj basar.** `NEXT_PUBLIC_*` adresleri derlemede gömülür, production baytları sandbox'ta koşmamış olur (12-factor III). Aynı ağaçtan, aynı koşuda derlenir.
-6. **Bazı depolarda yayın, ağacın main'de test edilmiş olmasına bağlı değildir** (skylab-site, arge, artlab-site, cms-backend, yildizplace-backend, ekstremspor, Forms): production push'unda imaj yeniden derlenir. arge'nin testi PR'da ve main'de koşar, ama production yayını o koşuya bakmaz; yildizplace-backend production'da `mvn verify` koşup derler. Karar 3'e ve SSDF'ye aykırıdır; sahiplerinin işidir.
-7. **Değişiklik kaydı GitHub Deployments'ta değil,** hub'daki yayın günlüklerindedir. DORA'nın dört ölçütünden yalnız yayın sıklığı ölçülebiliyor.
+3. **GitOps yok.** OpenGitOps, Argo CD ve Flux istenen durumu Git'te tutar ve sürekli uzlaştırır. Dokploy'un istenen durumu (env, ağ, alan adı) kendi veritabanındadır ve GitOps desteği yoktur; sapmayı olgu betikleri yakalar. Yayın başına kopyalanan sihirbaz SRE'nin "toil" dediği iştir (Consequences'taki açık iş).
+4. **core-frontend her commit için iki imaj basar.** `NEXT_PUBLIC_*` adresleri derlemede gömülür, production baytları sandbox'ta koşmamış olur (12-factor III). Aynı ağaçtan, aynı koşuda derlenir.
+5. **Bazı depolarda yayın, ağacın main'de test edilmiş olmasına bağlı değildir** (skylab-site, arge, artlab-site, cms-backend, yildizplace-backend, ekstremspor, Forms): production push'unda imaj yeniden derlenir. arge'nin testi PR'da ve main'de koşar, ama production yayını o koşuya bakmaz; yildizplace-backend production'da `mvn verify` koşup derler. Karar 3'e ve SSDF'ye aykırıdır; sahiplerinin işidir.
+6. **Değişiklik kaydı GitHub Deployments'ta değil,** hub'daki yayın günlüklerindedir. DORA'nın dört ölçütünden yalnız yayın sıklığı ölçülebiliyor.
 
 ## Considered Options
 
