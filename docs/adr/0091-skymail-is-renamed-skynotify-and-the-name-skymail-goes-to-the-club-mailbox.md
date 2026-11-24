@@ -26,15 +26,13 @@ Karar (Yusuf, 2026-11-24):
    - Doğrulama tutmazsa sihirbazın geri alma yolu eski adları geri getirir.
 5. **Forms Fatih'indir.** Forms'taki adlar için ona not gider. SkyNotify'ın Forms'un ayarında yazılı iç adresi, Fatih ayarını değiştirene kadar ağda eski adla da çözülür. Bu tek istisna Fatih'in geçişiyle kalkar.
 6. **Eski adlar ortak posta kutusu ürününe ancak pencere bitince verilir.** Eski depo adları için GitHub bir yönlendirme tutar. Aynı adla yeni bir depo açılınca bu yönlendirme kalkar ve eski bağlantılar yeni ürünü gösterir. Bu yüzden yeni ürünün depoları açılmadan önce yerel klonların uzak adresleri, sihirbazlar ve iş akışları yeni ada geçmiş olur. Eski GHCR paketleri pencereden sonra silinir. Böylece yeni ürünün imajları SkyNotify'ın eski imajlarıyla aynı pakete düşmez.
-7. **Belgeler.** Kabul edilmiş ADR'lerin metni değiştirilmez. 2026-11-24'ten önce yazılmış ADR'lerdeki "SkyMail" ve `skymail` bugünkü SkyNotify'dır. CONTEXT.md, README'ler ve depo kataloğu yeni adları kullanır.
-8. **Açık (önerisi "kalsın"):**
-   - Gönderilmiş postalardaki genel bağlantılar için `/api/skymail/t/` (açılma ve tıklama) ve `/api/skymail/u/` (tek tık çıkış) yolları, SkyNotify'a giden kalıcı bir yönlendirme olarak kalır. Bu iki yol silinirse takipli eski postalardaki her bağlantı ve eski toplu postalardaki tek tık çıkış bağlantısı çalışmaz (RFC 8058). Yeni ürün `/api/skymail` yolunu kullanmaz; o `mail.`'de durur.
-   - Geri dönen posta okuyucusu, pencereden önce gönderilmiş postaların geri dönüşleri için eski `X-SkyMail-Queue-Id` başlığını da okur. Yeni postalar yalnız yeni başlıkla gider. Okunmazsa o adresler bastırılmaz.
+7. **Önce `notify.`.** ADR-0090'daki alan adı geçişi bu taşımadan önce, ayrı bir pencerede yapılır. Taşıma penceresi `notify.`'ın canlı olmasını önkoşul olarak denetler.
+8. **Belgeler.** Kabul edilmiş ADR'lerin metni değiştirilmez. 2026-11-24'ten önce yazılmış ADR'lerdeki "SkyMail" ve `skymail` bugünkü SkyNotify'dır. CONTEXT.md, README'ler ve depo kataloğu yeni adları kullanır.
 
 ## Consequences
 
 - Kısa bir kesinti olur. Bu sürede postalar kuyrukta bekler, konsol ve bildirim kutusu açılmaz.
-- Daha önce gönderilmiş postalardaki takip ve tek tık çıkış bağlantıları `/api/skymail/…` yolunu gösterir. Karar 8'deki yönlendirme kalmazsa bu bağlantılar çalışmaz.
+- Taşımadan önce gönderilmiş postalardaki takip ve abonelikten çıkış bağlantıları çalışmayı bırakır; bu Yusuf'un bilinçli kararıdır.
 - Eski yedekler `skymail` adlı veritabanını taşır. Geri yükleme ve silme tekrarı (ADR-0053) bu adı yeni adla eşler.
 - 2026-11-24'ten önce yazılmış ADR'lerdeki depo bağlantıları, yeni ürün `skymail-*` adlı bir depo açtığında o ürünü gösterir.
 - sky-app'e verilen sözleşme (Mobile Lab) yeni istemci adı ve yolla güncellenir.
