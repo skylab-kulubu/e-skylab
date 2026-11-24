@@ -141,6 +141,8 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 
 ## Ek (2026-10-25): Forms'un postaları ve iki yeni olay (ADR-0075)
 
+_Güncelleme (2026-11-24): ADR-0087 ile Forms postasına ilişkin kısımlar geri çekildi._
+
 ADR-0075 karar 3'ü alan servislerinin birbirine de uygular: Forms SkyMail'i, SkyMail Forms'u bilmez. Forms'un postaları core'un bildirim kararına geçtiği için:
 
 - **Olay listesi genişler.** `forms.response.status_changed` `nextFormId`, `returnedQuestionCount` ve `reviewedAt` alanlarını da taşır. İki yeni tür gelir: `forms.workflow_run.reopened` ve `forms.attempt.updated`. Karar 5 aynen geçerlidir: olaylarda yalnız kimlik ve karar alanları vardır.
