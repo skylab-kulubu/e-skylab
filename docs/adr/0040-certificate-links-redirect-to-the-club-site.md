@@ -35,7 +35,7 @@ Karar (Yusuf, 2026-11-23; 2026-11-24 akşamı güncellendi: "varsayılanda da ol
 - **QR isteğe bağlıdır.** Sertifika şablonunun zorunlu katmanları alıcı adı ve etkinlik adıdır. Düzenleyen şablon editöründe doğrulama QR'ını kaldırabilir; QR'sız şablon kaydedilir, yayınlanır ve QR'sız PDF üretir.
 - **Varsayılan şablon QR'lı kalır.** Kulübün varsayılan şablonu ve editörde açılan yeni şablon QR'la başlar.
 - **Doğrulama seri numarasıyla çalışır.** Adres QR'dan bağımsızdır: `skyl.app/c/{seri}` → `yildizskylab.com/sertifika/{seri}`. Sertifika satırında ve sertifika postasında durur. QR bu adresin basılı kısayoludur; yukarıdaki "printed QRs stay compact" gerekçesi QR'lı şablonlar için geçerlidir.
-- Uygulama: core-backend #421 (şablon doğrulaması), core-frontend (editörde QR katmanı silinebilir).
+- Uygulama: core-backend #421 (şablon doğrulaması), core-frontend #175 (editörde QR katmanı silinebilir).
 
 ### Endüstri uygulamasıyla karşılaştırma
 
