@@ -24,7 +24,7 @@ Kod, sürümleme ve dağıtım her ürünün kendi deposunda yapılır.
 
 ## Genel amaç
 
-SKY LAB'in web, mobil, kimlik, etkinlik, form ve posta ürünleri farklı
+SKY LAB'in web, mobil, kimlik, etkinlik, form ve bildirim ürünleri farklı
 depolarda geliştirilir. Bu merkez; yeni katılan bir geliştiricinin hangi
 ürünün ne yaptığını, verinin sahibini, servislerin nasıl konuştuğunu ve eski
 bir sistemin yerine neyin geçtiğini tek bakışta bulmasını sağlar. Buradaki
@@ -51,11 +51,11 @@ Kullanıcı
    ├── admin.yildizskylab.com ─ core-frontend
    ├── my.yildizskylab.com ──── account-center
    ├── forms.yildizskylab.com ─ forms-frontend
-   ├── notify.yildizskylab.com ─ skymail-frontend
+   ├── notify.yildizskylab.com ─ skymail-frontend (SkyNotify)
    └── sky-app ───────────────── mobil istemci
              │
              ├── e.yildizskylab.com ─ e-skylab-keycloak
-             └── API servisleri ───── core / CMS / Forms / Mail
+             └── API servisleri ───── core / CMS / Forms / SkyNotify
 ```
 
 Servis keşfi için Eureka ve ortak bir Spring Gateway kullanılmaz. İstemciler ve
