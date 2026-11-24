@@ -4,6 +4,8 @@ status: accepted
 
 # Alan servisleri birbirini bilmez; bildirim kararını ve servisler arası koordinasyonu core verir, teslimi iletişim servisi yapar; Forms'un postaları ve form yanıtlayanlarına toplu gönderim core'a geçer
 
+_Güncelleme (2026-11-24): Kısmen yerini aldı: **ADR-0087**. Karar 5, 6 ve 8 (Forms postasının ve form yanıtlayanlarına toplu gönderimin core'a geçişi) ile 2026-11-08 ekinin core'un kitle çözümüne dayanan maddeleri geri çekildi: Forms postasını kendi giden kutusundan SkyMail'e kendisi gönderir, toplu gönderimde SkyMail kitleyi Forms'tan okur (`form_mail_sources`). Karar 4'teki "`forms.*` sözleşmesinin sahibi core olur" cümlesi de geri çekildi. Karar 1, 2, 4 ve 7 ile ekin madde 10'u (gönderen alıcı listesini görmez) aynen geçerlidir; karar 3'e ADR-0087'de iki yazılı istisna eklendi._
+
 Bugün Forms kendi postalarını SkyMail'e doğrudan gönderiyor. ADR-0070 karar 3 ve ADR-0072 karar 8 bunu yazılı olarak bıraktı. Bunlar beş posta:
 
 - form kopyası (`forms.form-copy`);
