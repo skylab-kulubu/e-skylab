@@ -4,7 +4,7 @@ status: accepted
 
 # Forms kendi postasını kendisi gönderir, core araya girmez; form yanıtlayanlarına toplu gönderimde Forms kitleyi SkyMail'e kaynak olarak verir (ADR-0075'in posta bölümünün yerine)
 
-_Güncelleme (2026-11-24): Karar 3'teki "Gönderen alıcı listesini görmez, yalnız toplu sayıları görür" kuralı kalkar; gönderen kendi gönderiminin alıcılarını görür (ADR-0074, 2026-11-24 eki)._
+_Güncelleme (2026-11-24): Karar 3'teki "Gönderen alıcı listesini görmez, yalnız toplu sayıları görür" kuralı kalkar; gönderen kendi postasının alıcılarını, açılmalarını ve tıklamalarını kişi kişi görür (ADR-0074, 2026-11-24 eki)._
 
 _Güncelleme (2026-11-24): Karar 5'in "iki yazılı istisna"sı ilkeye dönüştü (ADR-0071'in 2026-11-24 eki): SkyMail ortak teslim hizmetidir, her ürün kendi işlem postasını doğrudan SkyMail'e gönderir, core yalnız kendi kaydına dayanan kararda (tercih, rıza, kitle, ekip) girer. Forms → SkyMail `/single` bu ilkenin örneğidir; yalnız `form_mail_sources` ucu ADR-0075 karar 4'e istisna olarak kalır._
 
