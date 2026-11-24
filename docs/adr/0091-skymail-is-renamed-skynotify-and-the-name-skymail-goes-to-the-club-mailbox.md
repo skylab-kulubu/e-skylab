@@ -19,6 +19,8 @@ Karar (Yusuf, 2026-11-24):
    - **Veri ve işletim:** veritabanı ve giriş rolleri; `/api/skymail` yolu; `X-SkyMail-*` posta başlıkları; `skylab_skymail_*` metrikleri; `skylab-skymail-*` sunucu birimleri.
    - **Microsoft 365:** uygulama kaydı `skymail-posta` ve gönderen işareti `CustomAttribute10=skymail-gonderen`.
    - **Kod ve araçlar:** koddaki tanımlayıcılar; sihirbaz ve işletim betiklerindeki sabit adlar.
+   - **Saklı biçim kimlikleri:** veride saklı `skymail.visual` ve `data-skymail-notrack` gibi kimlikler ileri ve geri veri göçüyle taşınır.
+   - **Keycloak SPI:** posta gönderici sağlayıcısının `sky-mail` adı ve `SKY_MAIL_*` ayarları `skynotify` olur.
 4. **Geçiş aşamasız ve tek penceredir.** Eski ve yeni adı birlikte kabul eden bir ara dönem yoktur. Pencere şöyle işler:
    - Önce kod PR'ları birleşir. Bunlar yalnız yeni adları bilir.
    - Sonra tek bir sihirbaz önce sandbox'ta, sonra production'da adlandırmaları sırayla yapar, yayınlar ve her şeyin yeni adla çalıştığını doğrular.
