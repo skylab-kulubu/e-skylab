@@ -20,7 +20,7 @@ Karar (Yusuf, 2026-11-11, karar 21: davet ve erişim talebi şimdi yapılır; 20
    - Bağlantı anahtar taşımaz; iletilen posta tek başına daveti kabul ettirmez.
    - Hesabı olduğu bilinen kişi bugünkü gibi aday aramasıyla doğrudan eklenir.
 3. **Davet 14 gün geçerlidir** (Yusuf). Süre ortam ayarıdır. Davet postasında girişsiz ret bağlantısı vardır; ret anahtarının yalnız özeti tutulur ve anahtar yalnız reddetmeye yarar.
-   - Adres yalnız davet beklerken tutulur. Kabul, ret, süre dolumu, geri çekme ya da geçersizlikte hemen silinir; kişisiz kayıt 90 gün sonra silinir.
+   - Adres core'da yalnız davet beklerken tutulur. Kabul, ret, süre dolumu, geri çekme ya da geçersizlikte hemen silinir; kişisiz kayıt 90 gün sonra silinir.
    - Davet eden ya da o grubu yöneten biri daveti geri çekebilir. Posta 24 saatte en çok bir kez, toplamda en çok iki kez yeniden gönderilir; süre yenilenmez.
    - Sınırlar: davet eden başına günde 20, ekip başına 50 açık davet, aynı ekip ve adrese 1 açık davet, aynı adrese bütün kulüpte 30 günde 3 davet.
    - Posta SkyMail'den işlem postası olarak gider (`club.team-invitation`). Davet edenin bu ekibe tek seferlik işlem postasıdır ve Contact consent'in (Davet onayı, ADR-0062) kapsamına girmez: kişiyi başka etkinlik ya da duyurular için bir listeye almaz. Davetliye ad yazılmaz; alıcı SkyMail'in saklama süresince tutulur ve posta her posta gibi takip edilir (ADR-0062, ADR-0074). İletişim tercihi bu postaya uygulanmaz.
