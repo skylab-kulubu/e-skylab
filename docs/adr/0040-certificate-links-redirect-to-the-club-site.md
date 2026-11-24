@@ -15,7 +15,7 @@ Karar (Yusuf, 2026-11-23, K4, K5, S2, S5).
   - "Elle verildi" bilgisi ve gerekçe herkese açık değildir.
   - Kopya sertifika satırıyla yaşar ve onunla silinir (ADR-0062).
   - Açık (S7): aydınlatma metnine "doğrulama sayfasında katılım sayısı görünür" cümlesinin eklenmesi ve metnin sahibi.
-- Uygulama: core-backend (katılım kopyası ve herkese açık alan) ve skylab-site (doğrulama satırı) biletleri; ikisi de henüz PR değil. Otomatik kapanış production'a kopyadan önce çıkmaz, yoksa ilk otomatik sertifikalar kopyasız kalır.
+- Uygulama: core-backend (katılım kopyası ve herkese açık alan) ve skylab-site (doğrulama satırı) biletleri: core-backend #404 ve skylab-site #100. Otomatik kapanış production'a kopyadan önce çıkmaz, yoksa ilk otomatik sertifikalar kopyasız kalır.
 
 ### Endüstri uygulamasıyla karşılaştırma
 
