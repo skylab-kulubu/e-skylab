@@ -4,7 +4,7 @@ status: accepted
 
 # SkyMail postaların açılmasını ve tıklanmasını kişi bazında kaydeder; dayanak meşru menfaattir, üye Hesap Merkezi'nden itiraz eder, gizli bağlantılar hiçbir zaman sayılmaz, her şey kapalı bayrakların arkasındadır
 
-_Güncelleme (2026-11-24, Yusuf): Karar 13'teki bilgilendirme postası gönderildi, itiraz gelmedi. Kişi bazında takip sürer. Ekrandaki görünürlük sınırları (gizleme, bulanıklaştırma) kaldırıldı; uygulaması skymail-frontend'de._
+_Güncelleme (2026-11-24, Yusuf): Karar 13'teki bilgilendirme postası gönderildi, itiraz gelmedi. Kişi bazında takip sürer. Takip ekranlarındaki gizleme ve eşik sınırları kaldırıldı (10 kişi eşiği dahil; ayrıntı skymail-frontend PR'ında)._
 
 ADR-0067 haber ve duyuru postalarını SkyMail'e verdi, açılma izlemeyi açık soru olarak bıraktı (Sapmalar 5). ADR-0070 iletişimi tek servise topladı, açılma ve tıklama izlemeyi "ayrı bir kararla" diye kapsam dışında tuttu. ADR-0072 karar 2 "takip akışa bağlı değildir, bütün postalar takiplidir" dedi ve takip kararını ayrı bir ADR'a bıraktı. Bu ADR o karardır.
 
