@@ -27,3 +27,7 @@ Kaynak: `sky_lab_genel/notes/sertifika-oturum/01-arastirma.md` §3 (ürünlerin 
 2. **Cvent**'te "6 oturumdan 5'i" için otomatik sertifika yoktur; katılım raporu dökülüp uygunlara elle posta atılır. Bizde kural otomatik uygulanır.
 3. **Süre yok.** Webex Events ve PheedLoop süreyi check-out ya da çevrim içi izlemeyle ölçer; biz yalnız tek Check-in sayarız.
 4. **Eşik sayıyla girilir,** yüzdeyle değil; yüzde yalnız gösterilir.
+
+## Ek: oturumsuz etkinlikte alana giriş katılımdır (2026-11-25)
+
+Karar (orkestratör, 2026-11-25; Yusuf'un oturumsuz etkinlik isteğine dayanarak): canlı oturumu olmayan etkinlikte etkinliğin kendisi tek sayılan birimdir (N = 1) ve Venue entry katılım sayılır; "alana giriş sertifikada sayılmaz" kuralı (ADR-0082, kapı postaları K3) yalnız oturumlu etkinlik için geçerlidir. Bütün oturumlar iptal edilirse kapı girişleri ölçüt olur. Uygulama: core-backend #422.
