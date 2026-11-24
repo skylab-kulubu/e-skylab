@@ -23,7 +23,7 @@ Karar (Yusuf, 2026-11-22; 1–16. soruların hepsinde önerilen şık, 5. soruda
    - **SkyPass anahtarı döndürülürse** bilet anahtarı da değişir ve gönderilmiş, basılmış bütün bilet QR'ları geçersizleşir. Bu yüzden döndürmede yeni bilet anahtarı yeni `kid` (`tk-e2`) ile gelir; eski anahtar (`tk-e1`) JWKS'te ve core'un doğrulamasında, eski anahtarla basılmış en geç biletin `exp`'ine kadar geçiş penceresi olarak kabul edilir. Eski kodları doğrulamak için eski türetilmiş açık anahtar pencere boyunca core'da ayrı bir geçiş ayarında, OpenBao'da (ADR-0049) tutulur; bu, döndürme anına özgü tek ek ayardır. Pencere tarihsiz etkinliğin biletinde 1 yıla kadar uzar; kabul. Çevrimdışı tarayıcı JWKS'ten iki `tk-*` anahtarını da alır ve `kid`'e göre seçer. Yeni basımlar yeni anahtarla yapılır. Sandbox'ta geçici SkyPass anahtarı her yeniden başlatmada bilet QR'larını geçersiz kılar; bu kabul.
    - Kapıda SkyPass QR'ıyla aynı kural geçerlidir (ADR-0022): kimlik doğrulaması cihazda, giriş çevrimiçi, core yokken Queued check-in.
    - Üyenin postasında da bilet QR'ı vardır; üyenin SkyPass'ı kapıda geçerli kalır. İki yol aynı bilet × oturum girişini yazar, ikincisi "zaten girdi" alır.
-2. **İletilen kod kabul edilen bir risktir.**
+2. **İletilen koda ek bağlama yoktur.**
    - Oturum başına ilk okutma kazanır ve tarayıcı girenin adını gösterir.
    - Panel "Bağlantıyı yenile" üç şey yapar: yeni erişim anahtarı üretir, `qv`'yi artırır ve yeni bağlantıyla bilet postasını yeniden gönderir. Eski sayfa `404`, eski kod çevrimiçi `410 ticket_qr_superseded` alır.
    - Dönen kod (SafeTix) yoktur: PDF'e ve baskıya konamaz, kulüp kapısı fail-open'dır, etkinlikler ücretsizdir.
@@ -82,7 +82,7 @@ Karar (Yusuf, 2026-11-22; 1–16. soruların hepsinde önerilen şık, 5. soruda
     - Üye sky-app "QR Okut" ile `check-in/me` + jeton kullanabilir.
     - Projeksiyondaki jetonun kullanım sınırı kapıdakinden ayrıdır (`ATTENDANCE_QR_MAX_USES`). Bunun için jeton, imzanın (MAC) kapsadığı bir kullanım sınıfı alanı taşır (`door` ya da `display`); böylece çok kopyalı core'da her kopya jetonun sınıfını jetondan okur. Bugünkü kapı jetonunun biçimi bu alanla genişler.
     - Statik oturum QR'ı `SESSION_QR_MODE=qr` ile kapanır; jetonu okuyan sky-app sürümü mağazaya çıkınca geçilir (Yusuf, 13. soru). Böylece evden yoklama açığı biter. Basılı statik QR o andan sonra yoklama yazmaz.
-    - Kod 15 saniyede bir dönse de salondan anlık paylaşım kısa süre işler; bu kabul edilen bir risktir. Konum ya da cihaz bağlama yoktur.
+    - Kod 15 saniyede bir döner; konum ya da cihaz bağlama yoktur.
 11. **Yoklama ekranı bağlantısı görevli girişi istemez** (Yusuf, 16. soru: ekran sitede).
     - Kapı QR'ını basabilen biri, oturuma sabit ya da saate göre o anki oturumu bulan (ADR-0027) bir bağlantı açar.
     - İki süre ayrıdır. **Bağlantının ömrü** etkinliğin bitişi + 12 saattir ve bağlantı panelden iptal edilebilir. **Ekranın bastığı jetonun ömrü** varsayılan 60 saniyedir; görüntü salona bir yayın üzerinden gecikmeyle geliyorsa bağlantı başına `ttlSeconds` ile 60–180 saniye arasında (`DOOR_QR_TTL` sınırları içinde) uzatılabilir. Yenileme her durumda 15 saniyedir.

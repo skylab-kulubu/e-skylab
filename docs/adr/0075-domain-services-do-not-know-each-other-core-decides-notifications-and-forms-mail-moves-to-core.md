@@ -4,6 +4,8 @@ status: accepted
 
 # Alan servisleri birbirini bilmez; bildirim kararını ve servisler arası koordinasyonu core verir, teslimi iletişim servisi yapar; Forms'un postaları ve form yanıtlayanlarına toplu gönderim core'a geçer
 
+_Güncelleme (2026-11-24): 2026-11-08 ekinin 10. maddesi (gönderen alıcı listesini görmez) kalkar; gönderen kendi postasının alıcılarını, açılmalarını ve tıklamalarını kişi kişi görür (ADR-0074, 2026-11-24 eki)._
+
 _Güncelleme (2026-11-24): Kısmen yerini aldı: **ADR-0087**. Karar 5, 6 ve 8 (Forms postasının ve form yanıtlayanlarına toplu gönderimin core'a geçişi) ile 2026-11-08 ekinin core'un kitle çözümüne dayanan maddeleri geri çekildi: Forms postasını kendi giden kutusundan SkyMail'e kendisi gönderir, toplu gönderimde Forms kitleyi SkyMail'e kaynak olarak verir (`form_mail_sources`). Karar 1, 2, 4 ve 7 Forms postası dışında geçerlidir; şunlar adıyla geri çekildi: karar 1'in ikinci maddesi (bildirim kararı), karar 2'nin ölçütü (tercih, rıza, kitle, misafir sınırı ve zamanlama), karar 2'deki "kişiye kendiliğinden bildirim (kutu, push) core'a girer" cümlesi, karar 4'teki "`forms.*` sözleşmesinin sahibi core olur" cümlesi ve karar 7'nin ikinci cümlesi. Karar 3'e iki yazılı istisna (Forms SkyMail'i çağırır; SkyMail'in Forms'a özel `form_mail_sources` ucu), karar 4'e SkyMail'in Forms'a özel ucu istisnası eklendi. Karar 6'nın Davet onayı kuralı ve ekin madde 10'u (gönderen alıcı listesini görmez) aynen geçerlidir; rızayı SkyMail uygular._
 
 _Güncelleme (2026-11-24): Karar 3 SkyMail için geçmez: SkyMail ortak teslim hizmetidir (ADR-0071'in 2026-11-24 eki)._
@@ -86,12 +88,12 @@ Karar (Yusuf, 2026-10-25):
    - **Amaç ve rıza (Yusuf, 2026-10-26).** Hangi yanıtlayana posta gideceğini amaç belirler:
      - **`islem`.** Gönderen, postanın yalnız alıcının kendi başvurusu ya da işlemi hakkında olduğunu beyan eder (ADR-0072 karar 2 ve 8). Posta bütün yanıtlayanlara gider. Tercih, çıkış kaydı ve Davet onayı aranmaz. Kalıcı ret bastırması uygulanır.
      - **`duyuru`.** Her alıcı ayrı süzgeçten geçer:
-       - Member için kontrol noktası ADR-0072 karar 3'tür. Varsayılan tek başına engellemez (karar 3), çünkü yanıtlayan kitleye kendi yanıtıyla girmiştir. Değişen yalnız Member olmayanın dayanağıdır.
+       - Member için kontrol noktası ADR-0072 karar 3'tür. Varsayılan tek başına engellemez (karar 3), çünkü yanıtlayan kitleye kendi yanıtıyla girmiştir. Değişen yalnız Member olmayanın kuralıdır.
        - Member olmayan yanıtlayan (hesabı olsun olmasın) postayı yalnız etkin bir Davet onayıyla alır (ADR-0062, `davet-v2`). Bu kural bugün gönderenin beyanına kalmıştı; artık core uygular.
        - Asıl amacı tanıtım olan posta yalnız tanıtım izni verene gider (ADR-0062 eki, ADR-0072 eki).
        - Hesabı olmayan adres ayrıca SkyMail'in çıkış kaydına bakar (ADR-0072 karar 4).
    - **Kontrol noktası değişmez.** ADR-0072'nin kuyruğa alma kontrol noktası ve dağıtıcının her turdaki yeniden sorgusu bu gönderime de uygulanır. Bu kitlede yeniden sorgu Davet onayını da denetler. Çözümle gönderim arasında onayı geri alınan Member olmayana sıradaki posta gitmez.
-   - **Denetim kaydı.** core her `form_respondents` çözümünü kısa bir denetim kaydına yazar: gönderenin `sub`'ı, form, zaman, alıcı sayısı. Adres ve ad yazılmaz. Gönderen bir yetkilidir; kayıt meşru menfaatle tutulur. Süresi ADR-0062 tablosuna satır olarak eklenecek.
+   - **Denetim kaydı.** core her `form_respondents` çözümünü kısa bir denetim kaydına yazar: gönderenin `sub`'ı, form, zaman, alıcı sayısı. Adres ve ad yazılmaz. Gönderen bir yetkilidir. Süresi ADR-0062 tablosuna satır olarak eklenecek.
 7. **Yeni bir core sorumluluğu eklenirken** ADR'de neden core'da olduğu yazılır. Bu ADR'ın gerekçesi: tercih, rıza ve kitle core'da; bildirim kararı onlara dayanır.
 8. **Geçiş kayıpsızdır ve geri alınabilir.**
    - **Kendiliğinden giden postalar şablon şablon geçer.** Production'da önce core'un o şablonu açılır, hemen ardından Forms'ta o şablonun `FormMail__*TemplateKey` ayarı boşaltılır; boş anahtarla Forms'un kodu postayı atmaz.
@@ -177,7 +179,7 @@ Nasıl:
 5. **Gönderenin kimliği güvenilir alt sistemle taşınır.** SkyMail gönderenin `sub`'ını core'a, core da Forms'a servis token'ıyla verir.
    - **Kullanılmayan iki standart akış.** Microsoft'un on-behalf-of akışı (`jwt-bearer` grant, `requested_token_use=on_behalf_of`) ve OAuth 2.0 Token Exchange (RFC 8693; Keycloak'ın uyguladığı). İkisi aynı işi yapan iki ayrı akıştır. İkisinde de her adım kişinin token'ını sonraki servis için değiştirir ve yetkiyi kişinin kendi token'ı taşır.
    - **Token değiştirme bizde zaten var.** Altyapı ADR-0058/0059'da (admin BFF) kurulu. Ama bu akış SkyMail → core → Forms zincirinde iki yeni değişim izni ve üç serviste yeni doğrulama ister.
-   - **Güven farkı.** Bugün yetkiyi kişinin kendi token'ıyla Forms koyuyor; SkyMail kimseden kişi verisi çekemiyor. Yeni yolda SkyMail'in servis hesabı gönderenin `sub`'ını beyan ediyor. SkyMail'in servis kimliği sızarsa, bir yetkilinin `sub`'ını beyan ederek bir formun yanıtlayan listesi çekilebilir.
+   - **Güven farkı.** Bugün yetkiyi kişinin kendi token'ıyla Forms koyuyor; SkyMail kimseden kişi verisi çekemiyor. Yeni yolda SkyMail'in servis hesabı gönderenin `sub`'ını beyan ediyor.
    - **Önlem.** Ucuz olanı seçildi: core her çözümü adres içermeyen bir denetim kaydına yazar (karar 6). Servis kimliğinin sırrı zaten OpenBao'da tutulur (ADR-0049).
 6. **Form geneli yönetici rolünü core okur.** Forms'un yetki kuralının bu yarısı (`skyforms:*`) token'dan okunuyor; servis token'ıyla gelen istekte Forms onu göremez. Bu yüzden rolü core Keycloak'tan okur. Ortak çalışanlığı yine Forms söyler.
 7. **Hatırlatma için core Forms'u yoklar.** Saf olay mimarisinde core bekleyen yanıtların kopyasını olaylardan kurardı (event-carried state transfer). Bu ölçekte 30 dakikalık okuma daha basittir ve kopya durum tutmaz.

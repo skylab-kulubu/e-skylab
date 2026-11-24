@@ -4,6 +4,8 @@ status: accepted
 
 # Ekibe davet, kişi kabul edene kadar bekler ve hesap açmaz; erişim talebi Hesap Merkezi'nden istenir, ekibi yöneten onaylar
 
+_Güncelleme (2026-11-24): Ekip daveti postası da her posta gibi takip edilir; karar 3'teki cümle buna göre yazıldı: alıcı SkyMail'in saklama süresince tutulur (ADR-0074, 2026-11-24 eki)._
+
 Bugün hesabı olmayan birini ekibe almanın yolu iki adımlıdır: kişi my.yildizskylab.com'dan kaydolur (ADR-0063), en geç 5 dakika sonra core'a düşer, sonra lider ya da YK onu ekler (ADR-0065). Bir ekibe katılmak isteyen kişi de lidere kendisi yazar; bunun bir kaydı ve onay yolu yoktur.
 
 Karar (Yusuf, 2026-11-11, karar 21: davet ve erişim talebi şimdi yapılır; 2026-11-23 01:01: davet 14 gün geçerlidir, davet ve talep production'da `TEAM_DELEGATION` ile birlikte açılır):
@@ -18,11 +20,11 @@ Karar (Yusuf, 2026-11-11, karar 21: davet ve erişim talebi şimdi yapılır; 20
    - Bağlantı anahtar taşımaz; iletilen posta tek başına daveti kabul ettirmez.
    - Hesabı olduğu bilinen kişi bugünkü gibi aday aramasıyla doğrudan eklenir.
 3. **Davet 14 gün geçerlidir** (Yusuf). Süre ortam ayarıdır. Davet postasında girişsiz ret bağlantısı vardır; ret anahtarının yalnız özeti tutulur ve anahtar yalnız reddetmeye yarar.
-   - Adres yalnız davet beklerken tutulur. Kabul, ret, süre dolumu, geri çekme ya da geçersizlikte hemen silinir; kişisiz kayıt 90 gün sonra silinir.
+   - Adres core'da yalnız davet beklerken tutulur. Kabul, ret, süre dolumu, geri çekme ya da geçersizlikte hemen silinir; kişisiz kayıt 90 gün sonra silinir.
    - Davet eden ya da o grubu yöneten biri daveti geri çekebilir. Posta 24 saatte en çok bir kez, toplamda en çok iki kez yeniden gönderilir; süre yenilenmez.
    - Sınırlar: davet eden başına günde 20, ekip başına 50 açık davet, aynı ekip ve adrese 1 açık davet, aynı adrese bütün kulüpte 30 günde 3 davet.
-   - Posta SkyMail'den işlem postası olarak gider (`club.team-invitation`). Davet edenin bu ekibe tek seferlik işlem postasıdır; dayanağı KVKK m. 5/2-f'dir ve Contact consent'in (Davet onayı, ADR-0062) kapsamına girmez: kişiyi başka etkinlik ya da duyurular için bir listeye almaz. Davetliye ad yazılmaz; posta gönderildikten sonra SkyMail'de tutulmaz, açılması ve tıklanması izlenmez. İletişim tercihi bu postaya uygulanmaz.
-   - Posta aydınlatma metni bağlantısını (`noticeUrl`) ve adresin silineceği tarihi taşır (KVKK m. 10).
+   - Posta SkyMail'den işlem postası olarak gider (`club.team-invitation`). Davet edenin bu ekibe tek seferlik işlem postasıdır ve Contact consent'in (Davet onayı, ADR-0062) kapsamına girmez: kişiyi başka etkinlik ya da duyurular için bir listeye almaz. Davetliye ad yazılmaz; alıcı SkyMail'in saklama süresince tutulur ve posta her posta gibi takip edilir (ADR-0062, ADR-0074). İletişim tercihi bu postaya uygulanmaz.
+   - Posta gizlilik metni bağlantısını (`noticeUrl`) ve adresin silineceği tarihi taşır.
 4. **Erişim talebi Hesap Merkezi'nden istenir** (Access request). Girmiş her etkin hesap, public listelenen bir ekibe ya da alt ekibine katılmak isteyebilir. Protected gruplar, Leader grupları, Privileged kökler ve `/ROLLER` hedef olamaz.
    - İsteğe bağlı gerekçe en çok 500 karakter düz metindir.
    - Kişi başına 3 açık talep ve günde 5 talep, hedef başına 1 açık talep olur. Reddedilen hedefe 30 gün sonra yeniden talep açılabilir.
@@ -43,7 +45,7 @@ Kaynaklar:
 ## Consequences
 
 - **CONTEXT.md:** iki yeni terim gelir: **Invitation** ve **Access request**. **Promote** ve **Self-registration**'a kabul ve onay yolları eklenir.
-- **Aydınlatma metni:** davet adresi, talep gerekçesi ve süreleri faaliyet tablosuna ve "Ekibe Davet" alt başlığına yazılır. Production'da açılıştan önce yayında olur. Hesap açılmadığı için yeni bir hukuki sebep gerekmez (m. 5/2-f).
+- **Gizlilik metni:** davet adresi, talep gerekçesi ve süreleri faaliyet tablosuna ve "Ekibe Davet" alt başlığına yazılır. Production'da açılıştan önce yayında olur.
 - **Kabul edilmeyen davet hiçbir şey bırakmaz:** üyelik yok, hesap yok, adres yok. Bedeli: kişi kabul edene kadar ekip postası almaz ve uygulama ataması devralmaz.
 - **ADR-0062 saklama tablosuna satırlar eklenir:** `team_invitations_age`, `access_requests_age` ve davet adres sayacı ("aynı adrese 30 günde 3 davet" sınırı için; yalnız sha256(adres) ve gün tutulur, 30 gün sonra silinir). Hesap silme saga'sı (ADR-0051) bu iki tablodaki kişiye ait satırları siler; davet edenin hesabı silinirse açık davetleri geçersiz olur.
 - **Sunucuda yetki okuma.** Kabul anında yetki denetimi, davet edenin bugünkü gruplarını Keycloak'tan okur. Gözden geçirmenin kapanışı da aynı yardımcıyı kullanır (ADR-0085).
@@ -66,7 +68,7 @@ Kaynaklar:
 
 ## Considered Options
 
-- **Entra B2B gibi davette hesap açmak.** Kişinin eylemi olmadan ad ve e-posta ile hesap açılırdı. Self-registration dışında ikinci, adresi doğrulanmamış bir hesap açma yolu ve aydınlatma metninde ayrı bir sebep gerekirdi. Hesap varlığı da sızardı.
+- **Entra B2B gibi davette hesap açmak.** Kişinin eylemi olmadan ad ve e-posta ile hesap açılırdı. Self-registration dışında ikinci, adresi doğrulanmamış bir hesap açma yolu ve gizlilik metninde ayrı bir madde gerekirdi. Hesap varlığı da sızardı.
 - **Davette var olan hesabı doğrudan eklemek.** Hesap varlığını davet edene söylerdi. Doğrudan ekleme zaten aday aramasıyla yapılabiliyor.
 - **Hesap açılınca daveti kendiliğinden kabul etmek.** Kişinin kendi eylemi olmadan üyelik yazılırdı; açık bir "Katıl" seçildi.
 - **Talebi panelde istemek.** Paneli yetkisi olmayan herkese açmak gerekirdi.

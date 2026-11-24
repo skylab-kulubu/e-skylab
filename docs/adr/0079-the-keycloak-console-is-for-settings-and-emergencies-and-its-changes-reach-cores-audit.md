@@ -15,7 +15,7 @@ Karar (Yusuf, 2026-10-12: GY3, GY4 ve GY8; aynı gece S2 ve S3; konsol listesi 2
    - Acil hesabın her girişi ADMIN'e posta olarak gider.
    - Kullanıldığı gün ne yapıldığı ekibe yazılır. İş bitince parola değiştirilir, yeni zarf hazırlanır, açılan zarf imha edilir.
    - **Yılda bir deneme.** Dönem devri haftasında her acil hesapla bir kez girilir, salt okur bakılır, çıkılır; ADMIN'e postanın geldiği doğrulanır. Tarih kulübün iç runbook'una yazılır.
-5. **Sunucudan kurtarma.** Keycloak'a hiçbir hesapla girilemiyorsa sunucu yöneticisi Keycloak'ın yönetici kurtarma komutuyla (`kc.sh bootstrap-admin`) geçici bir yönetici açar; iş bitince siler ve master'da geçici yönetici kalmadığını doğrular. Sunucuya ikinci bir kişi eklenmez (GY8); bu bilinçli bir sapmadır.
+5. **Sunucudan kurtarma.** Keycloak'a hiçbir hesapla girilemiyorsa sunucu yöneticisi Keycloak'ın yönetici kurtarma komutuyla (`kc.sh bootstrap-admin`) geçici bir yönetici açar; iş bitince siler ve master'da geçici yönetici kalmadığını doğrular. Sunucuya ikinci bir kişi eklenmez (GY8).
 6. **Konsol değişiklikleri core'un denetim kaydına girer** (GY3/GY4'ün "sonra" kısmı).
    - core, e-skylab realm'inin admin olaylarını birkaç dakikada bir okur: grup, grup üyeliği, client rolü eşlemesi ve realm rolü eşlemesi. Bunun için core'un service account'u olay okuma rolünü alır; realm'de admin olayları açık tutulur.
    - core'un kendi service account'unun olayları atlanır; onlar zaten kayıtta.
@@ -38,7 +38,7 @@ Kaynaklar:
 - **Acil hesap girişi postası** master'ın giriş olaylarından okunur; bu yüzden master realm'de giriş olayları açıktır.
 - **Haftalık ölçüm.** Konsol yazıcı sayısı, master `admin` taşıyan insan sayısı ve e-skylab'da yönetim rolü taşıyan insan ve grup sayısı düzenli ölçülür; kişiler adıyla değil sayıyla raporlanır.
 - **Uygulama durumu (2026-10-30).** Karar 6 uygulanmadı; o gelene kadar karar 7 geçerlidir.
-- **Sunucuda tek kişi.** Keycloak'ın kendisi bozulursa onarım sunucu yöneticisini bekler. Panel ve konsol üzerinden yapılabilen işleri konsol yazıcıları yürütür.
+- **Keycloak'ın onarımı.** Keycloak'ın kendisi bozulursa onarımı sunucu yöneticisi yapar. Panel ve konsol üzerinden yapılabilen işleri konsol yazıcıları yürütür.
 - Sunucu, kullanıcı adları ve kimlik bilgisinin yeri kulübün iç runbook'undadır; bu public depoya yazılmaz.
 - **CONTEXT.md'de yeni terim:** Console change.
 
@@ -58,8 +58,6 @@ Kaynaklar:
 1. **Dizinin kurallarımızı bilmeyen bir konsolu var.** Entra'da kurallar ve kayıt dizinin kendisindedir. Bizde kurallar core'da, dizin Keycloak'ta. Bunu teknik olarak değil, politika ve tespitle kapatıyoruz.
 2. **Tespit gecikmelidir:** birkaç dakikada bir okunur.
 3. **Deneme yılda bir yapılır.** Entra 90 günde bir önerir; bizde dönem devriyle birlikte.
-4. **Sunucuda tek kişi var** (GY8). Entra ve GitHub sürekliliği en az iki kişiyle sağlar.
-5. **Konsol yazıcısı sayısı** Microsoft'un "beşten az Global Administrator" önerisini aşar (ADR-0076, sapma 6).
 
 ## Considered Options
 

@@ -55,7 +55,7 @@ Yusuf'a soruldu; yarışmanın ilk dilimini bekletmez, cevap gelene kadar spec'i
 - **Event'e bağlılık:** öneri, her yarışma bir Event'e bağlı (yukarıdaki model). Seçenek: bağımsız yarışma, Event isteğe bağlı.
 - ~~**Kim yönetir:** öneri, Event'in Owner team'inin Leader'ları (ADR-0065'le üst ekiplerinkiler de), uygulama geneli `competition:manage` rolü, yarışmaya atanmış Competition staff; Owner team'i olmayan Event'te yalnız Privileged (ADR-0018). Bugünkü "ekibin her üyesi" kuralı daralır; kullanım sıfır olduğu için kimse yetki kaybetmez.~~ *Kapandı (Yusuf, 2026-10-12 ve 2026-10-25); bkz. aşağıdaki ek. Kalan sorular ekin "Açık" alt başlığında.*
 - **Misafir yarışabilir mi:** öneri, evet, GUEST Ticket'la; çevrimiçi gönderimde hesap açarak (ADR-0063).
-- **Public tabloda ad:** öneri, bireyde ad soyad, takımda takım adı ve üyeler; yarışma ayarıyla takma ad; profil fotoğrafı yok. Reşit olmayan katılımcının adının yayımı hukuk sorusudur (veli onayı ya da hiç yayımlamamak).
+- **Public tabloda ad:** öneri, bireyde ad soyad, takımda takım adı ve üyeler; yarışma ayarıyla takma ad; profil fotoğrafı yok. Reşit olmayan katılımcının adının yayımı açık sorudur (veli onayı ya da hiç yayımlamamak).
 - **Yeni saklama süreleri:** öneri, flag ve cevap denemeleri etkinlik + 90 gün, gönderim dosyaları etkinlik + 1 yıl (kazananınki arşiv), jüri yorumları etkinlik + 1 yıl. ADR-0062'ye ek olarak yazılır.
 - **Rol adı:** öneri, `competitor:manage` Keycloak'ta ve core'un rol sözleşmesinde `competition:manage` olur.
 - **Derece sertifikası şablonu:** öneri, yarışma başına tek şablon, ödül adı katmanla yazılır; ödül başına ayrı şablon seçime bağlı.

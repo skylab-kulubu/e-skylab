@@ -14,7 +14,7 @@ Adres değişmez: kalıcı yer bugünkü `api.yildizskylab.com/api` yoludur. Esk
 
 - **Keycloak.** inscribed'ın rol modeli kullanılır: her Site client'ında `content:read` / `content:write` / `schema:sync` rolleri ve bunları `roles` claim'ine yazan bir mapper vardır. Tenant `azp`'dir, audience `skycms` kalır. ~~`cms:access` geçişten sonra emekli olur.~~ 2026-09-28'de değişti: `cms:access` kalır, aşağıdaki eke bakın.
 - **Kod sahipliği.** Kod ve npm yayını (inscribed, `@skylab-kulubu/inscribed-auth`, site SDK yükseltmeleri) Fatih'tedir. Kulüp; Keycloak'ı, Dokploy'u, veri taşımayı ve kendi repolarındaki küçük ayarları yapar.
-- **`:latest` bilinçli bir risktir.** Her redeploy yeni sürüm çeker. Fatih'ten, kırıcı değişiklikleri yalnız major sürümde ve önceden haber vererek yapması istendi.
+- **inscribed `:latest` etiketinden çekilir.** Her redeploy yeni sürüm çeker. Fatih'ten, kırıcı değişiklikleri yalnız major sürümde ve önceden haber vererek yapması istendi.
 - **Hesap silme ve erişim kapısı.** inscribed'da erişim kapısı ve silme ucu yoktur. Hesap silmeyi açmak (ADR-0051), bu ikisi inscribed'a genel ve opsiyonel özellik olarak gelene kadar bekler. Sözleşme Fatih'le paylaşılan raporda tanımlıdır.
 
 ## Considered Options
@@ -69,7 +69,7 @@ Değerlendirilen ve seçilmeyenler:
 Yukarıdaki "Hesap silme ve erişim kapısı" maddesi daraldı: inscribed'a erişim kapısı gelmez, tam silme ucu da gerekmez (ayrıntı ve gerekçe ADR-0051'in 2026-10-03 ekinde).
 
 - **Küçük uç, sahibinden.** Fatih inscribed'a core'un silme komutunu karşılayan küçük bir uç ekler. Uç düzenleyen kolonlarındaki (`UpdatedBy`) kişinin `sub`'ını herkes için aynı "Silinmiş kullanıcı" yer tutucusuna çevirir; içerik, sürüm ve tarih değişmez. Makbuz tablosu ve tenant çözümü yoktur; token `core-erasure`'ın, rol `skycms` üzerindeki `cms:account:erase`'tir.
-- **Kapı yok.** inscribed hesap tutmaz; eski token bir hesabı diriltemez. Kalan risk, kişi kapatılmadan önce alınmış access token'ın ömrü (300 sn + 30 sn skew) içinde yapılan bir düzenlemedir. Core CMS adımını kimlik kapandıktan 6 dk sonra gönderir; o düzenleme de temizlenir.
+- **Kapı yok.** inscribed hesap tutmaz; eski token bir hesabı diriltemez. Core CMS adımını kimlik kapandıktan 6 dk sonra gönderir; kişi kapatılmadan önce alınmış access token'ın ömrü (300 sn + 30 sn skew) içinde yapılan düzenleme de böylece temizlenir.
 - **Eski `ArchivedBy` kolonları** (cms-backend kopyası) bir kez, herkes için boşaltılır.
 
 ## Ek: SkyApp'ten haber ve takım düzenleme (2026-10-03)

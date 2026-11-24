@@ -2,13 +2,13 @@
 
 Restoring a service database from a backup taken before some erasures brings those people's e-mail-keyed data back into the live database: SkyMail recipient rows, list memberships and queued mail. Core cannot find them again. After an erasure completes, core keeps no address and no hash of one (CONTEXT: Account erasure), and SkyMail keeps no suppression list (ADR-0051). Replaying the Erasure command with `emails: []` re-erases only subject-keyed data. The rows stay live; they do not age out with the backup.
 
-Regulators agree on the outcome and leave the method to the controller. After a restore, deletions are applied again: the EDPB's 2025 coordinated enforcement report, Denmark's Datatilsynet, CNIL's developer guide, the ICO's "beyond use" guidance and KVKK deletion regulation art. 8.
+After a restore, deletions are applied again.
 
 We decided (Yusuf, 2026-09-26): **no new record is kept. A restore replays erasure by reading the addresses from the matching core and Keycloak backups.**
 - After service X is restored to time T, core lists the requests completed after T.
 - For each request, it loads the newest core backup taken before that request's `anonymize_core` step, and the newest Keycloak backup taken before its `delete_identity` step. Each goes into a temporary Postgres with no network.
 - It reads the person's addresses into memory only and re-sends the normal Erasure command. Endpoints and contract are unchanged.
-- The temporary databases are destroyed. The replay is recorded without personal data, like any erasure (regulation art. 7(3)).
+- The temporary databases are destroyed. The replay is recorded without personal data, like any erasure (ADR-0051).
 
 Rejected:
 - **An encrypted, time-limited address ledger (OpenBao).** It stores exactly what the rule forbids, if only for a while, and its decrypt permission is a new attack surface.

@@ -22,7 +22,7 @@ Karar (Yusuf, 2026-10-20):
 4. **Gönderim otomatiktir:** hedef (etkinlik ya da oturum) bittikten 2 saat sonra. Panelde varsayılan işaretli bir kutu ve "Şimdi gönder" vardır.
 5. **Cevaplamayanlara tek bir hatırlatma gider,** ilk postadan 3 gün sonra. Bunun için core kimin cevapladığını bilir: giriş yapmış kişiyi kullanıcısından, misafiri postadaki kişiye özel davet kodundan.
 6. **Linki olan herkes doldurabilir.** Yanıtlayan kısıtı konmaz; hatırlatma eşlemesi kişiye özel bağlantıyla yapılır.
-7. **Cevaplar kişiyle bağlı kalır.** Arayüzde "anonim" denmez; aydınlatma metnine üyelerin geri bildirim cevapları eklenir.
+7. **Cevaplar kişiyle bağlı kalır.** Arayüzde "anonim" denmez; gizlilik metnine üyelerin geri bildirim cevapları eklenir.
 8. **`event_with_sessions` kipinde** düzenleyen formun biçimini seçer: herkes bütün oturumları görür ve "Katılmadım" diyebilir, ya da kişi katıldığı oturumları kendisi işaretler. Bağlantıdan ön işaretleme ilk sürümde yoktur.
 9. **Kişi başına günde tek posta.** Kişinin o gün katıldığı oturumların formları tek postada gider, günün son katıldığı oturumunun bitişinden 2 saat sonra. Hatırlatma da tek postadır.
 10. **Form kapanınca bekleyen hatırlatma iptal olur,** form sonra yeniden açılsa da gitmez.
