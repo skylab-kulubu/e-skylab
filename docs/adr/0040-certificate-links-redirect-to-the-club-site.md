@@ -27,3 +27,22 @@ Karar (Yusuf, 2026-11-23, K4, K5, S2, S5).
 1. **PDF'e yazılmaz,** yalnız doğrulama sayfasında görünür.
 2. **Süre ölçülmez.** CME katılım süresine kredi verir; bizdeki saat, katılınan oturumların program süresidir.
 3. **Kişi başına gizleme yok;** satır her sertifikada görünür.
+
+## Ek: doğrulama QR'ı varsayılan ama isteğe bağlı (2026-11-24)
+
+Karar (Yusuf, 2026-11-23; 2026-11-24 akşamı güncellendi: "varsayılanda da olmasın" yerine "varsayılanda kalsın, zorunlu olmasın").
+
+- **QR isteğe bağlıdır, QR ya da seriden biri zorunludur.** Sertifika şablonunun zorunlu katmanları alıcı adı, etkinlik adı ve doğrulama QR'ı ya da sertifika numarası katmanından en az biridir: kâğıttaki sertifika her zaman doğrulanabilir. Düzenleyen QR'ı kaldırabilir; seri katmanı olan QR'sız şablon kaydedilir, yayınlanır ve QR'sız PDF üretir. Son kalan QR ya da seri silinmek istenince editör uyarır.
+- **Varsayılan şablon QR'lı kalır.** Kulübün varsayılan şablonu ve editörde açılan yeni şablon QR'la başlar.
+- **Doğrulama seri numarasıyla çalışır.** Adres QR'dan bağımsızdır: `skyl.app/c/{seri}` → `yildizskylab.com/sertifika/{seri}`. Sertifika satırında ve sertifika postasında durur. QR bu adresin basılı kısayoludur; yukarıdaki "printed QRs stay compact" gerekçesi QR'lı şablonlar için geçerlidir.
+- Uygulama: core-backend #421 (şablon doğrulaması), core-frontend #175 (editörde QR katmanı silinebilir), skylab-site #108 (`/sertifika`'da numarayla doğrulama kutusu).
+
+### Endüstri uygulamasıyla karşılaştırma
+
+**Uyanlar:**
+- **Accredible ve Certifier.** Sertifika tasarım aracında QR bir öğedir, şablona eklenip çıkarılabilir; doğrulama sertifikanın bağlantısıyla yapılır.
+- **Credly.** Doğrulama rozetin bağlantısıyla yapılır; QR doğrulamanın şartı değildir.
+
+**Sapmalar:**
+1. **Varsayılan şablonda QR var.** Credly'de basılı QR yoktur; bizde varsayılan QR'lıdır, kaldırmak düzenleyenin seçimidir.
+2. **Sitede hesap ya da rozet cüzdanı yok.** Doğrulama yalnız seriyle yapılır: `yildizskylab.com/sertifika` sayfasına numara girilir ve `yildizskylab.com/sertifika/{seri}` açılır (Coursera'nın `verify/{kod}` adresi gibi); kişinin profil sayfası yoktur.
