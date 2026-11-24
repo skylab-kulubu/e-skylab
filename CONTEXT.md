@@ -421,7 +421,7 @@ _Avoid_: giving it to Leaders or to DK; treating it as the editor role (that is 
 
 **Product hostname**:
 The subdomain of `yildizskylab.com` a product is served on, with `sandbox-<name>.` for its sandbox (ADR-0090). Product names are short English words for the product's job: `admin.`, `my.`, `forms.`, `notify.` (the SkyNotify UI), `status.` (the status page; the server jobs' heartbeat is its `/heartbeat` path), `events.` (SkyEvents). Event and club names are proper nouns and stay as they are (`gecekodu.`, `artlab.`, `skydays.`, `yildizjam.`, `ekstrem.`, `arge.`, `agc.`). A renamed product has one address: the old name is deleted at the cutover, not kept as a redirect. `bildirim.` and `duyuru.` are Microsoft 365 sender subdomains, not product hostnames.
-_Avoid_: Turkish product hostnames (`iletisim.`, `durum.`, `nabiz.`); `mail.` for the SkyNotify UI; keeping an old hostname as a redirect; renaming repositories, the Keycloak client `skymail` or the `skymail:*` roles along with a hostname
+_Avoid_: Turkish product hostnames (`iletisim.`, `durum.`, `nabiz.`); `mail.` for the SkyNotify UI; keeping an old hostname as a redirect
 
 ### Event operations
 
@@ -514,8 +514,12 @@ People assigned to one Competition, optionally. Organizers are the Leaders of th
 _Avoid_: making every Owner-team Member a manager; deriving judges from team membership; reading the retired Team setting on competitors (`members_manage_competitors`) as any right; letting a plain member add someone else as a competitor; reading the right to edit the Event as a right to add others as competitors
 
 **SkyNotify**:
-The club's communication service and its console (ADR-0070, ADR-0091), formerly called SkyMail. It delivers every Notification on every Channel and is where Mail templates, mailing lists, Mail onayı and Suppressions live. Its console is served at `notify.`. The name is shown to people; the technical identifiers keep the old name: the repositories `skymail-backend` and `skymail-frontend`, the Keycloak client `skymail` and `aud=skymail`, the `skymail:*` roles and `/ROLLER/SKYMAIL-*` Role groups, `SKYMAIL_*` settings, images, the database and metrics.
-_Avoid_: SkyMail as the product's name (only technical identifiers keep it); İletişim as the product's name; renaming the Keycloak client, roles, settings or images along with the name; calling the shared club mailbox on `mail.yildizskylab.com` SkyNotify (it is a separate product)
+The club's communication service and its console (ADR-0070, ADR-0091), called SkyMail until 2026-11-24. It delivers every Notification on every Channel and is where Mail templates, mailing lists, Mail onayı and Suppressions live; its console is served at `notify.`. All its names move to `skynotify` in one cutover (ADR-0091): repositories `skynotify-backend` and `skynotify-frontend`, the Keycloak client `skynotify` and its `skynotify:*` roles, `SKYNOTIFY_*` settings, images, the database. Until that cutover the technical names in this document still read `skymail`.
+_Avoid_: calling it SkyMail (that is now the club mailbox); İletişim as the product's name; keeping both the old and the new technical name side by side after the cutover
+
+**SkyMail**:
+The club's shared mailbox product on `mail.yildizskylab.com` (ADR-0091): YK members' personal club addresses and the shared `info@` box, with its own Keycloak client, repositories and database in the shared Postgres. Until 2026-11-24 "SkyMail" was the name of SkyNotify: older ADRs that say SkyMail or `skymail` mean SkyNotify.
+_Avoid_: taking SkyNotify's old technical names (`skymail-*` repositories, the `skymail` client, roles, database, images) before SkyNotify's cutover is finished; calling SkyNotify SkyMail
 
 **Notification** (Bildirim):
 One "what happened, to whom" request a service such as core sends to the communication service (SkyNotify, ADR-0070): a Notification type, its recipients by Keycloak `sub`, the variables, and an `Idempotency-Key`. The sender says what and to whom; SkyNotify picks the Channels, the time and the wording. For optional types the sender also passes the Channels each person allows, from their Communication preference.

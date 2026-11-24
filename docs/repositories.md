@@ -18,8 +18,8 @@ depolarını değil, ortak kulüp platformunu oluşturan ürünleri kapsar. Diğ
 | [`cms-backend`](https://github.com/skylab-kulubu/cms-backend) | Site içeriği ve yayın API'si | CMS API |
 | [`forms-backend`](https://github.com/skylab-kulubu/forms-backend) | Form, şablon ve yanıt alanı | Forms API |
 | [`forms-frontend`](https://github.com/skylab-kulubu/forms-frontend) | Form oluşturma, doldurma ve yönetim arayüzü | `forms.yildizskylab.com` |
-| [`skymail-backend`](https://github.com/skylab-kulubu/skymail-backend) | SkyNotify (eski adı SkyMail, ADR 0091): bildirim ve posta taslağı, liste, onay ve gönderim API'si | SkyNotify API |
-| [`skymail-frontend`](https://github.com/skylab-kulubu/skymail-frontend) | SkyNotify konsolu: bildirim ve posta operasyon arayüzü | `notify.yildizskylab.com` (ADR 0090) |
+| [`skymail-backend`](https://github.com/skylab-kulubu/skymail-backend) | SkyNotify (24 Kasım 2026'ya kadar adı SkyMail'di; depo `skynotify-backend` adına taşınacak, ADR 0091): bildirim ve posta taslağı, liste, onay ve gönderim API'si | SkyNotify API |
+| [`skymail-frontend`](https://github.com/skylab-kulubu/skymail-frontend) | SkyNotify konsolu: bildirim ve posta operasyon arayüzü; depo `skynotify-frontend` adına taşınacak (ADR 0091) | `notify.yildizskylab.com` (ADR 0090) |
 | [`skylcn-ui`](https://github.com/skylab-kulubu/skylcn-ui) | Paylaşılan tasarım sistemi; hazırlanıyor (ADR 0055) | Paket (`@skylab-kulubu/skylcn-ui`, henüz yayımlanmadı) |
 | [`inscribed-auth`](https://github.com/skylab-kulubu/inscribed-auth) | Paylaşılan kimlik doğrulama SDK'sı | Paket (`@skylab-kulubu/inscribed-auth`) |
 | [`skylab-assets`](https://github.com/skylab-kulubu/skylab-assets) | Resmî logo ve marka varlıkları | Varlık deposu |
