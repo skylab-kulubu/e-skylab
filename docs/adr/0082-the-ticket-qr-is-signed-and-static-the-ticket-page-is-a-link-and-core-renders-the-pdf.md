@@ -71,7 +71,7 @@ Karar (Yusuf, 2026-11-22; 1–16. soruların hepsinde önerilen şık, 5. soruda
 9. **Etkinlik iki kapı düzeniyle işler** (Yusuf, 12. soru). Etkinlik ayarı `entryMode` iki değer alır:
    - `per_session` (varsayılan, bugünkü davranış): görevlinin okutması o oturuma Check-in yazar.
    - `venue`: görevlinin okutması o güne **Alana giriş** yazar. Yanıt yine 201'dir, gövdede `kind: "entry"` vardır; aynı gün ikinci okutma 409 alır.
-   - Alana giriş, bilet × EventDay başına bir kayıttır ve kaynağını taşır (`scan`, `desk`, `attendance`). Yoklama değildir, sertifikada ve geri bildirim kitlesinde sayılmaz.
+   - Alana giriş, bilet × EventDay başına bir kayıttır ve kaynağını taşır (`scan`, `desk`, `attendance`). Yoklama değildir, sertifikada ve geri bildirim kitlesinde sayılmaz (sertifika için ADR-0026 eki ile daraltıldı: canlı oturumu olmayan etkinlikte alana giriş katılımdır).
    - Her oturum Check-in'i, eksikse o günün Alana giriş kaydını da yazar (kaynak `attendance`). Girişte okutulmamış birinin yoklaması reddedilmez (Yusuf, model B kararı). Bu kural `per_session` düzeninde de geçerlidir (orkestratör kararı, tutarlılık için: "o gün alanda bulundu mu" sayısı iki düzende aynı soruya cevap verir).
    - Masa iki düzende de oturuma Check-in yazar; `venue` düzeninde ayrıca "Alana giriş" düğmesi vardır.
    - Ekrandaki yoklama QR'ı iki düzende de açıktır: `per_session`'da yedek, `venue`'de asıl yoldur.
@@ -105,7 +105,7 @@ Kaynaklar:
 - **Site.** `/bilet/[key]`, PDF ile aynı belge görünümünde ve etkinliğin temasıyla. `/ekran/[key]`. `/kapi` "Oturum yoklaması" olur, bilet anahtarını ve e-postayı hatırlar.
 - **Panel.** Katılımcı satırında kod, yeniden gönder, yenile; masada kodla arama. "Bilet görünümü" kartı, kapı düzeni ayarı, yoklama ekranı bağlantıları, "kapıda okutulmadan girdi" sayısı; statik "Oturum QR indir" `qr` kipinde yoklama ekranı bağlantısına döner.
 - **sky-app (Mobile Lab).** Bugünkü tarayıcı Ticket QR'ı değişmeden okur. Sözleşme: metinler, 410, JWKS ile cihazda doğrulama, "etkinliklerim"de QR; "QR Okut" `/kapi/{id}?dq=` biçimini tanır; tarayıcı `kind: entry` yanıtını alır.
-- **Sertifika.** Attendance rule yalnız oturum Check-in'lerini sayar. `venue` düzeninde yalnız kapıdan girip hiçbir yoklamaya katılmayan kişi `once` ile de sertifika almaz; panelin kural metni bunu söyler.
+- **Sertifika.** Attendance rule yalnız oturum Check-in'lerini sayar. `venue` düzeninde yalnız kapıdan girip hiçbir yoklamaya katılmayan kişi `once` ile de sertifika almaz; panelin kural metni bunu söyler. (ADR-0026 eki ile daraltıldı: canlı oturumu olmayan etkinlikte alana giriş katılım sayılır.)
 - **Etkinlik kopyası (ADR-0066).** `ticketBrand`, `ticketAccentColor` ve `entryMode` yapıdır, kopyaya gelir.
 - **Saklama (ADR-0062).** Yeni bir kişisel veri kategorisi yok. Hesap silmede (ADR-0051) bilet anonimleşir ve kalır; silme adımı erişim anahtarını boşaltır ve `qr_version`'ı artırır, yani sayfa `404`, eski QR `410` olur (core'un `anonymize_core` adımına ek). Bilet arşivlenince ya da silinince anahtar ve kod onunla gider. PDF saklanmaz; ek gönderilince silinir.
 - **Walk-in.** Walk-in biletinin de kodu ve anahtarı olur, ama bilet postası gitmez (ADR-0032).
