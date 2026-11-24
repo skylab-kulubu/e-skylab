@@ -19,7 +19,7 @@ depolarını değil, ortak kulüp platformunu oluşturan ürünleri kapsar. Diğ
 | [`forms-backend`](https://github.com/skylab-kulubu/forms-backend) | Form, şablon ve yanıt alanı | Forms API |
 | [`forms-frontend`](https://github.com/skylab-kulubu/forms-frontend) | Form oluşturma, doldurma ve yönetim arayüzü | `forms.yildizskylab.com` |
 | [`skymail-backend`](https://github.com/skylab-kulubu/skymail-backend) | Posta taslağı, liste, onay ve gönderim API'si | Mail API |
-| [`skymail-frontend`](https://github.com/skylab-kulubu/skymail-frontend) | Posta operasyon arayüzü | `mail.yildizskylab.com` |
+| [`skymail-frontend`](https://github.com/skylab-kulubu/skymail-frontend) | Posta operasyon arayüzü | `notify.yildizskylab.com` (ADR 0090) |
 | [`skylcn-ui`](https://github.com/skylab-kulubu/skylcn-ui) | Paylaşılan tasarım sistemi; hazırlanıyor (ADR 0055) | Paket (`@skylab-kulubu/skylcn-ui`, henüz yayımlanmadı) |
 | [`inscribed-auth`](https://github.com/skylab-kulubu/inscribed-auth) | Paylaşılan kimlik doğrulama SDK'sı | Paket (`@skylab-kulubu/inscribed-auth`) |
 | [`skylab-assets`](https://github.com/skylab-kulubu/skylab-assets) | Resmî logo ve marka varlıkları | Varlık deposu |

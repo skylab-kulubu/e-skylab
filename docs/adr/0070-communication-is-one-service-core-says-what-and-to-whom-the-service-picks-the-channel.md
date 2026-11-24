@@ -54,7 +54,7 @@ Nasıl:
 ## Açık
 
 - **Firebase ve Apple Developer hesabı:** Mobile Lab cevap verdi (2026-10-13): sky-app henüz mağazalarda değil, Firebase projesi yok ve açılacak. Proje kulüp adına açılır, sahibi kulüp hesabı olur, Mobile Lab düzenleyicidir. Apple Developer hesabı yayın zamanında aynı kuralla açılır. Push bu hesaplar açılana kadar başlamaz.
-- **Alan adı:** yeni ad (`iletisim.` ya da `notification.`) ve zamanı sonraki adımda seçilir.
+- **Alan adı:** yeni ad (`iletisim.` ya da `notification.`) ve zamanı sonraki adımda seçilir. _Karara bağlandı (2026-11-24): ADR 0090, `notify.yildizskylab.com`; eski adlar yönlendirme olarak tutulmaz._
 - **SMS:** abonelik ve başlık YTÜ'ye mi bir derneğe mi.
 - **Bildirim türü kataloğu:** hangi türün hangi kategoride olduğu, hangisinin zorunlu olduğu ve varsayılan kanalları core'un kategorileriyle birlikte yazılır.
 
