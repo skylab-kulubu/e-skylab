@@ -14,7 +14,7 @@
 5. **Veri sahipliği paylaşılmaz.** Her servis kendi şemasını ve geçişlerini
    yönetir; başka bir servisin tablolarına doğrudan yazmaz.
 6. **Silme geri alınabilir olmalıdır.** Ürün verilerinde varsayılan yaklaşım
-   soft delete ve denetlenebilir yaşam döngüsüdür. Güvenlik, yasal saklama veya
+   soft delete ve denetlenebilir yaşam döngüsüdür. Güvenlik, saklama süresi veya
    gizlilik nedeniyle fiziksel silme gerekiyorsa ürün deposunda açıkça
    belgelenir.
 

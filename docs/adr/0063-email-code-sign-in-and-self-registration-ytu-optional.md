@@ -4,8 +4,6 @@ status: accepted
 
 # E-SKY LAB'e e-posta koduyla kayıt ve giriş; YTÜ hesabı isteğe bağlı, ilk YTÜ girişinde okul adresi birincil
 
-_Güncelleme (2026-11-24): Yönetici hesaplarında (ADMIN, YK, DK; panel) ikinci adım (passkey ya da TOTP) zorunlu değildir. Bu bilinçli bir sapmadır (Yusuf, 2026-11-24): Microsoft yönetici hesaplarında oltalamaya dayanıklı ikinci adım ister, NIST SP 800-63B-4 e-posta kodunu doğrulayıcı saymaz. Yönetici de sıradan hesap gibi kodla, parolayla ya da passkey'le girer._
-
 Kişiler okul e-postası ve okul Microsoft şifresi istenince "bilgilerimizi çalıyorlar" hissine kapılıyor. Bir kısmı da okul şifresini bilmediği için vazgeçiyor. 128 hesabın 115'i YTÜ Microsoft'a bağlı, parolası olan tek kişi var. YTÜ'süz kendi kendine kayıt kapalı (`registrationAllowed=false`); mezun, personel ve başka üniversiteden gelen kişi hesap açamıyor. İlk YTÜ girişi altı ekran sürüyor: SKY LAB eşleyicisi Microsoft'tan gelen e-postayı her girişte siliyor, bu yüzden yeni kişiye bir profil formu ve bir doğrulama bağlantısı daha çıkıyor. 20 hesabın birincil adresi hiç yok. Araştırma ve spec hub'daki `eskylab-login-ux` çalışma notlarında (2026-10-04).
 
 Karar (Yusuf, 2026-10-04; S1-S8 olduğu gibi onaylandı):
@@ -48,7 +46,7 @@ Nasıl:
 - **Application Initiated Actions.** CONTEXT.md'deki "Application Initiated Actions as the product path" yasağı Account center'ın kimlik, kimlik bilgisi ve e-posta değişikliklerini kapsar; onlar yine yalnız sky-account SPI'sinden geçer. İki yer bu yasağın dışındadır ve yeni değildir:
   - Account center'ın gönderdiği tek eylem YTÜ bağlamadır (`kc_action=idp_link`), çünkü bağlantıyı yalnız kişinin Microsoft'taki girişi kanıtlar.
   - Kayıttan hemen sonraki öneriler `e.`'deki giriş akışının parçasıdır, Account center'ın self-service'i değildir. Orada Keycloak'ın hazır eylemleri (`idp_link`, `webauthn-register-passwordless`, `UPDATE_PASSWORD`) kullanılabilir. `idp_link`'in akış içinden tetiklenmesi prototipte doğrulanır; olmazsa kişi giriş bittikten sonra Account center'daki "YTÜ hesabımı bağla"ya gönderilir.
-- **Kayıt yeni bir veri toplama noktasıdır** (ad, soyad, e-posta). Dayanağı sözleşmenin ifasıdır (KVKK md. 5/2-c), açık rıza ve onay kutusu yoktur; aydınlatma metnine veri kaynağı olarak eklenir. Giriş ekranındaki KVKK cümlesi "kabul ediyorsunuz" kalıbından çıkar, "okuyabilirsin" olur. Yeni alıcı yoktur (SkyMail, Microsoft, Cloudflare zaten listede). Saklama ADR-0062'dedir: hesap "üye hesabı ve profili" satırına girer; bekleyen kodlar on dakikada kendiliğinden silinir; tamamlanmayan kayıttan yalnız Keycloak olayı ve SkyMail gönderim kaydı kalır.
+- **Kayıt yeni bir veri toplama noktasıdır** (ad, soyad, e-posta). Onay kutusu yoktur; gizlilik metnine veri kaynağı olarak eklenir. Giriş ekranındaki gizlilik cümlesi "kabul ediyorsunuz" kalıbından çıkar, "okuyabilirsin" olur. Yeni alıcı yoktur (SkyMail, Microsoft, Cloudflare zaten listede). Saklama ADR-0062'dedir: hesap "üye hesabı ve profili" satırına girer; bekleyen kodlar on dakikada kendiliğinden silinir; tamamlanmayan kayıttan yalnız Keycloak olayı ve SkyMail gönderim kaydı kalır.
 - **Microsoft izin ekranı ilk YTÜ girişinde kalır** (karar 6). Ekran sayısı hedefi bu ekranı saymaz.
 - **ADR-0044 değişmez;** bu ADR onu genişletir: Personal e-mail'in kanıtı kayıtta da yapılabilir, kod kuralları aynıdır. Giriş, kayıt ve Account center'daki adres kanıtının kodu altı hanedir (2026-10-16 kararı).
 - **CONTEXT.md'de değişenler:**
@@ -85,7 +83,7 @@ Nasıl:
 - **Keycloak'ın hazır kayıt formu** (parola ve doğrulama bağlantısı): parola şikâyetin kendisi. Bağlantıyı ADR-0044 reddetti. Hazır form ayrıca hesabı adres kanıtlanmadan açar.
 - **Sihirli bağlantı:** ADR-0044'teki gerekçeyle reddedildi. Oturumsuz açılan bağlantı ya bozulur ya da başkasının adına tıklatılabilir.
 - **Topluluk e-posta OTP eklentisi:** kod deposu, oran sınırı, SkyMail ve adres çözümleme bizde zaten var. Eklentiyi alsak da bakımı ve güvenlik incelemesi bize kalırdı.
-- **Google reCAPTCHA** (Keycloak'ın hazır CAPTCHA'sı): yeni bir yurt dışı alıcı getirir, kullanıcıyı da yorar.
+- **Google reCAPTCHA** (Keycloak'ın hazır CAPTCHA'sı): yeni bir dış alıcı getirir, kullanıcıyı da yorar.
 - **Tek e-posta kutusuyla alan adına göre yönlendirme** (Keycloak Organizations, identity-first): Yusuf iki düğmeyi seçti.
 - **Kayıt anında parola istemek.**
 - **Okul adresiyle kodla hesap açmak:** okul posta kutusunu okuyabilen aynı Microsoft hesabına da girebilir. Kodlu okul hesabı hem doğrulanmamış bir School e-mail hem de sonradan gelecek bir çift hesap demek.

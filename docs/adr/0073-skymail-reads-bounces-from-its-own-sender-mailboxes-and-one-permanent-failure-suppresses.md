@@ -31,7 +31,7 @@ Karar (2026-10-20, Yusuf: K1–K4; ayrıntılar hub SPEC skymail-bounce-isleme v
 3. **Okuyucu kutuyu yoklar.**
    - Her 5 dakikada Graph delta sorgusu (`mailFolders/inbox/messages/delta`); her yeni öğenin MIME'ı (`$value`) bellekte ayrıştırılır. Ham MIME SkyMail'de saklanmaz; yalnız delta bağlantısı saklanır.
    - Aynı anda tek okuyucu koşar (Postgres advisory lock); replika sayısı fark etmez.
-   - Bayrak `SKYMAIL_BOUNCE_READER=off|dry-run|on`, varsayılan `off`. `dry-run` okur ve sayar; ret ve bastırma yazmaz, yalnız kutudaki yerini (delta bağlantısı) ve sayıları tutar. Production'da `on` aydınlatma metninin teslim durumu satırını bekler (hub bileti 07).
+   - Bayrak `SKYMAIL_BOUNCE_READER=off|dry-run|on`, varsayılan `off`. `dry-run` okur ve sayar; ret ve bastırma yazmaz, yalnız kutudaki yerini (delta bağlantısı) ve sayıları tutar. Production'da `on` gizlilik metninin teslim durumu satırını bekler (hub bileti 07).
 
 4. **Yalnız standart rapor işlenir, ve yalnız SkyMail'in postasına bağlanabiliyorsa.**
    - Üst tür `multipart/report; report-type=delivery-status` (RFC 6522) olmalı. Yalnız `message/delivery-status` bölümü ve geri dönen postanın başlıkları okunur. Konu, insan metni ve HTML hiç okunmaz; Exchange bunları kutunun diline göre yazar.
@@ -81,7 +81,7 @@ Karar (2026-10-20, Yusuf: K1–K4; ayrıntılar hub SPEC skymail-bounce-isleme v
 - **Arayüz (skymail-frontend).** Bastırma listesinde bounce satırını onaylı kaldırma, gönderim sayfasında "ulaşmadı" ve "bastırıldı" sayıları, hesap postası işareti, yumuşak ret etiketi (hub bileti 08).
 - **Keycloak.** `skymail` istemcisine `skymail:suppressions:manage`, bir gruba; ADR-0072'nin `skymail:unsubscribes:reactivate` rolüyle aynı reconcile değişikliğinde (hub bileti 06). Rol verilene kadar listeyi kimse okuyamaz ve kaldıramaz.
 - **Ops.** Uygulama kaydı, sertifika, yönetim kapsamı ve saklama etiketi bir wizard ile kuruldu (hub biletleri 02 ve 12). Yönlendirme kuralı Audit kipinde kuruldu; posta provası, Graph provası ve Enforce'a geçiş (`--posta-provasi`, `--prova`, `--kural-enforce`) henüz kayıtlı değil (bilet 02). Sertifika iki yıllıktır; bitişten önce yenileme aynı wizard'dadır. Okuyucunun açılması sandbox'ta gerçek bir NDR ile eşlemenin doğrulanmasını bekler.
-- **Metinler.** KVKK Aydınlatma Metni'ne "e-posta teslim durumu" girer: amaç (ulaşmayan adrese yeniden göndermemek, hesap postalarının ulaşmasını korumak), dayanak (meşru menfaat), süreler ve Microsoft'un posta teslim eden veri işleyen olduğu (hub bileti 07).
+- **Metinler.** Gizlilik metnine "e-posta teslim durumu" girer: amaç (ulaşmayan adrese yeniden göndermemek, hesap postalarının ulaşmasını korumak), süreler ve postayı Microsoft'un teslim ettiği (hub bileti 07).
 - **Saklama.** Süreler ADR-0062'nin iki ekindedir (2026-10-27): ret kaydı (adressiz) 1 yıl; bastırma kaydı (adres) kaldırılana ya da hesap silinene kadar; kaldırma denetim kaydı (adressiz, görevlinin kimliğiyle) 3 yıl, sonra silinir (Yusuf, 2026-10-27).
 - **Bilinen sınırlar.**
   - Düz metin bounce işlenmez (sapma 2). Böyle bir rapor gönderen sunucunun alıcısı bastırılmaz; adrese posta gitmeye devam eder.
@@ -116,7 +116,7 @@ Karar (2026-10-20, Yusuf: K1–K4; ayrıntılar hub SPEC skymail-bounce-isleme v
 
 ## Considered Options
 
-- **Gönderimi SES ya da Postmark'a taşımak.** Bounce ve şikâyeti sağlayıcı işlerdi. Yeni gönderici alan adı, DKIM, SPF, Return-Path, ödeme ve hesap sahibi, KVKK md. 9 kapsamında yeni bir yurt dışı aktarım gerekirdi. Bizim ölçekte gereksiz yük (Yusuf, K2).
+- **Gönderimi SES ya da Postmark'a taşımak.** Bounce ve şikâyeti sağlayıcı işlerdi. Yeni gönderici alan adı, DKIM, SPF, Return-Path, ödeme ve hesap sahibi, yeni bir dış sağlayıcı gerekirdi. Bizim ölçekte gereksiz yük (Yusuf, K2).
 - **IMAP ve OAuth.** `IMAP.AccessAsApp` kiracı geneli Entra izni ve kutuda `FullAccess` (okuma, yazma, silme) ister. Graph salt okur ve kapsamlıdır.
 - **Posta akışı kuralıyla raporları dış bir ayrıştırma servisine yönlendirmek.** Adres ve orijinal başlıklar kiracının dışına akardı. Exchange'in kendi ürettiği NDR'lere kural uygulanıp uygulanmadığı belgede yok.
 - **İnsanların da kullandığı eski gönderen kutusunu okumak.** İnsan postası ve SkyMail raporları aynı kutuda olurdu; okuyucunun yetkisi insanların postasını da kapsardı. Ayrı kutular açıldı (K1).
@@ -150,4 +150,4 @@ Karar (Yusuf, 2026-10-26). Karar 1–9 aynen geçerlidir.
 - **Kişi bastırmayı kaldıramaz.** Karar 7 aynen geçerlidir: kaldırma yalnız panelden, `skymail:suppressions:manage` rolüyle yapılır. Hesap Merkezi yalnız gösterir.
 - **Olay, core kaydı ve core ucu yoktur.** core bastırma bilgisini hiçbir kararında kullanmaz, bu yüzden araya girmez (ADR-0075 karar 2). Kişiye kendiliğinden bildirim istenirse yeniden değerlendirilir (ADR-0071 eki 2026-10-26).
 - **Bilinen sınır.** Kişinin `sub`'ı bastırma kaydına yalnız gönderim kişiyi biliyorsa yazılır (karar 8). Keycloak'un giriş kodu ve bugün Forms'un postaları kişisiz gider. Kişisiz bastırılmış bir kişisel adres, token'da karşılığı yoksa görünmez. Birincil adres doğrulanmışsa, okul adresi de token'da varsa, token'dan eşlendiği için görünür.
-- **Aydınlatma.** Consequences'taki "e-posta teslim durumu" satırının amacına, bastırmanın kişiye Hesap Merkezi'nde gösterilmesi de girer (hub bileti skymail-bounce-isleme 07).
+- **Gizlilik metni.** Consequences'taki "e-posta teslim durumu" satırının amacına, bastırmanın kişiye Hesap Merkezi'nde gösterilmesi de girer (hub bileti skymail-bounce-isleme 07).

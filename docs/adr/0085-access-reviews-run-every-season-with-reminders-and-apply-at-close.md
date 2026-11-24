@@ -39,7 +39,7 @@ Kaynaklar:
 
 - **ADR-0078 karar 6 bu ADR'la değişir.** "Ayrı bir kampanya motoru yazılmaz", "dönem açılınca tek hatırlatma postası" ve "işaretler kapanınca silinir" cümleleri düşer. "YK en üst ekiplerin liderlerini, ADMIN Privileged kökleri gözden geçirir" cümlesi, yönetim üyelikleri için Dönem devri ekranına yönlenir. ADR-0078'in gövdesi yeniden yazılmaz; başına bir not düşülür.
 - **CONTEXT.md'de Access review tanımı yeniden yazılır.** Dönem, birincil ve yedek gözden geçiren, kapanışta uygulama ve 30 günlük saklama eklenir. "_Avoid_: a campaign engine" çıkar.
-- **Aydınlatma metnine bir ek gelir:** "kalsın / çıksın" kararları ve 30 günlük süre. Production'da `apply` açılmadan önce yayında olur.
+- **Gizlilik metnine bir ek gelir:** "kalsın / çıksın" kararları ve 30 günlük süre. Production'da `apply` açılmadan önce yayında olur.
 - **ADR-0062 tablosuna bir satır eklenir:** `access_review_items_age`.
 - **Uygulama adımının sunucuda yetki okuması gerekir.** Kapanış işi, kararı verenin bugünkü gruplarını Keycloak'tan okuyarak yetkiyi denetler. Davet kabulü (ADR-0084) de aynı yardımcıyı kullanır.
 - **Bilinçli risk:** yanıt vermeyen liderin ekibinde kimse çıkmaz. D-7 yükseltmesi ve kapanış özeti bunu görünür tutar.

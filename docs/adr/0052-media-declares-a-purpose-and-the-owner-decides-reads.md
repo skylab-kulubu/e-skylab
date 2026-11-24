@@ -29,7 +29,7 @@ We keep **one media service in core**. Every Media has a **Media purpose**: prof
 
 **Private purposes (Answer file, certificate asset):**
 - They never get a public address.
-- Core encrypts each file with its own data key, wrapped by a key held by the secret service (OpenBao) that rotates every 90 days. This follows KVKK's cloud guidance that data reaches the cloud already encrypted.
+- Core encrypts each file with its own data key, wrapped by a key held by the secret service (OpenBao) that rotates every 90 days.
 - Core reaches the secret service with its own identity. That identity may only encrypt, decrypt and rewrap.
 - The owning product decides who may open a file. For Answer files that is Skyforms. It then asks core for a five-minute link; core decrypts and streams the file and records who opened what.
 

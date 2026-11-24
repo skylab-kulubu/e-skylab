@@ -55,7 +55,7 @@ Karar (2026-10-21). İlke, S1–S3 cevapları ve karar 10 Yusuf'undur; öteki ay
      - kanalın ana anahtarı kapalıdır;
      - o kategoride kişinin kendi "kapalı" seçimi geçerlidir. Bu seçim doğrudan o kategoride ya da üst ekipte yapılmış olabilir (ADR-0067 kalıtımı).
    - **Varsayılan tek başına engellemez.** Kitleyi listeyi gönderen seçmiştir; core yalnız çıkışı uygular.
-     - Bu yüzden listeye konmuş, Member olmayan bir hesap da (konuk, Place kullanıcısı) çıkış yapmadıysa postayı alır (Yusuf, 2026-10-21). Listenin hukuki dayanağı gönderenindir (ADR-0062).
+     - Bu yüzden listeye konmuş, Member olmayan bir hesap da (konuk, Place kullanıcısı) çıkış yapmadıysa postayı alır (Yusuf, 2026-10-21). Listeye kimin konacağı gönderenin sorumluluğundadır (ADR-0062).
      - Haber gönderiminin kitlesi (ADR-0067) bundan ayrıdır: core'un varsayılanlarıyla çözülür ve değişmez.
    - **Adres.** Posta listedeki adrese gider; kişiye eşleşen adreste tercih kişinindir. ADR-0070 karar 3 ("alıcı kişidir") yeni bildirim ucu içindir. Operatör postası adres tabanlı kalır ve Contact point kullanmaz.
    - **core yanıt vermezse gönderim yazılmaz.** Operatör ya da onaylayan yeniden dener. Onaylı gönderimde soru onay anında sorulur.
@@ -90,11 +90,11 @@ Karar (2026-10-21). İlke, S1–S3 cevapları ve karar 10 Yusuf'undur; öteki ay
      - Postmark'a göre toplu posta aynı içeriğin birçok alıcıya gitmesidir, ve onu alıcının bir eylemi tetiklemez.
      - CAN-SPAM'in "işlem ya da ilişki iletisi" tanımı ticari işlemler içindir; burada yalnız benzetme olarak anılır.
    - **Form sahibinin yanıtlayanlara yaptığı toplu gönderim duyuru akışındadır.** Bu gönderim Forms'un "mail-source" anlık görüntüsü ve SkyMail'deki gönderim ya da onay yoluyla yapılır. Posta yalnız alıcının kendi başvurusu hakkındaysa gönderen beyanla işlem amacını seçebilir (karar 2): yer ya da saat değişikliği, eksik belge, sonuç. Genel duyuru, davet ya da başka bir etkinlik duyurudur. Belirsizse duyurudur.
-9. **KVKK ve 6563.**
-   - Kulüp postası ticari elektronik ileti değildir: sponsor tanıtımı, ücretli bilet, şirket iş ilanı ya da çekiliş içermez. Gönderen bunu her duyuru gönderiminde beyan eder (ADR-0062, ADR-0067).
-   - Ticari içerik olsaydı 6563 sayılı Kanun'un onayı, İYS kaydı ve ret bildiriminin üç iş günü içinde uygulanması gerekirdi. Kulüp tüzel kişi olmadığı için İYS'ye kaydolamaz; bu yüzden ticari içerik gönderilmez ve ticari akış yoktur.
-   - Duyuru postası Member'a meşru menfaatle gider (ADR-0062). KVKK md. 11'de GDPR'ın doğrudan pazarlamaya itirazı gibi genel bir itiraz hakkı yoktur. Tek tık çıkış meşru menfaat dengesinin önlemidir.
-   - Çıkış kaydının amacı adrese yeniden göndermemektir (md. 5/2-f). Kayıt şu durumlardan biri olana kadar tutulur: kişi yeniden abone olur, panel kişinin isteğiyle kaydı geri alır, ya da hesap silinir.
+9. **Posta türü ve çıkış kaydı.**
+   - Kulüp postası tanıtım içermez: sponsor tanıtımı, ücretli bilet, şirket iş ilanı ya da çekiliş içermez. Gönderen bunu her duyuru gönderiminde beyan eder (ADR-0062, ADR-0067).
+   - Ticari içerik gönderilmez ve ticari akış yoktur.
+   - Duyuru postası Member'a rıza sorulmadan gider (ADR-0062); her postada tek tık çıkış vardır.
+   - Çıkış kaydının amacı adrese yeniden göndermemektir. Kayıt şu durumlardan biri olana kadar tutulur: kişi yeniden abone olur, panel kişinin isteğiyle kaydı geri alır, ya da hesap silinir.
    - Hesap silme kişinin adreslerindeki kayıtları da siler. ADR-0051 karar 4 silmeden sonrası için daraltılmış haliyle geçerlidir (ADR-0051 eki).
 10. **Duyuru akışı kendi alt alan adından çıkar: `duyuru.yildizskylab.com`** (Yusuf, 2026-10-21).
     - **Önceki kararın yerine geçer.** Yusuf'un 2026-10-20 tarihli "tek alt alan `bildirim.yildizskylab.com`, `duyuru.` yok" kararı (hub SPEC skymail-bounce-isleme §0, "Kesin gönderen düzeni") bu kararla değişir.
@@ -149,8 +149,8 @@ Nasıl:
   - Duyuru alt alanı (karar 10): DNS, M365'te kabul edilen alan adı, duyuru kutusunun adres değişikliği, Dokploy'da `SKYMAIL_FROM_DUYURU`, ısınma.
   - SkyMail çıkış anahtarı OpenBao'ya bir wizard ile girer; wizard yeni anahtar sürümü de ekler. Dokploy'da yalnız referans tutulur.
   - Kenarın erişim logu `/api/skymail/u/` yolunu tutmamalıdır.
-- **Metinler.** KVKK Aydınlatma Metni'ne "abonelikten çıkış kaydı" girer: amacı, dayanağı ve süresi. Duyuru akışının production'da açılması bu metnin yayımlanmasını bekler.
-- **Saklama.** ADR-0062'ye şu satır eklenecek: "SkyMail: duyuru akışından çıkış kaydı (adres, akış, zaman, kaynak) | kişi yeniden abone olana, kişinin isteğiyle geri alınana ya da hesap silinene kadar | meşru menfaat". ADR-0062 bu kayıtla değişmez.
+- **Metinler.** Gizlilik metnine "abonelikten çıkış kaydı" girer: amacı ve süresi. Duyuru akışının production'da açılması bu metnin yayımlanmasını bekler.
+- **Saklama.** ADR-0062'ye şu satır eklenecek: "SkyMail: duyuru akışından çıkış kaydı (adres, akış, zaman, kaynak) | kişi yeniden abone olana, kişinin isteğiyle geri alınana ya da hesap silinene kadar". ADR-0062 bu kayıtla değişmez.
 - **ADR-0067 ve ADR-0051'e tarihli ek** yazılır: çıkış kaydı tercih değildir; ADR-0051 karar 4 silmeden sonrası için daraltılır.
 - **core'un çıkış anahtarı** bugün "hiç döndürülmez" kuralında (`COMMUNICATION_PREFERENCE_KEY`). Aynı anahtar halkasına geçmesi ayrı bir iştir.
 - **Bilinen sınırlar.**
@@ -164,7 +164,7 @@ Nasıl:
 ## Açık
 
 - **DKIM kapsamı** (skymail-bounce-isleme 11, S2). Exchange Online, MIME `sendMail`'deki iki başlığı DKIM imzasının `h=` listesine alıyor mu? Belgelerde yazmıyor; ilk başlıklı postada okunacak. Almıyorsa Gmail tek tık düğmesini göstermeyebilir; o zaman ayrı bir gönderen ya da relay kararı gerekir.
-- **Kimliği olmayan adresin silme başvurusu.** Böyle bir kişi bilgi@'ya KVKK md. 11/e başvurusu yaparsa yol, karar 7'deki yetkili geri almadır; gerekçeye "silme başvurusu" yazılır. Ama kayıt silinince çıkış da kalkar. Adresin listelerden de silinmesi ve yeniden eklenmemesi elle yapılır. Bu, ADR-0051'in kabul ettiği sınırın aynısıdır.
+- **Kimliği olmayan adresin silme başvurusu.** Böyle bir kişi bilgi@'ya silme başvurusu yaparsa yol, karar 7'deki yetkili geri almadır; gerekçeye "silme başvurusu" yazılır. Ama kayıt silinince çıkış da kalkar. Adresin listelerden de silinmesi ve yeniden eklenmemesi elle yapılır. Bu, ADR-0051'in kabul ettiği sınırın aynısıdır.
 - **Şikâyet geri bildirimi.** Yahoo CFL kulübün DKIM alanıyla kurulabilir mi? Ayrı bir takip bileti açıldı.
 
 ## Endüstri uygulamasıyla karşılaştırma
@@ -213,7 +213,7 @@ Nasıl:
     - SES bağlantıyı yer tutucuyla ekler.
 11. **Çıkış süresi.**
     - SkyMail kaydı da core'daki çıkış da göndermeden hemen önce, bir sonraki dağıtım turunda uygulanır. Tek istisna yeni doğrulanmış bir adresin kişiye eşlenmesidir (sapma 1).
-    - Dış sınırlar: Google 48 saat önerir, Yahoo 2 gün şart koşar, 6563 yönetmeliği 3 iş günü, CAN-SPAM 10 iş günü.
+    - Dış sınırlar: Google 48 saat önerir, Yahoo 2 gün şart koşar, CAN-SPAM 10 iş günü.
 12. **Gönderen, kişinin çıkışını yalnız kişi isteyince ya da bir hata olunca geri alır.**
     - Postmark: "only reactivate email addresses when asked to do so, or when mistakes happen". SES contact tercihini API'yle değiştirtir. SendGrid global ve group çıkışlarını panelden kaldırtır. Dynamics rıza kaydını düzenletir ve denetim geçmişi tutar.
     - Bizde bu ayrı bir yetki, gerekçe ve denetim kaydı ister.
@@ -263,7 +263,7 @@ Nasıl:
      - Bizim kiracıda TERRL 10.000 (ölçüm 2026-10-20). İnsan kutularıyla ortaktır. SkyMail'in günlük bütçesi 9.000, toplu şeridin payı 6.300.
    - **Dayanak (a):** ADR-0070'in reddettiği seçenekler.
      - Self-host Novu (seçenek C): tek sunucuya sığmıyor.
-     - SaaS (seçenek D: Knock, Courier, SuprSend, OneSignal): üye verisini yurt dışındaki bir işleyene taşıyor (KVKK md. 9).
+     - SaaS (seçenek D: Knock, Courier, SuprSend, OneSignal): üye verisini dış bir sağlayıcıya taşıyor.
      - Azure Communication Services: 2028-09-30'da emekliye ayrılıyor.
      - Bu yüzden kendi motorumuz Exchange Online kutularından gönderiyor. Duyuru ticari değil ve hacim bu sınırların altında tutuluyor.
      - Tetik: hacim TERRL'ye yaklaşırsa ya da Microsoft kısarsa, gönderim sağlayıcısı kararı yeniden açılır.
@@ -311,18 +311,17 @@ Nasıl:
 - Yahoo: [Sender Best Practices](https://senders.yahooinc.com/best-practices/) (2 gün şartı, IP ya da DKIM alanıyla ayırma), [Complaint Feedback Loop](https://senders.yahooinc.com/complaint-feedback-loop/)
 - Microsoft Outlook.com: [yüksek hacimli göndericiler](https://techcommunity.microsoft.com/blog/outlook/strengthening-email-ecosystem-outlook%E2%80%99s-new-requirements-for-high%E2%80%90volume-senders/4399730) (gövde okunamadı; ikincil özetlere göre SPF, DKIM ve DMARC zorunlu, görünür çıkış bağlantısı öneri)
 - FTC: [CAN-SPAM uyum rehberi](https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business) (işlem ya da ilişki iletisinin tanımı, 10 iş günü, bağlantının en az 30 gün çalışması)
-- Ticari İletişim ve Ticari Elektronik İletiler Hakkında Yönetmelik md. 9 (ret bildirimi, üç iş günü; [RG 04.01.2020, 30998](https://www.turmob.org.tr/arsiv/mbs/resmigazete/30998-30998-1.pdf) değişikliği)
 
 ## Ek (2026-10-24): karar 9, sponsor teşekkürü ve tanıtım izni (ADR-0062 eki)
 
-Karar 9'un ilk iki maddesi ("sponsor tanıtımı, ücretli bilet, şirket iş ilanı ya da çekiliş içermez" ve "ticari içerik gönderilmez") şu kuralla değişir (avukat cevabı 13, Yusuf 2026-10-23; KVKK Aydınlatma Metni s6 §5.10). Karar 9'un öteki maddeleri değişmez.
+Karar 9'un ilk iki maddesi ("sponsor tanıtımı, ücretli bilet, şirket iş ilanı ya da çekiliş içermez" ve "ticari içerik gönderilmez") şu kuralla değişir (Yusuf, 2026-10-23). Karar 9'un öteki maddeleri değişmez.
 
 - **Asıl amaç belirler.** Asıl amacı bilgilendirme olan duyurudaki kısa sponsor teşekkürü ya da sponsor logosu tanıtım sayılmaz. Bu posta duyuru akışından, tercihe göre bütün alıcılara gider.
 - **Tanıtım yalnız izin verene gider.** Asıl amacı tanıtım olan içerik (indirim kodu, şirket iş ilanı, satış, çekiliş) yalnız tanıtım izni veren kişiye gider. Ayrı bir ticari akış açılmaz: tanıtım postası duyuru akışından çıkar. Kitle, karar 3'ün süzgecinden geçen alıcılar ile core'daki tanıtım izni listesinin gönderim anındaki kesişimidir. core yanıt vermezse tanıtım postası gönderilmez. Postadaki çıkış bağlantısı tanıtım iznini kapatır.
 - **Tanıtım izni kişi başına tek bir izindir** ve işaretsiz kutuyla alınır (ADR-0062 eki).
 - **Beyan değişir.** Gönderen artık "ticari içerik yok" değil, "postanın asıl amacı tanıtım değil" beyan eder. Kısa teşekkür ve logo bu beyana engel değildir.
-- **İYS.** Kulüp İYS'ye kayıtlı bir hizmet sağlayıcı değildir. Tanıtım içeriği yalnız kulübün kendi tanıtım iznine dayanarak gider.
-- **Açık:** karar 9'daki "ücretli bilet" örneği s6 §5.10'un listesinde yok. Kulübün kendi ücretli etkinliğinin duyurusu asıl amaç ölçüsüne göre değerlendirilir; ayrı bir kural gerekiyorsa Yusuf karar verir.
+- **Kendi izni.** Tanıtım içeriği yalnız kulübün kendi tanıtım iznine dayanarak gider.
+- **Açık:** karar 9'daki "ücretli bilet" örneği yukarıdaki tanıtım listesinde yok. Kulübün kendi ücretli etkinliğinin duyurusu asıl amaç ölçüsüne göre değerlendirilir; ayrı bir kural gerekiyorsa Yusuf karar verir.
 
 ## Ek (2026-10-25): takip kararı (ADR-0074)
 
@@ -338,7 +337,7 @@ Karar 8'in iki yolu ADR-0075 ile değişir; akış sınıfları değişmez.
 - **Form sahibinin toplu gönderimi.** "Forms'un mail-source anlık görüntüsü" yolu kalkar. SkyMail kitleyi core'dan çözer: kitle türü `form_respondents`, gönderim ya da onay anında çözülür. core yanıtlayanları ve gönderenin forma erişimini Forms'un iç ucundan okur.
 - **Amaç ve süzgeç.** Amaç seçimi ve beyan (karar 2) aynen kalır:
   - `islem` beyanlı posta bütün yanıtlayanlara gider.
-  - `duyuru` postasında Member karar 3'ün süzgecinden geçer. Varsayılan tek başına engellemez, çünkü yanıtlayan kitleye kendi yanıtıyla girmiştir. Değişen yalnız Member olmayanın dayanağıdır.
-  - Member olmayan yanıtlayan duyuru postasını yalnız etkin bir Davet onayıyla alır (ADR-0062). Bu kural için karar 3'teki "listenin hukuki dayanağı gönderenindir" cümlesi bu kitleye uygulanmaz, çünkü kitleyi gönderen değil core çözer.
+  - `duyuru` postasında Member karar 3'ün süzgecinden geçer. Varsayılan tek başına engellemez, çünkü yanıtlayan kitleye kendi yanıtıyla girmiştir. Değişen yalnız Member olmayanın kuralıdır.
+  - Member olmayan yanıtlayan duyuru postasını yalnız etkin bir Davet onayıyla alır (ADR-0062). Bu kural için karar 3'teki "listeye kimin konacağı gönderenin sorumluluğundadır" cümlesi bu kitleye uygulanmaz, çünkü kitleyi gönderen değil core çözer.
   - Hesabı olmayan adres ayrıca karar 4'teki çıkış kaydına bakar.
 - **Kontrol noktası** (karar 3 ve 6) bu gönderime de aynen uygulanır. Bu kitlede tur başına yeniden sorgu Davet onayını da denetler.

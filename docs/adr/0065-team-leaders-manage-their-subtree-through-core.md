@@ -66,7 +66,7 @@ Kaynaklar:
   - Kod değişikliği ise Owner team kayıtlarını, CMS slug'ını ve Forms eşleşmesini kırar. Bu yüzden ancak koda bağlı kayıt yokken yapılır.
   - Ekibe özel haber ve duyuruların ekip yolunu ekip adlandırılınca ya da taşınınca core günceller (ADR-0067).
 - **Token boyutu.** Her yeni üyelik token'a bir tam yol ekler ve Group overage henüz hiçbir client'ta açık değil. Alt ekip derinliği, yol uzunluğu, alt ekip sayısı ve kişi başı grup sayısı sınırlanır. Alt ekipler çoğalırsa overage'ın açılması öne alınır.
-- **Denetim kaydı yeni bir kişisel veri işleme amacıdır** (meşru menfaat, KVKK md. 5/2-f). ADR-0062'nin saklama tablosuna "ekip ve grup yönetimi kaydı: 3 yıl" satırı eklenir, aydınlatma metni güncellenir. Account erasure kaydı silmez. Hesap silinince kişinin kimliği kimseye çözülmez; özel dosya erişim kaydıyla aynı ilke.
+- **Denetim kaydı yeni bir kişisel veri işleme amacıdır**. ADR-0062'nin saklama tablosuna "ekip ve grup yönetimi kaydı: 3 yıl" satırı eklenir, gizlilik metni güncellenir. Account erasure kaydı silmez. Hesap silinince kişinin kimliği kimseye çözülmez; özel dosya erişim kaydıyla aynı ilke.
 - **Leader herhangi bir etkin hesabı ekibine ekleyebilir**, yani onu Member yapabilir (Promote). Bu karar ADR-0063'teki "üyelik yönetici kararıdır" cümlesini ekip liderlerini de kapsayacak biçimde genişletir. Kişiye ekip üyelik maili gider.
 - **Ekip bilgisi.** Sitedeki kodda sabit ekip adları ve logolar core'dan okunmaya başlar; değer yoksa koddaki değere düşer. CMS Teams kaydının kuralı ve SkyApp'in yazma yolu değişmez (ADR-0056).
 - **Admin paneli.** Menü ve düğmeler core'un "yeteneklerim" yanıtından gelir (ADR-0059). Panelde grup adına bakan kural kalmaz.

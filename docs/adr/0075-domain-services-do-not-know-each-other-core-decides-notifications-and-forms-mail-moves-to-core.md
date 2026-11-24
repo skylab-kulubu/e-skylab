@@ -91,7 +91,7 @@ Karar (Yusuf, 2026-10-25):
        - Asıl amacı tanıtım olan posta yalnız tanıtım izni verene gider (ADR-0062 eki, ADR-0072 eki).
        - Hesabı olmayan adres ayrıca SkyMail'in çıkış kaydına bakar (ADR-0072 karar 4).
    - **Kontrol noktası değişmez.** ADR-0072'nin kuyruğa alma kontrol noktası ve dağıtıcının her turdaki yeniden sorgusu bu gönderime de uygulanır. Bu kitlede yeniden sorgu Davet onayını da denetler. Çözümle gönderim arasında onayı geri alınan Member olmayana sıradaki posta gitmez.
-   - **Denetim kaydı.** core her `form_respondents` çözümünü kısa bir denetim kaydına yazar: gönderenin `sub`'ı, form, zaman, alıcı sayısı. Adres ve ad yazılmaz. Gönderen bir yetkilidir; kayıt meşru menfaatle tutulur. Süresi ADR-0062 tablosuna satır olarak eklenecek.
+   - **Denetim kaydı.** core her `form_respondents` çözümünü kısa bir denetim kaydına yazar: gönderenin `sub`'ı, form, zaman, alıcı sayısı. Adres ve ad yazılmaz. Gönderen bir yetkilidir. Süresi ADR-0062 tablosuna satır olarak eklenecek.
 7. **Yeni bir core sorumluluğu eklenirken** ADR'de neden core'da olduğu yazılır. Bu ADR'ın gerekçesi: tercih, rıza ve kitle core'da; bildirim kararı onlara dayanır.
 8. **Geçiş kayıpsızdır ve geri alınabilir.**
    - **Kendiliğinden giden postalar şablon şablon geçer.** Production'da önce core'un o şablonu açılır, hemen ardından Forms'ta o şablonun `FormMail__*TemplateKey` ayarı boşaltılır; boş anahtarla Forms'un kodu postayı atmaz.

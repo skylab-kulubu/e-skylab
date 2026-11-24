@@ -44,7 +44,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
      - DLQ 14 gün, `unrouted` 1 gün.
      - Tüketicinin olay kimliği kaydı 30 gün.
      - Giden kutusu satırı onayda silinir, onaysız kalırsa 7 gün sonra bırakılır.
-     - DLQ'daki kimlikler KVKK'nın 30 günlük silme süresi içinde düşer. Bu satırlar ADR-0062'nin saklama tablosuna eklenecek (ADR-0062 bu ADR'la değişmez).
+     - DLQ'daki kimlikler hesap silme için tanınan 30 gün içinde düşer. Bu satırlar ADR-0062'nin saklama tablosuna eklenecek (ADR-0062 bu ADR'la değişmez).
 7. **Güvenlik.**
    - Her servisin kendi RabbitMQ kullanıcısı var: yalnız kendi exchange'ine kendi önekiyle yazar ya da yalnız kendi kuyruğunu okur, hiçbir şey kuramaz.
    - Parolalar OpenBao'da (ADR-0049) ve gece döner. Bu ADR, ADR-0050'yi yeni bir `rabbitmq` sınıfıyla genişletir: veritabanı gibi iki kullanıcı dönüşümlü, Keycloak'unki pazar gecesi.

@@ -8,7 +8,7 @@ ADR-0011'de kulüp duyuruları CMS'in News koleksiyonu oldu ve sitelerde göster
 
 - **Yazma yüzeyleri uyuşmuyor.** Yönetim paneli News'i düz metinle yazıyor. inscribed'ın gövdesi ise zengin metin: editörün ürettiği bir HTML metni. SkyApp gövdeyi düz metne çevirerek gösteriyor ve düzenleyip kaydettiğinde HTML'i düz metne çeviriyor.
 - **Okuma ve yayın araçları eksik.** Ana site haberleri göstermiyor. Haber ile duyuru ayrılmıyor; bitiş tarihi ve hedef kitle yok.
-- **E-postayla ulaşma yolu yok.** Yayımlanan bir şeyi üyelere e-postayla duyurmanın yolu yok. SkyMail bir gruba toplu gönderebiliyor, ama postalarında çıkış bağlantısı yok. ADR-0062 üye duyurusunu "her postada çıkış bağlantısı" şartıyla meşru menfaate bağlamıştı.
+- **E-postayla ulaşma yolu yok.** Yayımlanan bir şeyi üyelere e-postayla duyurmanın yolu yok. SkyMail bir gruba toplu gönderebiliyor, ama postalarında çıkış bağlantısı yok. ADR-0062 üye duyurusunu "her postada çıkış bağlantısı" şartına bağlamıştı.
 - **Tercih yok.** Kişinin "duyuru almak istemiyorum" diyebileceği bir kayıt hiçbir yerde yok.
 
 Yusuf'un isteği (2026-10-12): duyurular ana siteden inscribed ile yönetilebilmeli. Bir duyuru ya da haber girilince SkyMail'le "duyuru gönder" yapılabilmeli, Medium'daki gibi. Admin panelinden de yönetilebilmeli. Her özellik hem haberde hem duyuruda olmalı.
@@ -43,7 +43,7 @@ Nasıl (spec'ten):
   - Bir ekibe giden postanın kitlesi: o ekibin ve alt ekiplerinin üyeleri, artı o ekibi ya da üst ekiplerinden birini takip edenler.
   - Ekiplere özel bir kayıt yalnız görünürlüğü içindekilere gider.
   - Posta yalnız kişinin seçtiği Primary e-mail'e gider. Devre dışı, doğrulanmamış ve adressiz hesaplar atlanır.
-- **Duyuru tercihi rıza değildir.** Member'a kulüp geneli ve kendi ekipleri meşru menfaatle gider (ADR-0062) ve varsayılan açıktır. Ekip, grup kimliğiyle tutulur; adlandırma ve taşıma tercihi bozmaz. Çıkış bağlantısı imzalıdır ve RFC 8058 tek tık çıkışını destekler. Tercih Contact consent kaydına konmaz, çünkü o bir onay kaydıdır ve varsayılanı kapalıdır. Hesap silinince tercih de silinir; bastırma listesi tutulmaz (ADR-0051).
+- **Duyuru tercihi rıza değildir.** Member'a kulüp geneli ve kendi ekipleri rıza sorulmadan gider (ADR-0062) ve varsayılan açıktır. Ekip, grup kimliğiyle tutulur; adlandırma ve taşıma tercihi bozmaz. Çıkış bağlantısı imzalıdır ve RFC 8058 tek tık çıkışını destekler. Tercih Contact consent kaydına konmaz, çünkü o bir onay kaydıdır ve varsayılanı kapalıdır. Hesap silinince tercih de silinir; bastırma listesi tutulmaz (ADR-0051).
 - **Toplu gönderim sistem postalarını bekletmez.** SkyMail'de öncelik şeridi vardır: giriş kodu, sertifika ve form postaları önce gider. Replikalar arası paylaşılan bir hız sınırı ve günlük bütçe vardır; sağlayıcı kısma yanıtı verirse toplu şerit geri çekilir. Teslim "en az bir kez"dir; SMTP'de "tam olarak bir kez" mümkün değil.
 - **Doğrudan gönderim izni** SkyMail'in bir client rolüdür ve YK, DK ve ADMIN gruplarına eşlenir (ADR-0059).
 - **Leader'ın kendi ekibine yazıp göndermesi** ekip yetki devrinin (ADR-0065) güvenlik önkoşulu production'a çıkmadan açılmaz: bugün Privileged grup adından okunuyor ve `YK` adlı bir alt ekip bütün üyelere gönderme yetkisi verirdi.
@@ -59,10 +59,8 @@ Nasıl (spec'ten):
 - **SkyApp.** Gövdeyi HTML olarak göstermeli ve yazarken bütün veriyi korumalıdır (sözleşme). Güncellenene kadar uygulamadan yapılan düzenleme yeni alanları siler; uygulamadan düzenleme bugün yalnız Privileged'da var ve seyrek.
 - **Sızıntı testleri** birinci adımda yazılır ve anonim okumaya karşı koşar; tam matris ikinci adımın önkoşuludur.
 - **Ekip adlandırma ve taşıma.** Core güncelleyene kadar özel kaydın ekip yolu eskirse kayıt üyelere kapanır; bu güvenli yöndür.
-- **Metinler.** KVKK Aydınlatma Metni'ne duyuru postaları eklenir. Emsal: Kurul 2023/938, üniversite duyurularının aydınlatmaya eklenmesi.
-- **ADR-0062 ile iki gerilim** avukata ve YTÜ'ye gider; ADR-0062'nin kendisi değişmez:
-  - Mezunlara duyuru. Üyelik YTÜ yönergesine göre mezuniyetle bitiyor; ADR-0062'nin "mezun duyurusu meşru menfaat" satırı bununla gerilimde.
-  - ADR-0062'nin konuk daveti için dayandığı Kurul 2018/119'un kapsamı.
+- **Metinler.** Gizlilik metnine duyuru postaları eklenir.
+- **Mezunlara duyuru açık kalır:** üyelik mezuniyetle bitiyor; ADR-0062'nin kendisi değişmez.
 - **CONTEXT.md'de değişenler:**
   - News: tür (haber/duyuru), görünürlük kayıt bazında gerçek erişim sınırı, bitiş ve sabitleme.
   - Yeni terimler: Announcement preference (Duyuru tercihi), Team follow (Ekip takibi), News send (Haber gönderimi).
@@ -73,13 +71,13 @@ Yusuf'a soruldu; cevap gelene kadar spec'in önerisi uygulanır.
 
 - **Tek koleksiyon mu, ayrı duyuru koleksiyonu mu:** öneri, tek News koleksiyonu ve tür alanı. SkyApp ve üç yazma yüzeyi hiçbir şey yapmadan ikisini de görür; her özellik bir kez kurulur.
 - **Taslak ve zamanlanmış yayın:** öneri, Fatih'ten inscribed'a kalıcı taslak ve yayın zamanı istenir; gelene kadar "kaydet = yayınla". SkyMail gönderimi ayrıca zamanlanabilir.
-- **Üye olmayan aboneler:** öneri, şimdilik yok; yalnız var olan Contact consent listesi, yalnız etkinlik daveti niteliğindeki duyurular için. Talep olursa açık rızalı, çift onaylı ayrı bir bülten aboneliği.
+- **Üye olmayan aboneler:** öneri, şimdilik yok; yalnız var olan Contact consent listesi, yalnız etkinlik daveti niteliğindeki duyurular için. Talep olursa çift onaylı ayrı bir bülten aboneliği.
 - **Postanın biçimi:** öneri, duyuru tam metin, haber "özet, kapak ve devamını oku"; gönderirken değiştirilebilir.
 - **Gönderen hesap:** öneri, bugünkü kulüp posta hesabı. Ayrı gönderici alan adı ve toplu posta sağlayıcısı hacim büyürse.
 - **Açılma ve tıklama izleme:** öneri, yok. Postadaki bağlantı Short link'se kişisiz kanal sayımı zaten var.
-- **Sponsorlu içerik postada:** öneri, yok. Gönderimde onay kutusu, sponsor yalnız web'de. Kulüp tüzel kişi değil ve ticari ileti için gereken kaydı (İYS) yapamaz. ADR-0062 davet postası için aynı kuralı koymuştu.
+- **Sponsorlu içerik postada:** öneri, yok. Gönderimde onay kutusu, sponsor yalnız web'de. ADR-0062 davet postası için aynı kuralı koymuştu.
 - **Aynı haberin ikinci gönderimi:** öneri, kişi başına bir kez; "eksik kalanlara gönder" yeni üyelere gider.
-- **Mezunlara duyuru:** öneri, avukat cevap verene kadar yok; gönderim yalnız Member'lara.
+- **Mezunlara duyuru:** öneri, şimdilik yok; gönderim yalnız Member'lara.
 
 Fatih'e soruldu (2026-10-12); cevap gelene kadar birinci adım bunlarsız yürür:
 
@@ -134,7 +132,7 @@ Bu kararın tercih ve çıkış kuralları değişmez. ADR-0072 onları yalnız 
 
 ## Ek (2026-10-24): sponsor teşekkürü postada olabilir, tanıtım yalnız izin verene gider (ADR-0062 eki)
 
-"Sponsorlu içerik postada" açık sorusunun önerisi ("yok; sponsor yalnız web'de") şu kuralla değişir (avukat cevabı 13, Yusuf 2026-10-23; KVKK Aydınlatma Metni s6 §5.10):
+"Sponsorlu içerik postada" açık sorusunun önerisi ("yok; sponsor yalnız web'de") şu kuralla değişir (Yusuf, 2026-10-23):
 
 - **Asıl amacı bilgilendirme olan haber ya da duyuru,** kısa bir sponsor teşekkürü ya da sponsor logosu taşıyabilir. Bu tanıtım sayılmaz. Posta, tercih ve ekip aboneliğine göre bütün alıcılara gider.
 - **Asıl amacı tanıtım olan içerik** (indirim kodu, şirket iş ilanı, satış, çekiliş) yalnız tanıtım izni veren kişiye gider. Kitle, bu kararın kitlesi ile core'daki tanıtım izni listesinin kesişimidir.
@@ -143,7 +141,7 @@ Bu kararın tercih ve çıkış kuralları değişmez. ADR-0072 onları yalnız 
 
 ## Ek (2026-10-25): açılma ve tıklama kişi bazında kaydedilir (ADR-0074)
 
-"Sapmalar 5" ("Açılma izleme yok, açık soruya bağlı") kapanır. SkyMail haber ve duyuru postalarının açılmasını ve tıklanmasını kişi bazında kaydeder; dayanak meşru menfaattir, üye Hesap Merkezi'nden itiraz eder, gizli bağlantılar sayılmaz. Kural, kapsam ve süreler ADR-0074'tedir. Bayraklar kapalı başlar; production açılışı ayrı bir karardır.
+"Sapmalar 5" ("Açılma izleme yok, açık soruya bağlı") kapanır. SkyMail haber ve duyuru postalarının açılmasını ve tıklanmasını kişi bazında kaydeder; üye Hesap Merkezi'nden itiraz eder, gizli bağlantılar sayılmaz. Kural, kapsam ve süreler ADR-0074'tedir. Bayraklar kapalı başlar; production açılışı ayrı bir karardır.
 
 ## Ek (2026-11-08): Leader kendi ekip ağacına Mail onayıyla posta gönderir; devir açılmadan, kendi anahtarıyla
 
@@ -216,7 +214,7 @@ Endüstri karşılaştırması:
 - **Sapmalar:**
   1. Grup sahibi kendi grubuna onaysız yazamaz. Exchange'de sahipler moderasyondan muaftır, Google Groups'ta yönetici yazar. Bizde her gönderim YK onayından geçer.
   2. Onay kapısı kişiye bağlıdır, kitleye değil (HubSpot gibi; Exchange'in kitle başına moderasyonu gibi değil).
-  3. Dağıtım grubu üyesi Exchange'de çıkamaz; bizde çıkabilir, çünkü duyuru meşru menfaate dayanır (ADR-0062).
+  3. Dağıtım grubu üyesi Exchange'de çıkamaz; bizde çıkabilir (ADR-0062).
   4. **Koltuk rolden değil liderlikten gelir.** Entra'da bir uygulamaya giriş kullanıcıya ya da gruba atamayla (app role assignment) gelir. Bizde rolsüz Leader'ın SkyMail'in ekip postası kısmına girişi core'un liderlik cevabından türetilir; Keycloak'ta rol eşlenmez. Neden: rolü bütün seviyelerdeki Leader gruplarına eşlemek ADR-0076 karar 4'ü delerdi ve tek seferlik seed sonradan açılan alt ekipleri kaçırırdı.
   5. **Alıcıları posta aracının grup çözümü bulur** (yukarıda, "Nasıl"). Haber gönderiminde kitleyi core çözer; ekip postasında SkyMail Keycloak grubundan çözer, core her alıcıyı gönderimde denetler (2026-10-21 eki).
   6. **Gönderen kendi gönderiminin alıcılarını görmez, yalnız toplu sayıları görür.** ADR-0074 karar 9 panel göndereninin kişi bazında görünümünü açıyordu; Yusuf'un 2026-11-08 kararı bunu varsayılan olarak kapatır; kişi bazında açma-tıklama yalnız takip okuma rolüyle, alıcılar ve teslim durumu gönderim okuma rolüyle açılır. Varsayılanı SkyMail'deki bir anahtar değiştirebilir.
