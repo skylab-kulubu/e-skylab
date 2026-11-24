@@ -6,7 +6,7 @@ status: accepted
 
 ADR-0075 karar 5, 6 ve 8, Forms'un kendiliğinden giden postalarını ve form yanıtlayanlarına toplu gönderimi core'a taşıyordu: Forms olay yayımlayacak, core posta kararını verip kendi kuyruğundan SkyMail'e gönderecek, 36 saatlik hatırlatmayı core zamanlayacak, toplu gönderimin kitlesini core'un `form_respondents` türü çözecekti. Bunların hiçbiri production'a çıkmadı.
 
-ADR-0075'in en somut gerekçesi "Forms yeniden başlarsa kuyruktaki posta kaybolur" idi. Bu gerekçe kapandı: Forms postayı artık bellek içi kuyruk yerine kendi veritabanındaki giden kutusuna yazıyor ve bir gün boyunca yeniden deniyor (forms-backend `OutboxMailDispatcher.cs`, `MailOutboxHandler`). Kalan gerekçe "bildirim kararı tek yerde olsun" idi. LinkedIn'in Air Traffic Controller'ı ve Nick Tune'un mapper context'i merkezi bir kararı destekler; ama orada merkez bir bildirim platformudur, bizde SkyMail'e denk gelir. Üretici ile bildirim platformu arasına ikinci bir iş servisi giren örnek bulunmadı (aşağıda).
+ADR-0075'in en somut gerekçesi "Forms yeniden başlarsa kuyruktaki posta kaybolur" idi. Bu gerekçe kapandı: Forms postayı artık bellek içi kuyruk yerine kendi veritabanındaki giden kutusuna yazıyor ve bir gün boyunca yeniden deniyor (forms-backend `OutboxMailDispatcher.cs`, `MailOutboxHandler`). Kalan gerekçe "bildirim kararı tek yerde olsun" idi. LinkedIn'in Air Traffic Controller'ı merkezi bir kararı destekler; ama orada merkez bir bildirim platformudur, bizde SkyMail'e denk gelir. Nick Tune üretici ile bildirim platformu arasında böyle bir ara bağlam önerir; neden sapıldığı Sapma 1'de.
 
 Karar (Yusuf, 2026-11-24):
 
@@ -44,7 +44,7 @@ ADR-0075'ten Forms postası dışında geçerli kalanlar: karar 1, 2, 4 ve 7. Ş
 
 **Uyanlar:**
 - **Ürün kendi postasının tetikleyicisine ve alıcısına karar verir; posta platformu şablonu, gönderimi, yeniden denemeyi, tercihi ve abonelik çıkışını yönetir.** LinkedIn'in Air Traffic Controller'ı ürün ekiplerinin ürettiği bildirimleri alıp teslim kararını merkezde verir; merkez bir bildirim platformudur, bizde SkyMail'e denk gelir. Knock'ta uygulama olay anında platformu doğrudan tetikler (karar 1 ve 2).
-- **Tercih ve rıza bildirim platformunda uygulanır** (karar 3). Dynamics 365 Customer Insights – Journeys, HubSpot ve Customer.io rızayı gönderim anında, gönderen platformda değerlendirir.
+- **Tercih ve rıza bildirim platformunda uygulanır** (karar 3). Dynamics 365 Customer Insights – Journeys rızayı gönderim anında, gönderen platformda değerlendirir.
 - **Form ürünlerinde onay postası formun kendi ayarıdır.** Tally'nin yanıtlayana bildirimi ve Jotform'un otomatik yanıtı formun içinde kurulur (karar 1).
 - **Jira bildirim şemaları.** Hangi olayda kime posta gideceğini ürünün kendi şeması söyler (karar 1).
 - **Transactional outbox.** Forms'un posta kaydı kendi veritabanındadır ve kayıpsız yeniden denenir.
@@ -52,7 +52,7 @@ ADR-0075'ten Forms postası dışında geçerli kalanlar: karar 1, 2, 4 ve 7. Ş
 **Sapmalar (hepsi):**
 1. **Nick Tune'un mapper context önerisinden sapar.** Tune, alana özgü olayları genel bildirim komutlarına çeviren merkezi bir "mapper context" önerir; ADR-0075'in tasarımı buna yakındı. Bizde core'un bu çeviriye kendi kaydından ekleyeceği bir bilgi yok: Forms postasının tetikleyicisi, alıcısı, misafir sınırı ve zamanlaması saf Forms kuralıdır, tercih ve rıza da SkyMail'de uygulanır. Çeviriyi core tutsaydı Fatih'in her posta değişikliği iki depoda değişiklik isterdi.
 2. **Alan servisi teslim servisini doğrudan çağırır ve SkyMail'in Forms'a özel bir ucu vardır** (ADR-0075 karar 3 ve 4'e istisna). Sektörde de üretici platformu doğrudan tetikler; bizdeki sapma kendi ilkemizden.
-3. **Toplu gönderimde kitle anlık görüntüdür** (30 dakika). Dynamics 365, HubSpot ve Customer.io kitleyi gönderim anında çözer; onayda bekleyen gönderim, hazırlandığı anın yanıtlayanlarına gider. Rıza yine gönderim anında, SkyMail'de denetlenir.
+3. **Toplu gönderimde kitle anlık görüntüdür** (30 dakika). Dynamics 365, HubSpot ve Customer.io kitleyi gönderim anında çözer (kaynaklar ADR-0075 eki 2026-11-08'de); onayda bekleyen gönderim, hazırlandığı anın yanıtlayanlarına gider. Rıza yine gönderim anında, SkyMail'de denetlenir.
 
 ## Considered Options
 
@@ -69,7 +69,5 @@ ADR-0075'ten Forms postası dışında geçerli kalanlar: karar 1, 2, 4 ve 7. Ş
 - Jotform, setting up an autoresponder e-mail: https://www.jotform.com/help/26-setting-up-an-autoresponder-email-2
 - Atlassian, configure notification schemes: https://support.atlassian.com/jira-cloud-administration/docs/configure-notification-schemes/
 - Microsoft Dynamics 365 Customer Insights – Journeys, rıza uygulaması: https://learn.microsoft.com/en-us/dynamics365/customer-insights/journeys/real-time-marketing-email-text-consent
-- HubSpot, active ve static segmentler: https://knowledge.hubspot.com/segments/change-list-type
-- Customer.io, segment oluşturma: https://docs.customer.io/messaging/segmentation/creating-segments/
 - forms-backend `origin/main` 86e2b5a: `src/Forms.Infrastructure/Mail/OutboxMailDispatcher.cs`, `src/Forms.Infrastructure/Integrations/SkyMail/SkyMailClient.cs`.
 - skymail-backend `origin/main`: `internal/handlers/form_mail_source.go` (form kaynağı gönderiminde core'un tercih kontrol noktası), `internal/mailer/consent_gate.go` (Davet onayı kapısı).

@@ -166,7 +166,7 @@ Kararlar (Yusuf, 2026-10-25 ve 2026-10-26). Karar 1–16 aynen geçerlidir. Bu e
   - Kişisel veri değildir. Alan eklemek olduğu için şema sürümü değişmez. Keycloak olayları CloudEvents olmadığı için taşımaz.
 - **SkyMail bastırması olay olmaz.** `skymail.events` bu ekle açılmaz; karar 1'deki "sonra" hâli sürer.
   - Kişiye gösterim olay değil, SkyMail'in kişi ucudur (ADR-0075 karar 2, ADR-0073 eki 2026-10-26). core bastırma bilgisini hiçbir kararında kullanmaz.
-  - Kişiye kendiliğinden bildirim (kutu, push) istenirse bu bir bildirim kararıdır ve ADR-0075 karar 1'e göre core'a girer. Olay yolu o gün yeniden değerlendirilir.
+  - Kişiye kendiliğinden bildirim (kutu, push) istenirse bu bir bildirim kararıdır ve ADR-0075 karar 1'e göre core'a girer (Forms postası için ADR-0087 ile geri çekildi). Olay yolu o gün yeniden değerlendirilir.
 - **Saklama değişmez.** Karar 6'daki saklama listesine satır eklenmez: yeni giden kutusu ya da yeni tüketici tablosu yoktur.
 
 **Endüstri uygulamasıyla karşılaştırma (bu ek).**
