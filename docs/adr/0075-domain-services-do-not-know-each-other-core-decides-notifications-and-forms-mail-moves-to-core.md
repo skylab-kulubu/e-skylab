@@ -88,7 +88,7 @@ Karar (Yusuf, 2026-10-25):
    - **Amaç ve rıza (Yusuf, 2026-10-26).** Hangi yanıtlayana posta gideceğini amaç belirler:
      - **`islem`.** Gönderen, postanın yalnız alıcının kendi başvurusu ya da işlemi hakkında olduğunu beyan eder (ADR-0072 karar 2 ve 8). Posta bütün yanıtlayanlara gider. Tercih, çıkış kaydı ve Davet onayı aranmaz. Kalıcı ret bastırması uygulanır.
      - **`duyuru`.** Her alıcı ayrı süzgeçten geçer:
-       - Member için kontrol noktası ADR-0072 karar 3'tür. Varsayılan tek başına engellemez (karar 3), çünkü yanıtlayan kitleye kendi yanıtıyla girmiştir. Değişen yalnız Member olmayanın dayanağıdır.
+       - Member için kontrol noktası ADR-0072 karar 3'tür. Varsayılan tek başına engellemez (karar 3), çünkü yanıtlayan kitleye kendi yanıtıyla girmiştir. Değişen yalnız Member olmayanın kuralıdır.
        - Member olmayan yanıtlayan (hesabı olsun olmasın) postayı yalnız etkin bir Davet onayıyla alır (ADR-0062, `davet-v2`). Bu kural bugün gönderenin beyanına kalmıştı; artık core uygular.
        - Asıl amacı tanıtım olan posta yalnız tanıtım izni verene gider (ADR-0062 eki, ADR-0072 eki).
        - Hesabı olmayan adres ayrıca SkyMail'in çıkış kaydına bakar (ADR-0072 karar 4).

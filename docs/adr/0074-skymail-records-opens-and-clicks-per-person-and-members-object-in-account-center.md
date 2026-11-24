@@ -6,7 +6,7 @@ status: accepted
 
 _Güncelleme (2026-11-24, Yusuf): Karar 13'teki bilgilendirme postası gönderildi, itiraz gelmedi. Kişi bazında takip sürer. Takip ekranlarındaki gizleme ve eşik sınırları kaldırılır: ön yüzde skymail-frontend #180, 10 kişi eşiği skymail-backend'de (karar 9'daki eşik ve 2026-11-08 ekinin 4. maddesi düşer)._
 
-_Güncelleme (2026-11-24, Yusuf): Her posta takip edilir; hesabı olmayan alıcılar ve itiraz edenler dahil. `skymail:mails:read` her postanın içeriğini, alıcılarını ve olaylarını maskesiz görür. Karar 3, 8 ve 9 ile 2026-11-08 eki aşağıdaki 2026-11-24 ekiyle değişir._
+_Güncelleme (2026-11-24, Yusuf): Her posta takip edilir; hesabı olmayan alıcılar ve itiraz edenler dahil. `skymail:mails:read` her postanın içeriğini, alıcılarını ve olaylarını maskesiz görür. Karar 2, 3, 8 ve 9, Açık bölümü (madde 6) ve 2026-11-08 eki aşağıdaki 2026-11-24 ekiyle değişir._
 
 ADR-0067 haber ve duyuru postalarını SkyMail'e verdi, açılma izlemeyi açık soru olarak bıraktı (Sapmalar 5). ADR-0070 iletişimi tek servise topladı, açılma ve tıklama izlemeyi "ayrı bir kararla" diye kapsam dışında tuttu. ADR-0072 karar 2 "takip akışa bağlı değildir, bütün postalar takiplidir" dedi ve takip kararını ayrı bir ADR'a bıraktı. Bu ADR o karardır.
 
@@ -36,7 +36,7 @@ Kararlar Yusuf'undur: 2026-10-12 (T1–T8), 2026-10-19 (kapsam), 2026-10-20 (ki�
 
 - **SkyMail:** bayraklar ve okuma uçları; kimliksiz `GET|HEAD /t/o/{rt}` ve `/t/c/{rt}/{lt}` (HEAD tıklama kaydetmez, satır başına ve süreç başına sınırlar); `GET /v1/mail_tasks/{id}/tracking` ve `…/tracking/recipients`; iç uç `PUT /internal/v1/tracking-withdrawals/{sub}` (yalnız core'un servis hesabı); saklama işi `off|dry-run|apply|purge` (makbuz, advisory lock, fren). Kuyruk, bağlantı ve olay satırları her yolda aynı sırayla kilitlenir; hesap silme, itiraz ve saklama birbirini beklemez ve olay kaçırmaz.
 - **core:** `scope='tracking'` satırı, `COMMUNICATION_TRACKING_MODE`, SkyMail'in sorduğu uygunluk ucu (`POST /internal/v1/communication-preferences/tracking:resolve`, yalnız SkyMail'in servis hesabı), itirazı SkyMail'e taşıyan outbox ve işçi (vazgeçmez), değişikliklerin denetim kaydı. Kenardan gelen istek iç uçlarda 404 alır.
-- **Hesap Merkezi:** iletişim tercihlerinde tek anahtar; işaretli = takip yok. Takip edilmeyen ve itiraz etmemiş kişide bölüm görünmez.
+- **Hesap Merkezi:** iletişim tercihlerinde tek anahtar; işaretli = takip yok. Takip edilmeyen ve itiraz etmemiş kişide bölüm görünmez. *(2026-11-24 ekiyle değişti: anahtar takibi durdurmaz.)*
 - **Keycloak:** `skymail:mails:tracking:read` (ADMIN, YK, DK köklerine), `skymail:tracking:withdraw` (yalnız core'un servis hesabına; hiçbir gruba, bileşik role ya da varsayılan role girmez, uzlaştırma bunu denetler), core istemci rolü `communication-preferences:read` (yalnız SkyMail'in servis hesabına). İki token da `aud`'u mevcut audience çözümünden alır.
 - **Metin:** takip açılmadan önce gizlilik metni yayımlanır.
 - **Ops:** sandbox'ta istemci ölçümü (Apple MPP, Gmail proxy, klasik ve yeni Outlook, YTÜ Microsoft 365); saklama işi önce `dry-run`, makbuz okununca `apply`. Kenar günlükleri gizlilik metnindeki gibi: ham günlük en çok 90 gün, erişim kaydında yol maskelidir ve belirteç taşımaz; ikisi de takip kaydıyla birleştirilmez.
@@ -70,7 +70,7 @@ Kararlar Yusuf'undur: 2026-10-12 (T1–T8), 2026-10-19 (kapsam), 2026-10-20 (ki�
 5. **Hesap postalarında da piksel.** SendGrid ve Postmark bu postalarda takibi kapatmayı önerir. Biz yalnız bağlantıları dışarıda bırakıyoruz; piksel, giriş kodunun gereksiz klasörüne düşüp düşmediğini görmek içindir.
 6. **Tek kip, kulüp geneli.** Dynamics'te kip uyum profili başına seçilir; bizde tek kip ve tek ayar.
 7. **Posta başına sorulmuyor.** Outlook okundu bilgisinde alıcı her postada karar verir; bizde bir kez, Hesap Merkezi'nden.
-8. **Kapsam Dynamics'ten dar:** web ve UTM izleme yok; hesabı olmayan alıcı hiç izlenmez.
+8. **Kapsam Dynamics'ten dar:** web ve UTM izleme yok; hesabı olmayan alıcı hiç izlenmez. *(2026-11-24 ekiyle değişti: hesabı olmayan alıcı da izlenir.)*
 
 ## Considered Options
 
@@ -109,12 +109,12 @@ Karar (Yusuf, 2026-11-08; ADR-0075'in 2026-11-08 eki madde 10): gönderen kendi 
 Karar (Yusuf, 2026-11-24):
 
 1. **Her posta takip edilir.** Takip alıcıya göre süzülmez. Hesabı olmayan adresler (liste ve Forms alıcıları, konuk, davet listesi), Member olmayan hesaplar ve itiraz edenler dahil her alıcı belirteç alır. Karar 3'ün "yalnız core'un izin verdiği kişi" kuralı ve "hiçbir zaman takip edilmez" listesi düşer. Bayraklar (karar 4 ve 13) aynen kalır; takip yine yalnız ilgili bayrak açıkken çalışır.
-2. **İtiraz edenler takipten çıkarılmaz.** Hesap Merkezi'ndeki "Postalarımın açılmasını ve tıklamalarımı izleme" anahtarı da yazılı itiraz da takibi durdurmaz: kişinin olayları silinmez, gönderilmiş postalarındaki belirteçler kapatılmaz, yeni postaları da takiplidir. Karar 8'in "geçmişe etkili" kısmı (olayları silme, belirteçleri kapatma) ve karar 2'deki "'Herkesi izle, reddedeni de' kipi yoktur" cümlesi düşer; bugünkü davranış Dynamics'in *Disabled* kipinin karşılığıdır.
+2. **İtiraz edenler takipten çıkarılmaz.** Hesap Merkezi'ndeki "Postalarımın açılmasını ve tıklamalarımı izleme" anahtarı da yazılı itiraz da takibi durdurmaz: kişinin olayları silinmez, gönderilmiş postalarındaki belirteçler kapatılmaz, yeni postaları da takiplidir. Karar 8'in "geçmişe etkili" kısmı (olayları silme, belirteçleri kapatma) ve karar 2'deki "'Herkesi izle, reddedeni de' kipi yoktur" cümlesi düşer; bugünkü davranış Dynamics'in *Disabled* kipinin karşılığıdır. Varsayılan her şeyin takip edilmesidir; `opt_in` kişisel tercih değil, yalnız işletmenin acil fren anahtarı olarak kalır.
 3. **`skymail:mails:read` her şeyi görür, maske yok.** Bu rolü olan herkes her postanın içeriğini, alıcılarını ve olaylarını (teslim durumu, kişi bazında açılma ve tıklama) görür. Giriş kodu ve tek kullanımlık bağlantı dahil içerikte hiçbir şey maskelenmez. Karar 9'daki "kişi bazında görünüm yalnız `skymail:mails:tracking:read`" ayrımı ve 2026-11-08 ekinin 1. ve 2. maddeleri bu rol için düşer.
-4. **Gönderen kendi postasını kişi kişi görür.** Postayı gönderen kişi kendi postasının alıcılarını, açılmalarını ve tıklamalarını kişi bazında görür; bunun için takip okuma rolü gerekmez. Forms toplu gönderimi için konan "gönderen alıcı listesini görmez, yalnız toplu sayıları görür" kuralı kalkar: bu ADR'nin 2026-11-08 eki (3., 4. ve 5. maddeler), ADR-0075'in 2026-11-08 eki madde 10 ve ADR-0087 karar 3'teki aynı cümle.
+4. **Gönderen kendi postasını kişi kişi görür.** Postayı gönderen kişi kendi postasının alıcılarını, açılmalarını ve tıklamalarını kişi bazında görür; bunun için takip okuma rolü gerekmez. Sistem postasında gönderen kişi yoktur; onun kişi bazında görünümü `skymail:mails:read` rolüyle olur. Forms toplu gönderimi için konan "gönderen alıcı listesini görmez, yalnız toplu sayıları görür" kuralı kalkar: bu ADR'nin 2026-11-08 eki (3., 4. ve 5. maddeler), ADR-0075'in 2026-11-08 eki madde 10 ve ADR-0087 karar 3'teki aynı cümle.
 5. **Değişmeyenler.** Karar 1 (IP, Referer, konum ve ham user-agent okunmaz ve saklanmaz), karar 5 (gizli bağlantı yeniden yazılmaz ve sayılmaz; o postalarda yalnız piksel vardır), karar 6, 7, 10, 11 ve 12.
 6. **Açık'taki mezun ve fahri üye sorusu kapanır:** onlara giden postalar da takiplidir.
 
-Değişen başka belgeler: ADR-0084'teki ekip daveti postası için "açılması ve tıklanması izlenmez" cümlesi düşer; CONTEXT.md'deki Tracked send, Open event ve Tracking preference tanımları bu eke göre yazıldı.
+Değişen başka belgeler: ADR-0067'deki 2026-11-08 ekinin "Gönderen alıcı listesini görmez" kuralı ve sapma 6 düşer; ADR-0084'teki ekip daveti postası artık takiplidir ve alıcı SkyMail'in saklama süresince tutulur; CONTEXT.md'deki Tracked send, Open event ve Tracking preference tanımları bu eke göre yazıldı.
 
 **Endüstriyle karşılaştırma.** Uyan: Dynamics 365 Customer Insights – Journeys'in *Disabled* kipi herkesi izler; kipimiz artık ona denk düşer. Sapmalar: Dynamics'te kip uyum profili başına seçilir, bizde tek kip (sapma 6 sürer); SendGrid ve Postmark hesap postalarında takibi kapatmayı önerir, biz bu postalarda pikseli tutuyoruz (sapma 5 sürer); okuma rolü içeriği kod ve bağlantılarla birlikte maskesiz görür.

@@ -48,6 +48,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 7. **Güvenlik.**
    - Her servisin kendi RabbitMQ kullanıcısı var: yalnız kendi exchange'ine kendi önekiyle yazar ya da yalnız kendi kuyruğunu okur, hiçbir şey kuramaz.
    - Parolalar OpenBao'da (ADR-0049) ve gece döner. Bu ADR, ADR-0050'yi yeni bir `rabbitmq` sınıfıyla genişletir: veritabanı gibi iki kullanıcı dönüşümlü, Keycloak'unki pazar gecesi.
+   - İkinci sunucu gelirse iç ağda TLS açılır.
 8. **Keycloak.**
    - Mevcut sağlayıcı kullanılır, biçimi korunur.
    - Fork, IP'yi, `sessionId`'yi, `details`'i ve admin temsilini yayımlamayacak ve yalnız seçilen olay türlerini gönderecek şekilde değişir.
@@ -56,7 +57,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 10. **Ortam başına ayrı örnek** (Yusuf, 2026-10-21). Production ve sandbox'ın kendi RabbitMQ'su var, tek örnekte iki vhost yok. ADR-0061'in ortam ayrımına uyar. RabbitMQ'nun bellek ve disk alarmı düğümün bütün yayıncılarını durdurduğu için bir ortam ötekini durdurmaz.
 11. **Misafirin adı ve e-postası olayda yok** (Yusuf, 2026-10-21). core misafir biletini yazarken bunları Forms'un tek cevap iç ucundan okur: ince olay, "claim check" kalıbı. Kişisel veri olay akışına, kuyruk ve DLQ kopyalarına girmez.
 12. **Eski `super-skylab-rabbitmq` hemen silinir** (Yusuf, 2026-10-21). Yeni sandbox beklenmez, kurulum temiz yapılır. Silme salt okur envanterden (kimlik ve volume adı) sonra, konteyner ve volume adıyla yapılır. Genel `prune` yok.
-13. **Davet onayı yazımı istisna kalır** (Yusuf, 2026-10-21). Forms, Place ve Guessr rızayı core'un kaydına `POST /v1/consents` ile eşzamanlı yazar (ADR-0062). core rıza merkezidir. Rızanın ispat yükü merkezde olduğu için yazım eşzamanlıdır. Rızadan doğan olayları gerekirse merkez yayımlar.
+13. **Davet onayı yazımı istisna kalır** (Yusuf, 2026-10-21). Forms, Place ve Guessr rızayı core'un kaydına `POST /v1/consents` ile eşzamanlı yazar (ADR-0062). core rıza merkezidir. Rıza kaydının tek kaynağı merkez olduğu için yazım eşzamanlıdır. Rızadan doğan olayları gerekirse merkez yayımlar.
 14. **Kitle okuma istisna kalır** (Yusuf, 2026-10-21). SkyMail kitleyi ve kişi başına izinli kanalları gönderim anında core'dan okur (ADR-0067, ADR-0070). Kopya tutulmaz, liste her zaman günceldir.
 15. **ADR-0066 eki karar 10'daki 409 `registration_closed` adımı düşer** (Yusuf, 2026-10-21). Forms core'a sormaz ve core'un yanıt kodunu tanımaz. Cevap olayını yayımlar, karar core'undur.
 16. **Kapalı başvuruya gelen Forms cevabı `submittedAt`'e göre ayrılır** (Yusuf, 2026-10-21).
@@ -105,7 +106,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 - Microsoft'un .NET mikroservis rehberindeki ayrım: integration event yayımlanır ve cevap beklemez, sonucu beklenen istek ayrı tutulur.
 - Entra'nın kullanıcı eşitlemesi periyodiktir, olay onu hızlandırır (core-backend #270 aynı modeli izler).
 - İnce olay ve "claim check": kişisel veri olayda değil, tüketici kaynaktan okur (karar 11).
-- Rıza merkezi: rıza merkeze eşzamanlı yazılır, çünkü ispat yükü merkezdedir; olayları merkez yayımlar (karar 13).
+- Rıza merkezi: rıza merkeze eşzamanlı yazılır, çünkü rıza kaydının tek kaynağı merkezdir; olayları merkez yayımlar (karar 13).
 - Microsoft Customer Insights Journeys: kitle gönderim anında okunur, kopya tutulmaz (karar 14).
 - Azure Service Bus topic ve subscription, `MaxDeliveryCount` ve dead-letter alt kuyruğu bizim exchange, kuyruk, `delivery-limit` ve DLQ'muzla aynı kalıp. Event Grid CloudEvents 1.0'ı doğrudan kullanır.
 
@@ -121,7 +122,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 9. **Komutlar broker'dan geçmez.** Microsoft rehberi zamansal bağımlılığı azaltmak için asenkron komut mesajlarını da önerir. Bizde komutun sonucu bekleniyor, silme komutundaki adres kalıcı bir kopyaya (kuyruk, DLQ) yazılmamalı (ADR-0051).
 10. **Şema kaydı ve AsyncAPI kataloğu yok.** Sözleşme bu ADR'da, SPEC'te ve kodda. Makinece okunur katalog sonraki adım.
 11. **Tek broker örneği tek arıza noktası.** Kesintide yayın giden kutusunda bekler, tüketiciler yeniden bağlanır, Keycloak olayları kaybolur ve eşitleme turu yakalar.
-12. **İki alan servisi çağrısı core'a gider** (karar 13 ve 14): Forms'un rıza yazımı ve SkyMail'in kitle okuması. Saf olay mimarisinde ikisi de olayla yapılırdı (rıza olayı, kitlenin olayla beslenen kopyası). Rızada ispat yükü, kitlede güncellik için eşzamanlı çağrı seçildi.
+12. **İki alan servisi çağrısı core'a gider** (karar 13 ve 14): Forms'un rıza yazımı ve SkyMail'in kitle okuması. Saf olay mimarisinde ikisi de olayla yapılırdı (rıza olayı, kitlenin olayla beslenen kopyası). Rızada kaydın tek kaynakta hemen yazılması, kitlede güncellik için eşzamanlı çağrı seçildi.
 
 ## Considered Options
 
@@ -135,7 +136,7 @@ Karar (Yusuf, 2026-10-20: RabbitMQ kurulur; Fatih'in ilkesiyle core orkestratör
 - **MassTransit'i platform standardı yapmak:** v9 ticari lisanslı. Kütüphane seçimi servis sahibine bırakıldı.
 - **Misafirin iletişim bilgisini olayda taşımak:** Fatih'e bir uç daha az. Ama adres 14 güne kadar DLQ kopyasında kalır ve silme isteği oraya ulaşamaz.
 - **Eski konteyneri sandbox kurulana kadar tutmak:** geri dönülecek bir şey yok, içinde IP'li eski olaylar ve git'teki parolayla açılan bir yönetici var.
-- **Rızayı ve kitleyi olaya çevirmek:** rıza olayının kaybı ya da gecikmesi ispatı zayıflatır. Kitlenin SkyMail'de kopyası tercihi ve ekip ağacını iki yerde tutar.
+- **Rızayı ve kitleyi olaya çevirmek:** rıza olayının kaybı ya da gecikmesi rıza kaydını eksik bırakır. Kitlenin SkyMail'de kopyası tercihi ve ekip ağacını iki yerde tutar.
 - **Kapalı başvuruda her Forms cevabını reddetmek (ADR-0066 eki karar 10'un ilk hâli):** kapanıştan önce gönderilip sonra onaylanan cevabın bileti sessizce kaybolurdu.
 - **Kapalı başvuruda her Forms cevabına bilet yazmak:** kapanış Forms'tan gelenler için anlamını yitirirdi.
 

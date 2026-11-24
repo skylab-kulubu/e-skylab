@@ -88,7 +88,6 @@ Karar (2026-10-21). İlke, S1–S3 cevapları ve karar 10 Yusuf'undur; öteki ay
    - **Forms'un kendiliğinden giden postaları işlem postasıdır:** başvuru alındı, kabul, ret, iade, yeniden açıldı. Bunları alıcının kendi yanıtı tetikler. Forms bunları kendi servis hesabıyla `/v1/mail_tasks/single`'dan gönderir; bugünkü gibi `bilgi@`'dan, başlıksız ve tercihe bakmadan giderler.
      - Google işlem postasına örnek olarak form gönderimi onayını veriyor.
      - Postmark'a göre toplu posta aynı içeriğin birçok alıcıya gitmesidir, ve onu alıcının bir eylemi tetiklemez.
-     - CAN-SPAM'in "işlem ya da ilişki iletisi" tanımı ticari işlemler içindir; burada yalnız benzetme olarak anılır.
    - **Form sahibinin yanıtlayanlara yaptığı toplu gönderim duyuru akışındadır.** Bu gönderim Forms'un "mail-source" anlık görüntüsü ve SkyMail'deki gönderim ya da onay yoluyla yapılır. Posta yalnız alıcının kendi başvurusu hakkındaysa gönderen beyanla işlem amacını seçebilir (karar 2): yer ya da saat değişikliği, eksik belge, sonuç. Genel duyuru, davet ya da başka bir etkinlik duyurudur. Belirsizse duyurudur.
 9. **Posta türü ve çıkış kaydı.**
    - Kulüp postası tanıtım içermez: sponsor tanıtımı, ücretli bilet, şirket iş ilanı ya da çekiliş içermez. Gönderen bunu her duyuru gönderiminde beyan eder (ADR-0062, ADR-0067).
@@ -213,7 +212,7 @@ Nasıl:
     - SES bağlantıyı yer tutucuyla ekler.
 11. **Çıkış süresi.**
     - SkyMail kaydı da core'daki çıkış da göndermeden hemen önce, bir sonraki dağıtım turunda uygulanır. Tek istisna yeni doğrulanmış bir adresin kişiye eşlenmesidir (sapma 1).
-    - Dış sınırlar: Google 48 saat önerir, Yahoo 2 gün şart koşar, CAN-SPAM 10 iş günü.
+    - Dış sınırlar: Google 48 saat önerir, Yahoo 2 gün şart koşar.
 12. **Gönderen, kişinin çıkışını yalnız kişi isteyince ya da bir hata olunca geri alır.**
     - Postmark: "only reactivate email addresses when asked to do so, or when mistakes happen". SES contact tercihini API'yle değiştirtir. SendGrid global ve group çıkışlarını panelden kaldırtır. Dynamics rıza kaydını düzenletir ve denetim geçmişi tutar.
     - Bizde bu ayrı bir yetki, gerekçe ve denetim kaydı ister.
@@ -223,7 +222,6 @@ Nasıl:
 14. **Duyuru akışı ayrı alt alan adından çıkar.** Postmark akış başına alt alan önerir; Yahoo DKIM alanıyla ayırmayı önerir. Karar 10.
 15. **Bağlantı uzun ömürlüdür.**
     - RFC 8058 bir süre koymaz.
-    - CAN-SPAM bağlantının gönderimden sonra en az 30 gün çalışmasını ister.
     - Google: çıkış bağlantısı uzun süre çalışmazsa postalar tek tık şartını karşılamamış sayılır. Spam işaretlenmezler, ama gönderen teslim sorunlarında Google'dan destek alamaz. Google bir süre belirtmiyor.
     - Anahtar halkası, anahtar değişse de bağlantıyı açık tutar.
     - Karar 4.
@@ -289,7 +287,7 @@ Nasıl:
 - **Panelin çıkışı hiç geri alamaması** (HubSpot, Mailchimp). Bu ilk öneriydi. Yusuf Postmark ve SES modelini seçti: yetkili, uyarılı ve gerekçeli geri alma.
 - **core hükmünü 48 saate kadar kullanmak** (ilk taslak) ya da **5 dakikalık bir eşikle yeniden sormak** (ikinci taslak). 48 saat dış sınırdır, hedef değildir. İncelenen her sağlayıcı gönderim anında uyguluyor. Tur başına tek toplu istek zaten ucuz olduğu için eşik gerekmiyor. İkisi de ADR-0071 karar 14'ün "liste her zaman günceldir" kuralıyla gerilimdeydi.
 - **Çıkış kaydını `mail_suppressions`'a sütun olarak eklemek.** Eski imaj nedene bakmadan bütün satırları okur. İmaj geri alınırsa çıkmış adrese Forms onayı da dahil bütün postalar dururdu.
-- **Anahtarı hiç döndürmemek.** Bir sızıntıda ya bütün eski bağlantılar bozulurdu (Google'ın kuralı, CAN-SPAM'in 30 günü) ya da anahtar sızık kalırdı.
+- **Anahtarı hiç döndürmemek.** Bir sızıntıda ya bütün eski bağlantılar bozulurdu (Google'ın kuralı) ya da anahtar sızık kalırdı.
 - **Duyuruyu `bildirim.`'de bırakıp ayrımı bir tetiğe bağlamak** (giriş kodları spama düşerse). Bu, Yusuf'un 2026-10-20 kararıydı; 2026-10-21'de karar 10 ile değişti. Tetik zararı ancak oluştuktan sonra ölçer; ayrım ise düşük maliyetli ve `bildirim.` henüz bir günlük.
 - **Alt alan adı olarak `haber.`.** Reddedildi: her duyuru bir haber değil (Yusuf, 2026-10-21).
 - **Duyuru için yeni bir kutu açmak.** Gerekmez. Exchange'de bir kutunun birden çok adresi olur (proxy addresses): birincil adres değişir, eski adres ikincil kalır. Eski adrese gelen yanıtlar ve NDR'ler aynı kutuya düşer; uygulama yetkisi (etikete bağlı kapsam) ve posta akışı kuralı kutuyla birlikte kalır.
@@ -310,7 +308,6 @@ Nasıl:
 - Google: [gönderici kuralları](https://support.google.com/a/answer/81126) (tür başına From, birden çok IP varsa tür başına IP), [SSS: işlem postası, 48 saat önerisi, liste](https://support.google.com/a/answer/14229414)
 - Yahoo: [Sender Best Practices](https://senders.yahooinc.com/best-practices/) (2 gün şartı, IP ya da DKIM alanıyla ayırma), [Complaint Feedback Loop](https://senders.yahooinc.com/complaint-feedback-loop/)
 - Microsoft Outlook.com: [yüksek hacimli göndericiler](https://techcommunity.microsoft.com/blog/outlook/strengthening-email-ecosystem-outlook%E2%80%99s-new-requirements-for-high%E2%80%90volume-senders/4399730) (gövde okunamadı; ikincil özetlere göre SPF, DKIM ve DMARC zorunlu, görünür çıkış bağlantısı öneri)
-- FTC: [CAN-SPAM uyum rehberi](https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business) (işlem ya da ilişki iletisinin tanımı, 10 iş günü, bağlantının en az 30 gün çalışması)
 
 ## Ek (2026-10-24): karar 9, sponsor teşekkürü ve tanıtım izni (ADR-0062 eki)
 

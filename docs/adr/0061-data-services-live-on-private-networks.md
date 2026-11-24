@@ -41,7 +41,7 @@ Kaynak okundu (`Dokploy/dokploy` `v0.30.7`):
 - **Postgres ve Redis `dnsrr` kipindedir** (sanal IP yok); servis adı her ağda doğrudan konteynerin adresine çözülür.
 - **Traefik bağımsız bir konteynerdir ve yalnız `dokploy-network`'tedir.** Dokploy onu yalnız "Isolated Deployment" seçili compose projelerinin ağlarına bağlar (`reconnectServicesToTraefik`). Application'lar için Traefik'i özel ağlara bağlamaz; alan adı olan bir Application `dokploy-network`'ten ayrılırsa yönlendirme kırılır (panel de uyarır).
 - **Şifreli overlay kuramaz.** `network.create` yalnız MTU seçeneğini geçirir; `--opt encrypted` yok. Panelden "recreate" da Docker'a yalnız kayıttaki alanları gönderir.
-- **Dokploy'un kendi Postgres'i ve Redis'i** kurulumda (`setup.ts` ve kurulum betiği) `dokploy-network`'e konur; Dokploy açılışında yeniden yaratılmaz (`server.ts` yalnız ağın varlığını denetler). Bu yüzden onların ağı Docker'da değiştirilir ve Dokploy güncellemesinden sonra olgu betiğiyle denetlenir. Eski kurulumlarda bu Postgres'in parolası Dokploy kaynağında yazan sabit değerdir; v0.26.6 güvenlik betiği onu Docker secret'a taşır. Production'da hangisinin geçerli olduğu olgu betiğinin ilk sorusudur.
+- **Dokploy'un kendi Postgres'i ve Redis'i** kurulumda (`setup.ts` ve kurulum betiği) `dokploy-network`'e konur; Dokploy açılışında yeniden yaratılmaz (`server.ts` yalnız ağın varlığını denetler). Bu yüzden onların ağı Docker'da değiştirilir ve Dokploy güncellemesinden sonra olgu betiğiyle denetlenir.
 
 ## Geçiş sırası
 
@@ -96,7 +96,7 @@ Her adım ayrı bir wizard koşusudur; bir sonrakine, öncekinin ertesi günkü 
 - **Tek bir `skylab-platform-internal` ağı (production ve sandbox birlikte):** Sandbox uygulamaları production veritabanına ulaşırdı; ortam ayrımı bozulur.
 - **Her veri servisine ayrı ağ:** Daha ince ayrım ama Dokploy'da her uygulamaya üç dört ağ, panelde kalabalık. Ortam başına bir veri ağı bu ölçekte yeterli.
 - **Etkinlik uygulamalarını da `dokploy-network`'ten çıkarmak (compose + Isolated Deployment ya da Traefik'i elle bağlayan systemd birimi):** Uygulamadan uygulamaya erişimi de keser ama Traefik yeniden yaratıldığında bir sonraki deploy'a kadar yönlendirme kopar. Ayrı karar (ticket 10).
-- **Şifreli overlay:** tek düğümde etkisiz, Dokploy kuramıyor.
+- **Şifreli overlay:** tek düğümde etkisiz, Dokploy kuramıyor. Sunucuya ikinci bir düğüm eklenirse overlay şifrelenir.
 
 ## Ek: tek ClamAV, ortamlar arası ikinci ağ `sky-lab-scan` (2026-10-05)
 
