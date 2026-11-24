@@ -4,6 +4,8 @@ status: accepted
 
 # Ekibe davet, kişi kabul edene kadar bekler ve hesap açmaz; erişim talebi Hesap Merkezi'nden istenir, ekibi yöneten onaylar
 
+_Güncelleme (2026-11-24): Ekip daveti postası da her posta gibi takip edilir; karar 3'teki "açılması ve tıklanması izlenmez" cümlesi düşer (ADR-0074, 2026-11-24 eki)._
+
 Bugün hesabı olmayan birini ekibe almanın yolu iki adımlıdır: kişi my.yildizskylab.com'dan kaydolur (ADR-0063), en geç 5 dakika sonra core'a düşer, sonra lider ya da YK onu ekler (ADR-0065). Bir ekibe katılmak isteyen kişi de lidere kendisi yazar; bunun bir kaydı ve onay yolu yoktur.
 
 Karar (Yusuf, 2026-11-11, karar 21: davet ve erişim talebi şimdi yapılır; 2026-11-23 01:01: davet 14 gün geçerlidir, davet ve talep production'da `TEAM_DELEGATION` ile birlikte açılır):

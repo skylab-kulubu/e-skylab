@@ -6,6 +6,8 @@ status: accepted
 
 _Güncelleme (2026-11-24, Yusuf): Karar 13'teki bilgilendirme postası gönderildi, itiraz gelmedi. Kişi bazında takip sürer. Takip ekranlarındaki gizleme ve eşik sınırları kaldırılır: ön yüzde skymail-frontend #180, 10 kişi eşiği skymail-backend'de (karar 9'daki eşik ve 2026-11-08 ekinin 4. maddesi düşer)._
 
+_Güncelleme (2026-11-24, Yusuf): Her posta takip edilir; hesabı olmayan alıcılar ve itiraz edenler dahil. `skymail:mails:read` her postanın içeriğini, alıcılarını ve olaylarını maskesiz görür. Karar 3, 8 ve 9 ile 2026-11-08 eki aşağıdaki 2026-11-24 ekiyle değişir._
+
 ADR-0067 haber ve duyuru postalarını SkyMail'e verdi, açılma izlemeyi açık soru olarak bıraktı (Sapmalar 5). ADR-0070 iletişimi tek servise topladı, açılma ve tıklama izlemeyi "ayrı bir kararla" diye kapsam dışında tuttu. ADR-0072 karar 2 "takip akışa bağlı değildir, bütün postalar takiplidir" dedi ve takip kararını ayrı bir ADR'a bıraktı. Bu ADR o karardır.
 
 Kulübün bugün bir postanın hangi üyeye ulaştığını bilmesinin yolu yok. Uygulama içi kutu ve push gelince (ADR-0070) ulaşmayan üyeye başka kanaldan ulaşmak mümkün olacak; bunun için kime ulaşmadığını bilmek gerekiyor. Giriş kodu gibi hesap postalarının gereksiz klasörüne düşüp düşmediği de görünmüyor.
@@ -101,3 +103,18 @@ Karar (Yusuf, 2026-11-08; ADR-0075'in 2026-11-08 eki madde 10): gönderen kendi 
 6. **Kural geneldir.** SkyMail Forms'u ya da gönderenin yetki yolunu bilmeden uygular; ayrı bir "alıcılar gizli" bayrağı yoktur.
 
 **Endüstriyle karşılaştırma.** Uyan: Microsoft Exchange Online'ın message trace'inde salt okur roller (View-Only Organization Management, Global Reader) alıcı adresini ve teslim durumunu görür, etkileşim izlenmez; madde 2 buna denk düşer. Twilio SendGrid'de kişi bazında etkinlik (Email Activity) toplam istatistikten ayrı bir izindir; madde 1 ve 3 buna denk düşer. Mailchimp'te kişi bazında açanlar dahil kampanya raporunu kullanıcı rolü açar; Dynamics 365 Customer Insights – Journeys'te etkileşim kayıtları güvenlik rolüyle okunur. İkisinde de görünüm role bağlıdır, gönderen olmaya değil; bu ek de öyle yapar. Rol ayrımında sapma yok. Sapma: rolün yanında gönderene geri açan bir kulüp geneli anahtar vardır (madde 5).
+
+## Ek (2026-11-24): her posta takip edilir, itiraz takibi durdurmaz, `skymail:mails:read` her şeyi maskesiz görür
+
+Karar (Yusuf, 2026-11-24):
+
+1. **Her posta takip edilir.** Takip alıcıya göre süzülmez. Hesabı olmayan adresler (liste ve Forms alıcıları, konuk, davet listesi), Member olmayan hesaplar ve itiraz edenler dahil her alıcı belirteç alır. Karar 3'ün "yalnız core'un izin verdiği kişi" kuralı ve "hiçbir zaman takip edilmez" listesi düşer. Bayraklar (karar 4 ve 13) aynen kalır; takip yine yalnız ilgili bayrak açıkken çalışır.
+2. **İtiraz edenler takipten çıkarılmaz.** Hesap Merkezi'ndeki "Postalarımın açılmasını ve tıklamalarımı izleme" anahtarı da yazılı itiraz da takibi durdurmaz: kişinin olayları silinmez, gönderilmiş postalarındaki belirteçler kapatılmaz, yeni postaları da takiplidir. Karar 8'in "geçmişe etkili" kısmı (olayları silme, belirteçleri kapatma) ve karar 2'deki "'Herkesi izle, reddedeni de' kipi yoktur" cümlesi düşer; bugünkü davranış Dynamics'in *Disabled* kipinin karşılığıdır.
+3. **`skymail:mails:read` her şeyi görür, maske yok.** Bu rolü olan herkes her postanın içeriğini, alıcılarını ve olaylarını (teslim durumu, kişi bazında açılma ve tıklama) görür. Giriş kodu ve tek kullanımlık bağlantı dahil içerikte hiçbir şey maskelenmez. Karar 9'daki "kişi bazında görünüm yalnız `skymail:mails:tracking:read`" ayrımı ve 2026-11-08 ekinin 1. ve 2. maddeleri bu rol için düşer.
+4. **Gönderen alıcıyı görür.** Forms toplu gönderimi için konan "gönderen alıcı listesini görmez, yalnız toplu sayıları görür" kuralı kalkar: bu ADR'nin 2026-11-08 eki, ADR-0075'in 2026-11-08 eki madde 10 ve ADR-0087 karar 3'teki aynı cümle. Gönderen kendi gönderiminin alıcılarını görür.
+5. **Değişmeyenler.** Karar 1 (IP, Referer, konum ve ham user-agent okunmaz ve saklanmaz), karar 5 (gizli bağlantı yeniden yazılmaz ve sayılmaz; o postalarda yalnız piksel vardır), karar 6, 7, 10, 11 ve 12.
+6. **Açık'taki mezun ve fahri üye sorusu kapanır:** onlara giden postalar da takiplidir.
+
+Değişen başka belgeler: ADR-0084'teki ekip daveti postası için "açılması ve tıklanması izlenmez" cümlesi düşer; CONTEXT.md'deki Tracked send, Open event ve Tracking preference tanımları bu eke göre yazıldı.
+
+**Endüstriyle karşılaştırma.** Uyan: Dynamics 365 Customer Insights – Journeys'in *Disabled* kipi herkesi izler; kipimiz artık ona denk düşer. Sapmalar: Dynamics'te kip uyum profili başına seçilir, bizde tek kip (sapma 6 sürer); SendGrid ve Postmark hesap postalarında takibi kapatmayı önerir, biz bu postalarda pikseli tutuyoruz (sapma 5 sürer); okuma rolü içeriği kod ve bağlantılarla birlikte maskesiz görür.
