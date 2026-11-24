@@ -26,7 +26,7 @@
 | Etkinlik, kullanıcı gölgesi, bilet, katılım, sertifika, SkyPass | `core-backend` | Admin, mobil, ana site ve bağlı servisler |
 | Genel site içeriği | `cms-backend` | `skylab-site` ve yetkili editörler |
 | Formlar ve yanıtlar | `forms-backend` | `forms-frontend`, Core entegrasyonları |
-| Posta taslağı, liste ve gönderim | `skymail-backend` | `skymail-frontend`, yetkili servisler |
+| Bildirim ve posta: taslak, liste ve gönderim (SkyNotify) | `skymail-backend` | `skymail-frontend`, yetkili servisler |
 | Kullanıcı self-servis işlemleri | `account-center` BFF | Tarayıcı; arkada Keycloak Account/Admin sözleşmeleri |
 
 ## Kimlik akışı

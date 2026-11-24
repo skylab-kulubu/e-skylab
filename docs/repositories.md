@@ -18,8 +18,8 @@ depolarını değil, ortak kulüp platformunu oluşturan ürünleri kapsar. Diğ
 | [`cms-backend`](https://github.com/skylab-kulubu/cms-backend) | Site içeriği ve yayın API'si | CMS API |
 | [`forms-backend`](https://github.com/skylab-kulubu/forms-backend) | Form, şablon ve yanıt alanı | Forms API |
 | [`forms-frontend`](https://github.com/skylab-kulubu/forms-frontend) | Form oluşturma, doldurma ve yönetim arayüzü | `forms.yildizskylab.com` |
-| [`skymail-backend`](https://github.com/skylab-kulubu/skymail-backend) | Posta taslağı, liste, onay ve gönderim API'si | Mail API |
-| [`skymail-frontend`](https://github.com/skylab-kulubu/skymail-frontend) | Posta operasyon arayüzü | `notify.yildizskylab.com` (ADR 0090) |
+| [`skymail-backend`](https://github.com/skylab-kulubu/skymail-backend) | SkyNotify (eski adı SkyMail, ADR 0091): bildirim ve posta taslağı, liste, onay ve gönderim API'si | SkyNotify API |
+| [`skymail-frontend`](https://github.com/skylab-kulubu/skymail-frontend) | SkyNotify konsolu: bildirim ve posta operasyon arayüzü | `notify.yildizskylab.com` (ADR 0090) |
 | [`skylcn-ui`](https://github.com/skylab-kulubu/skylcn-ui) | Paylaşılan tasarım sistemi; hazırlanıyor (ADR 0055) | Paket (`@skylab-kulubu/skylcn-ui`, henüz yayımlanmadı) |
 | [`inscribed-auth`](https://github.com/skylab-kulubu/inscribed-auth) | Paylaşılan kimlik doğrulama SDK'sı | Paket (`@skylab-kulubu/inscribed-auth`) |
 | [`skylab-assets`](https://github.com/skylab-kulubu/skylab-assets) | Resmî logo ve marka varlıkları | Varlık deposu |
@@ -87,8 +87,8 @@ eğitim, yarışma ve dönemsel etkinlik depoları da arşivlendi:
 | [`skylab-skylite`](https://github.com/skylab-kulubu/skylab-skylite) | Skylite bitti |
 | [`skydays`](https://github.com/skylab-kulubu/skydays) | 2022 SkyDays, içinde AGC sayfası var |
 | [`maintenance`](https://github.com/skylab-kulubu/maintenance) | Eski bakım sayfası |
-| [`mail-sender`](https://github.com/skylab-kulubu/mail-sender) | → `skymail` |
-| [`bulk-mail-sender`](https://github.com/skylab-kulubu/bulk-mail-sender) | → `skymail` |
+| [`mail-sender`](https://github.com/skylab-kulubu/mail-sender) | → `skymail-backend` (SkyNotify) |
+| [`bulk-mail-sender`](https://github.com/skylab-kulubu/bulk-mail-sender) | → `skymail-backend` (SkyNotify) |
 | [`skydays-2025`](https://github.com/skylab-kulubu/skydays-2025) | 2025 etkinlik sitesi |
 | [`skydays-2024`](https://github.com/skylab-kulubu/skydays-2024) | 2024 etkinlik sitesi |
 | [`skydays-2023`](https://github.com/skylab-kulubu/skydays-2023) | 2023 etkinlik sitesi |
