@@ -210,3 +210,14 @@ Tabloya bir satır eklenir:
 
 - Ortak ekip satırlarının süresi yoktur; ekip yapısal bir birimdir ve kişisel veri taşımaz.
 - Ekleme ve çıkarma kayıtları ekip denetim kaydındadır ve onun 3 yılına bağlıdır.
+
+## Ek (2026-11-25, ikinci): etkinlik değişikliği bildirim yanıtının kaydı
+
+Karar (Yusuf, 2026-11-25): yayındaki bir Event'in saati, yeri ya da başka ayrıntıları değişince düzenleyen "Bilet sahiplerine bildir" sorusunu yanıtlar. Core yanıtı kaydeder. Bu kayıt da ekip denetim kaydı gibi 3 yıl saklanır. Tabloya bir satır eklenir:
+
+| Veri | Süre |
+|---|---|
+| core: bildirim yanıtının kaydı (Event, kaydeden kişinin kimliği, değişen alanların adları, yanıt, bildirimin sıraya girip girmediği, zaman; metin, ad ve adres yok) | 3 yıl, sonra silinir; hesap silinince silinmez, kimlik kimseye çözülmez; kişi kaydı tamamen silinirse kimlik boşaltılır |
+
+- Core'un periyodik imha işi siler (`event_change_notices_age`); süre sabittir, ayarı yoktur.
+- Event silinirse kayıtları da gider.
