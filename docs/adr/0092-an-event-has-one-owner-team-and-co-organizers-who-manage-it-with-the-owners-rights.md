@@ -36,11 +36,11 @@ Karar (Yusuf, 2026-11-25: "ana sahip YK ama düzenleyebilenler şu ekipler/ortak
 11. **Doğrulamalar.** Ortak ekip Owner team'den farklı, var olan bir Team code olur; Privileged kökler (YK, DK, ADMIN) ortak olamaz; en çok 10 ekip. Sahip ekip değişince yeni sahip listedeyse listeden düşer. Team code yeniden adlandırma denetimi (ADR-0065 karar 7) bu tabloyu da koda bağlı kayıt sayar.
 12. **Denetim ve posta.** Her ekleme, çıkarma ve seçim değişikliği Team audit record'a yazılır, reddedilen yazmalar dahil; kayıt yazılamazsa değişiklik yapılmaz (ADR-0065 karar 9). Eklenen kişiye ve eklenen ekibin Leader'larına posta gider (ADR-0080 deseni), çıkarmada kısa bir bilgi postası gider. Kişinin süresi dolunca ve yalnız seçimi değişen ekibe posta gitmez.
 13. **Kopya (ADR-0066).** Ortak ekipler kopyaya taşınır. Ortak kişiler yalnız istenirse, kopyalayanın `ManageOrganizers` yetkisi varsa ve hesap etkinse taşınır (kapı görevlisi deseni). Kopyalayan yalnız ortak düzenleyense kopyanın sahibi kaynak Event'in sahibi kalır.
-14. **Tek kaynak.** Event'ten türeyen her yetki kararı core'da tek bir yardımcıdan geçer; Event başına önbelleklenir, ekip başına değil. Panel bu kararı Event cevabındaki `viewer.can` alanından okur. `/v1/me/capabilities` değişmez.
+14. **Tek kaynak.** Event'ten türeyen her yetki kararı core'da tek bir yardımcıdan geçer; Event başına önbelleklenir, ekip başına değil. Panel bu kararı Event cevabındaki `viewer.can` alanından okur. `/v1/users/me/capabilities` değişmez.
 
 ## Consequences
 
-- Ortak listesi boş Event'lerde davranış birebir aynı kalır.
+- Ortak listesi boş Event'te de bir şey değişir (karar 6): sahip ekibin Leader'ı (atalar dahil) kapı görevlisi atar, önceden yalnız Privileged atardı; ortak listesini de o yönetir. Geri kalan yetki kararları ortak listesi boşken aynı kalır.
 - Owner team'i okuyan bütün bağlar (Team media library, CMS, Forms eşleşmesi, posta şablonlarındaki `OwnerTeam` değişkeni) tek sahibe bakmaya devam eder. Ortak düzenleyen sahip ekibin Team media library'sinden seçer ya da yeni Media yükler; kendi ekibinin başka Event'lerindeki Media'yı kullanamaz. Genişletme ayrı karardır.
 - Forms kendiliğinden değişmez: Event'in bağlı formu yine formun sahibi ve collaborator'larınındır. Forms isterse ileride `coOrganizerTeams` alanını okuyabilir; karar Forms'un sahibinindir.
 - sky-app'te değişiklik gerekmez; kapı ekranı core'un `Validate` kararını kullanır. Mobile Lab'e Event JSON'undaki yeni alan için sözleşme notu gider.
@@ -69,3 +69,15 @@ Model, Luma'nın manager ve check-in staff ayrımıyla Microsoft Teams'in "organ
 - Eventbrite, Permissions definitions: https://www.eventbrite.com/help/en-us/articles/362073/
 - Google Apps Script, CalendarEvent `guestsCanModify`: https://developers.google.com/apps-script/reference/calendar/calendar-event-series
 - ADR-0018 (sahipsiz Event), ADR-0059 (takım izinleri grup yoludur), ADR-0062 (saklama süreleri), ADR-0065 (ekip liderleri, ata kalıtımı, denetim kaydı), ADR-0066 (kopya), ADR-0068 (yarışma), ADR-0076 (yalnız gruplar), ADR-0080 (yetki değişikliği postası).
+
+## Ek (2026-11-25): metin düzeltmeleri; kopya denetim satırı, yardımcı ekibin şablonu, `members` ekibinin katılımcı verisi
+
+**Düzeltmeler (aynı gün, karar değişmeden).** "Consequences"taki "ortak listesi boşken davranış birebir aynı kalır" cümlesi karar 6 ile çelişiyordu: sahip ekibin Leader'ı artık kapı görevlisi atıyor, bu ortak listesi boşken de geçerli. Cümle düzeltildi. Karar 14'teki uç adı `/v1/users/me/capabilities` olarak düzeltildi.
+
+Karar (2026-11-25, uygulama incelemesinde):
+
+1. **Kopyada ortak ekip ve kişi denetim kaydına girer.** Karar 13 ile kopyaya taşınan her ortak ekip ve kişi, kopya Event için Team audit record'a ekleme satırı olarak yazılır; satırın kaynağı `copy`'dir. Kopyanın ortaklarını kimin, hangi kaynaktan getirdiği böylece okunur.
+2. **Yardımcı ekibin şablonu Event'e bağlanamaz.** Karar 10'daki genişleme yalnız `co_organizer` görünümlü ortak ekiplerin Certificate template'lerini kapsar; `helper` ekibin şablonu seçilemez (`400`). Bağlayan, ortak ekibin şablonunu okuyamıyorsa `403`. Ortak ekip listeden çıkarılır ya da `helper`'a çevrilirse o ekibin şablonuna Event bağlaması aynı yazmada kaldırılır; Event zincirin geri kalanına (sahip ekip, sonra SKY LAB varsayılanı) döner. Böylece dışarıda görünmeyen bir ekip sertifika tasarımıyla görünür olmaz.
+3. **`members` seçili ortak ekibin bütün üyeleri katılımcı verisini görür (Yusuf'un).** Ticket okuma `Update` düzeyindedir (karar 4 ve 7); `members` seçilince ortak ekibin her üyesi Event'in katılımcı listesini, ad ve e-postalarıyla görür. Bu bilinçli bir sonuçtur: büyük bir ekipte `members` bilerek seçilmelidir; yalnız liderlerin görmesi isteniyorsa `leaders` seçilir.
+
+CONTEXT.md'de Co-organizer ve Helper team bu eke göre güncellenir.
