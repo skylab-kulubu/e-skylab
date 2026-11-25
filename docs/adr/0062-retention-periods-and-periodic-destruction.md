@@ -221,3 +221,13 @@ Karar (Yusuf, 2026-11-25): yayındaki bir Event'in saati, yeri ya da başka ayr�
 
 - Core'un periyodik imha işi siler (`event_change_notices_age`); süre sabittir, ayarı yoktur.
 - Event silinirse kayıtları da gider.
+
+## Ek (2026-11-25, üçüncü): Biletsiz yanıtlayan kaydı (ADR-0069)
+
+ADR-0069'un 2026-11-25 eki, bağlanan formun biletsiz yanıtlayanlarını core'da tutar. Tabloya bir satır eklenir:
+
+| Veri | Süre |
+|---|---|
+| core: Biletsiz yanıtlayan (Event, form ve yanıt kimliği, yanıt zamanı, Forms durumu; girişli yanıtta hesap kimliği, misafirde ad, soyad, e-posta; cevap metni yok) | Event'in bitişinden 2 yıl sonra silinir (konuk verisiyle aynı süre; tarihsiz Event'te kaydın zamanından); form Event'ten çıkarılınca, bilet yazılınca ve hesap silinince hemen |
+
+- Core'un periyodik imha işi siler (`form_respondents`); bütün yeni kurallar gibi önce kuru koşuda başlar. Arşivlemek saati durdurmaz.
