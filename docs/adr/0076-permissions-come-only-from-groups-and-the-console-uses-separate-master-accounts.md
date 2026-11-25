@@ -154,3 +154,7 @@ Karar (Yusuf, 2026-10-23, ekip-yetkileri bilet 15; sektör denetimiyle 2026-11-2
 2. **Yönetici rolü yine yalnız Privileged kökte, `/ROLLER`'de ve en üst ekiplerin Leader gruplarında** (core `docs/app-assignments.md`). core'un Protected sınıflamasında yönetici rolü sayılan bir rol Uygulamalar sayfasından kişiye ya da ekip grubuna atanamaz. Privileged köklerdeki, `/ROLLER` yapraklarındaki, Leader gruplarındaki konumdan gelen (K4/2, karar 6) ve servis hesaplarındaki eşlemeler kodda (Keycloak'ın uzlaştırıcısında) durur; panel onları kilitli gösterir, değiştiremez.
 3. **K1 ve K4 yalnız yönetici rolleri için geçerlidir.** "Kişiye rol yok" ve "rol yalnız üç yerde" kuralları uygulama rolüne uygulanmaz. K2 (realm rolü yok) ve K3 değişmez.
 4. **Düşen cümleler.** Sapmalar listesinin 7. maddesi ("Kişiye doğrudan uygulama rolü yasak … daha sıkıyız") düşer: artık Entra gibi atıyoruz. Consequences'taki "Kişiye doğrudan rol kalmaz" cümlesi uygulama rolü için geçmez.
+
+## Ek (2026-11-25): Event'in ortak kişisi rol değil kaynak erişim listesidir (ADR-0092)
+
+Bir Event'e ortak düzenleyen olarak eklenen kişi K1'e aykırı değildir: Keycloak'ta rol eşlemesi ya da grup üyeliği değişmez, kişi bir uygulama izni almaz. Bu, tek bir kaynağa erişim listesidir (ACL); kapı görevlisi, Competition staff, Forms collaborator'ları ve kısa linkin sahibi aynı sınıftadır. Liste core'da durur, Event'te görünür, her değişikliği denetim kaydına girer, sayısı sınırlıdır ve süresi kendiliğinden biter. Ortak ekip de Keycloak'a yazılmaz; token'daki grup yolu okunur (ADR-0059). Bkz. ADR-0092.

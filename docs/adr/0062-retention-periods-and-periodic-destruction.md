@@ -199,3 +199,14 @@ Karar (Yusuf, 2026-10-31): biten yönetim görevinin kaydı, ekip denetim kaydı
 - DLQ'daki kimlikler hesap silme için tanınan 30 gün içinde düşer.
 
 **Forms yanıtı ile Answer file çelişkisi.** ADR-0052, Answer file'ı formun kapanışından 6 ay sonra siler. Bu ADR'nin 2026-10-24 eki ise SkyForms yanıtları için "kural yok, kendiliğinden silme yok" der. Yanıt dururken eki silinebilir. Yanıt süresi Fatih'in kararıdır; soru ve önerimiz (amaca göre süre) Fatih'e iletildi. Karar gelene kadar iki metin de olduğu gibi kalır.
+
+## Ek (2026-11-25): Event'in ortak kişileri (ADR-0092)
+
+Tabloya bir satır eklenir:
+
+| Veri | Süre |
+|---|---|
+| core: Event'in ortak düzenleyen kişisi (Event, kişinin kimliği, ekleyenin kimliği, eklenme zamanı) | Event'in bitişinden 90 gün sonra silinir (kapı görevlisi satırıyla aynı); yetki bitişten 30 gün sonra düşer; hesap silinince hemen |
+
+- Ortak ekip satırlarının süresi yoktur; ekip yapısal bir birimdir ve kişisel veri taşımaz.
+- Ekleme ve çıkarma kayıtları ekip denetim kaydındadır ve onun 3 yılına bağlıdır.

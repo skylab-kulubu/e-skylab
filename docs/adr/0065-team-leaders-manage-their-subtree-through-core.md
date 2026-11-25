@@ -172,3 +172,8 @@ Yusuf (2026-10-31): ekip lideri kendi ekibinde "bütün üyeler yarışmaları y
 - **Denetim aynı.** Her değişiklik karar 9'daki denetim kaydına eski ve yeni değerle, reddedilen yazma da `denied` olarak yazılır. Kayıt açılamazsa değişiklik yapılmaz.
 - **Microsoft Teams ile.** Teams'te ekip sahibi, sahip olmayan üyelere yetki açabilir ("Who can manage tags": *Team owners and members*). 2026-10-25 kuralının bu ayar için Teams'ten yaptığı sapma kapanır. Kalan sapma: ayarı üst ekibin Leader'ı da değiştirir (karar 2'nin kalıtımı) ve kulüp genelinde bir kilit yoktur (ADR-0068 eki, A7).
 - Uygulama: core #336 (yayında değil).
+
+## Ek (2026-11-25): Event'in ortak düzenleyenleri (ADR-0092)
+
+- Bir Event'in Owner team'i tek kalır; yanına ortak ekipler ve sınırlı sayıda ortak kişi eklenebilir. Event kararlarında karar 2'deki ata Leader kalıtımı ortak ekiplere de geçer. Owner team'i değiştirmek, ortak listesini değiştirmek, silmek ve arşivlemek yalnız Owner team Leader'larının (atalar dahil) ve Privileged'ındır; sahip ekibin Leader'ı kapı görevlisi de atar. Ayrıntı: bkz. ADR-0092.
+- Karar 7'deki Team code yeniden adlandırma denetimi Event'lerin ortak ekip satırlarını da koda bağlı core kaydı sayar. Karar 9'daki denetim kaydı ortak düzenleyen değişikliklerini de kapsar.
