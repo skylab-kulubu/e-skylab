@@ -364,12 +364,28 @@ The reason an organizer writes when issuing a Certificate manually to a Ticket b
 _Avoid_: an approval step for below-threshold issues; showing the justification publicly
 
 **Certificate template**:
-An editable certificate design identity whose published version is selected for future issuance. Resolution order is Event binding, then Owner-team binding, then the required SKY LAB default. Co-organizer teams are not in that chain; a Co-organizer team's template may be bound to the Event explicitly (ADR-0092).
-_Avoid_: EventType template; hard-coded HTML as the hidden default; resolving fallback separately in each caller
+An editable certificate design identity whose published version is selected for future issuance. Resolution order is Event binding, then Owner-team binding, then the required SKY LAB default. Co-organizer teams are not in that chain; a Co-organizer team's template may be bound to the Event explicitly (ADR-0092). An Event template belongs to one Event, is bound only to it, is created from the Event, and is copied with the Event (ADR-0038 addendum 2026-11-25).
+_Avoid_: EventType template; hard-coded HTML as the hidden default; resolving fallback separately in each caller; binding an Event template to a team or the club; listing Event templates among team templates
 
 **Certificate template version**:
 An immutable published snapshot of a Certificate template, including its layout and assets. Existing Certificates keep their pinned version; editing creates a draft that must be published as a new version.
 _Avoid_: mutating a published version; changing historical PDFs when a template is edited; silently publishing an external-design sync
+
+**Event template**:
+A Certificate template that belongs to one Event (`event_id`), at most one live per Event. Its owner team is the Event's Owner team and follows it when that changes. It starts as a copy of the template the Event uses at that moment, is bound only to its own Event (`template_event_scoped`), and is bound automatically when it is published; a draft is never used. Whoever may edit the Event may create, edit and publish it and bind the Event to a team or club template instead. Copying the Event makes an independent copy of it. See ADR-0038 addendum 2026-11-25.
+_Avoid_: binding it to a team, the club or another Event; listing it among team templates; tying its permission to team template rights; sharing one Event template between a copied Event and its source
+
+**Background placement**:
+How a Certificate template's background (image or PDF) sits on the page: `backgroundPlacement {fit, x, y, scale}`, where `fit` is `contain`, `cover`, `fill`, `none` (CSS `object-fit` meaning), `fitWidth` or `fitHeight`, `x`/`y` are `object-position` fractions and `scale` multiplies the fit's scale. Image render, PDF render and the editor use the same box. A layout without it renders as before: an image as `cover` centred, a PDF scaled to the page width. Uploading a background whose ratio differs from the page fits the page to it, with undo (ADR-0038 addendum 2026-11-25).
+_Avoid_: separate geometry in the image path, the PDF path and the editor; changing how an old layout without the field prints
+
+**Background text conversion**:
+Turning selected text of a PDF background into editable layers: the chosen text is removed from the PDF and placed as layers in the same spot and style with the nearest font, and the original PDF is kept so "Orijinale dön" restores it. Only on request, only the selected text, one page; scanned, outlined, invisible (OCR) and vertical text does not convert. It is a narrow, deliberate exception to not cloning external editors (ADR-0038 addendum 2026-11-25).
+_Avoid_: converting the whole PDF; converting shapes or images; dropping the original; silently swapping a missing font without telling the editor
+
+**Certificate font**:
+A font a team or the club uploads for certificates (`certificate_fonts`), stored as a sanitized WOFF2. Uploading needs certificate template rights for that team (club-wide: Privileged); anyone who may edit a template may use the template's team's and the club's fonts. A font used by a layout is copied into the published version, so archiving it never changes a published version or an issued Certificate. Variable fonts, collections and fonts that forbid embedding are refused; a font missing Turkish letters is accepted with a warning (ADR-0038 addendum 2026-11-25).
+_Avoid_: using a font from another team; storing or serving the raw upload; core parsing fonts itself; letting an Event editor without template rights upload one
 
 **Certificate manager**:
 A Member of one of the Event's organizer teams who holds one or more team-bound certificate-management roles in addition to the access Privileged people and that team's Leaders already have. The role comes from a Role group membership, not a per-user grant (ADR-0076). It does not extend outside the Event's organizer teams (the Owner team and the Co-organizer teams) that person belongs to, and membership of a Co-organizer team whose management choice is `leaders` gives none (ADR-0092); an Event without an Owner team remains Privileged-only.
