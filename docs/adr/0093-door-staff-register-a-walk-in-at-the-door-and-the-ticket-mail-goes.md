@@ -9,7 +9,7 @@ Kapıya bileti olmadan gelen kişi bugün içeri alınamıyor: bilet yazmak `tic
 Karar (Yusuf, 2026-11-26: "Kapıda kayıt özelliği ekleyelim; QR okuyan arkadaşlarda o yetki de olsun"; posta ve alanlar aynı gün):
 
 1. **Kim:** Event'in kapısına yazabilen herkes (Door staff, Team door scan üyesi, organizatör ekip Leader'ı, Co-organizer kişi, Privileged). Kapıda kayıt yeni bir rol ya da `ticket.assign` vermez; yalnız bu tek eylemi açar.
-2. **Ne yazılır:** ad, soyad, e-posta zorunlu; telefon, üniversite, bölüm, sınıf isteğe bağlı (etkinlik istatistiği; KVKK: yalnız sorulan alınır). Kişinin Event'te bileti varsa (misafir e-postası ya da üyenin hesap e-postası) yenisi açılmaz, kapı bunu açıkça söyler. Yoksa **her zaman misafir bileti** yazılır, e-posta bir üyenin olsa da: kapı kimsenin hesabına bilet yazmaz.
+2. **Ne yazılır:** ad, soyad, e-posta zorunlu; telefon, üniversite, bölüm, sınıf isteğe bağlı (etkinlik istatistiği; hiçbiri zorunlu değil). Kişinin Event'te bileti varsa (misafir e-postası ya da üyenin hesap e-postası) yenisi açılmaz, kapı bunu açıkça söyler. Yoksa **her zaman misafir bileti** yazılır, e-posta bir üyenin olsa da: kapı kimsenin hesabına bilet yazmaz.
 3. **Kontenjan:** bilet kontenjan altında yazılır; dolu Event reddeder, bekleme listesine düşürmez. Taslak, iptal, arşiv ve bitmiş Event reddeder.
 4. **Bilet postası gider.** Kişinin oturumlarda katılım QR'ı ve sertifika için bilete ve e-postasına ihtiyacı var; yazılan her yeni bilet gibi `event.ticket-created` gider. Eski "Walk-in'e bilet postası gitmez" kuralı kalkar.
 5. **Giriş:** `venue` kipinde günün Venue entry'si aynı istekte yazılır, kaynağı `walk_in` (bulunan bilette `desk`). `per_session` kipinde yalnız bilet yazılır; oturum katılımı her zamanki gibi.
