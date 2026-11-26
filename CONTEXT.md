@@ -450,7 +450,7 @@ _Avoid_: Turkish product hostnames (`iletisim.`, `durum.`, `nabiz.`); `mail.` fo
 ### Event operations
 
 **Ticket**:
-A person's door identity for one Event. Member apply writes a REGISTERED Ticket; Guest apply and Walk-in write a GUEST Ticket. Capacity and the door read this row, not a forms response. Ticket QR is the door proof, distinct from SkyPass QR (membership) and Event QR (join poster).
+A person's door identity for one Event. Member apply writes a REGISTERED Ticket; Guest apply and Walk-in write a GUEST Ticket. A GUEST Ticket whose address an account holds verified is a Linked guest Ticket: still GUEST, owned by that account (ADR-0094). Capacity and the door read this row, not a forms response. Ticket QR is the door proof, distinct from SkyPass QR (membership) and Event QR (join poster).
 _Avoid_: treating a skyforms response as the door identity; treating Ticket as the Event poster QR; treating Ticket as only an email row
 
 **Form slot**:
@@ -488,6 +488,10 @@ _Avoid_: redirecting a signed-in User to skyforms as the only apply path; forcin
 **Guest apply**:
 A person without an account, or who will not create one, registering through a public Form slot (skyforms or an external URL). Operators may also Guest apply from the Event hub (name, email, phone) so a guest Ticket exists before Desk check-in.
 _Avoid_: forcing every attendee through a public form; treating Guest apply as the logged-in path; a second guest identity besides the guest Ticket email; using Guest apply to enroll a Member
+
+**Linked guest Ticket** (Bağlı misafir bileti):
+A GUEST Ticket core linked to the one account that holds its address verified (ADR-0044's addresses: verified Primary, YTÜ-linked School, proven Personal e-mail), ADR-0094. It keeps the guest's name, e-mail, phone, code and QR, so the door still finds it by the guest's e-mail and name, and by the person too; the person sees it under their own Tickets and may cancel it. It is linked when written (the account holds no Ticket on the Event), after the user sync's pass, or by the one-time command, all behind one switch. Nothing is merged: when the account already holds a Ticket on the Event the guest Ticket stays unlinked and works as before. An ownerless Certificate is linked the same way, by its Ticket's owner or its address. Account erasure clears a linked Ticket's guest name, e-mail and phone. No account is ever made for an address.
+_Avoid_: "claim" as something the person does (core links it, nobody claims it); linking by an unverified address or one two accounts hold; turning the Ticket into a REGISTERED one; merging two Tickets of one person on one Event; making an account for a guest's address
 
 **Apply-for-other**:
 A Privileged or Owner-team Leader Member apply on behalf of another User from admin, writing that person's REGISTERED Ticket. The attendee is not sent to a public Form slot. Walk-in Event QR is not this.
